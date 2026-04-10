@@ -1,0 +1,192 @@
+
+
+/* ============================================
+   ANIMATIONS — GrowthHaven / Veridian v1.0
+   All entrance, hover, and ambient animations.
+   Reduced-motion is already handled globally
+   in normalize.css — no need to repeat here.
+   ============================================ */
+
+
+/* ============================================
+   KEYFRAMES
+   ============================================ */
+
+/* Standard entrance: fade + rise */
+@keyframes gh-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card entrance on desktop: fade + slide from right */
+@keyframes gh-fade-right {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Countdown number tick — JS toggles .ticking on each value update */
+@keyframes gh-tick {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.91); }
+  100% { transform: scale(1); }
+}
+
+/* Blob ambient drift — each blob gets a different path */
+@keyframes gh-drift-a {
+  0%, 100% { transform: translate(0, 0); }
+  33%       { transform: translate(28px, -18px); }
+  66%       { transform: translate(-12px, 22px); }
+}
+
+@keyframes gh-drift-b {
+  0%, 100% { transform: translate(0, 0); }
+  33%       { transform: translate(-22px, 16px); }
+  66%       { transform: translate(18px, -28px); }
+}
+
+
+/* ============================================
+   ENTRANCE SEQUENCE
+   cubic-bezier(0.22, 1, 0.36, 1) = spring-like
+   deceleration — feels snappy, not floaty.
+   animation-fill-mode: both keeps elements
+   invisible before their delay fires.
+   ============================================ */
+
+.badge-pill {
+  animation: gh-fade-up .8s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+.hero-heading {
+  animation: gh-fade-up 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+.hero-body {
+  animation: gh-fade-up 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+}
+
+.countdown {
+  animation: gh-fade-up 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+/* Mobile: card fades up in flow, after the countdown */
+.waitlist-card {
+  animation: gh-fade-up 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+/* Trust signals come in last on mobile */
+.trust-signals {
+  animation: gh-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+}
+
+
+/* ---- ADD THIS TO THE BOTTOM OF animations.css ---- */
+
+/* Launch day — numbers blink indefinitely */
+@keyframes gh-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.15; }
+}
+
+.countdown__value.launched {
+  color: var(--brand-primary);
+  animation: gh-blink 1.2s ease-in-out infinite;
+}
+
+/* Stagger each unit slightly so they don't all blink in sync —
+   feels more alive, less like a broken LED sign */
+#cd-days.launched  { animation-delay: 0s; }
+#cd-hours.launched { animation-delay: 0.15s; }
+#cd-mins.launched  { animation-delay: 0.3s; }
+#cd-secs.launched  { animation-delay: 0.45s; }
+
+/* Desktop: card slides in from the right instead */
+@media (min-width: 768px) {
+  .waitlist-card {
+    animation: gh-fade-right 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  }
+}
+
+
+/* ============================================
+   CARD HOVER LIFT
+   Transition handles post-entrance hover.
+   Both transform and box-shadow transition
+   together so the lift feels physical.
+   ============================================ */
+
+.waitlist-card {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.waitlist-card:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 2px 4px rgba(17, 24, 39, 0.03),
+    0 28px 72px rgba(17, 24, 39, 0.11),
+    0 0 0 1px rgba(34, 197, 94, 0.1);
+}
+
+
+/* ============================================
+   CTA BUTTON — ARROW NUDGE
+   The button itself already has hover styles
+   in landing.css. This adds the second layer:
+   the arrow moves independently inside it.
+   ============================================ */
+
+.cta-btn [data-lucide] {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cta-btn:hover [data-lucide] {
+  transform: translateX(5px);
+}
+
+
+/* ============================================
+   COUNTDOWN TICK
+   Your JS should add then remove .ticking
+   on each countdown__value span whenever
+   the displayed number changes.
+
+   Example in your script:
+     el.classList.add('ticking');
+     el.addEventListener('animationend', () => {
+       el.classList.remove('ticking');
+     }, { once: true });
+   ============================================ */
+
+.countdown__value.ticking {
+  animation: gh-tick 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+
+/* ============================================
+   DECORATIVE BLOBS — AMBIENT DRIFT
+   Long loop, low displacement. The viewer
+   won't consciously notice it but the page
+   will feel alive vs static.
+   ============================================ */
+
+.deco-blob--bottom-left {
+  animation: gh-drift-a 16s ease-in-out infinite;
+}
+
+.deco-blob--top-right {
+  animation: gh-drift-b 13s ease-in-out infinite;
+}

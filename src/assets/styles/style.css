@@ -1,0 +1,17 @@
+
+
+/* main css module */
+[data-lucide] {
+ width: 15px;
+  height: 15px;
+  stroke-width: 2px;
+}
+
+body {
+  background-color: var(--surface-background);
+  color: var(--text-primary);
+  font-family: var(--ff-primary);
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}
