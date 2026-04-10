@@ -221,9 +221,9 @@ form.addEventListener('submit', async (e) => {
     
     // Check if it's a unique constraint violation (they already signed up)
     if (error.code === '23505') {
-      alert('This email is already on the waitlist!');
+      showError(emailInput, 'This email is already on the waitlist!');
     } else {
-      alert('There was an issue securing your place. Please try again.');
+      showError(emailInput, 'There was an issue securing your place. Please try again.');
     }
     
     // Revert button state on error so they can try again

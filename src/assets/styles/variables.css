@@ -29,10 +29,30 @@
   --text-on-brand: #FFFFFF;
 
   /* Status Colors */
-  --status-success: #22C55E;
-  --status-error: #E11D48;
-  --status-warning: #F59E0B;
-  --status-info: #3B82F6;
+  
+  /* --- Success (Green) --- */
+  --status-success: #22C55E;        /* Base */
+  --status-success-bg: #DCFCE7;     /* Light background */
+  --status-success-border: #86EFAC; /* Soft border */
+  --status-success-text: #166534;   /* Dark accessible text */
+
+  /* --- Error (Red) --- */
+  --status-error: #E11D48;          /* Base */
+  --status-error-bg: #FFE4E6;       /* Light background */
+  --status-error-border: #FDA4AF;   /* Soft border */
+  --status-error-text: #9F1239;     /* Dark accessible text */
+
+  /* --- Warning (Amber) --- */
+  --status-warning: #F59E0B;        /* Base */
+  --status-warning-bg: #FEF3C7;     /* Light background */
+  --status-warning-border: #FCD34D; /* Soft border */
+  --status-warning-text: #92400E;   /* Dark accessible text */
+
+  /* --- Info (Blue) --- */
+  --status-info: #3B82F6;           /* Base */
+  --status-info-bg: #DBEAFE;        /* Light background */
+  --status-info-border: #93C5FD;    /* Soft border */
+  --status-info-text: #1E40AF;      /* Dark accessible text */
 
   /* --- 3. TYPOGRAPHY SCALE --- */
   --ff-primary: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

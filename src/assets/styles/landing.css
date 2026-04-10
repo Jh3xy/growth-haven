@@ -20,13 +20,14 @@
 }
 
 
-label.required{
+/* label.required{
   position: relative;
-}
+} */
 label.required::after{
   content: '*';
+  margin-left: 4px;
   position: absolute;
-  color: var(----status-error);
+  color: var(--status-error);
 }
 
 /* ============================================
@@ -288,6 +289,13 @@ img.site-header__wordmark {
   /* override normalize.css margin-bottom on label */
   margin-bottom: 0;
   cursor: default;
+}
+.form-field__error{
+  background-color: var(--status-error-bg);   
+  color: var(--status-error-text);  
+  border: 1px solid var(--status-error-border); 
+  border-radius: 8px;
+  padding: 10px 16px;
 }
 
 .form-field__input {
