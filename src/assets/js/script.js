@@ -16,7 +16,7 @@ import '../styles/queries.css'
 
 // JS Imports
 import { supabase } from './supabase.js';
-import { isValidEmail, isValidPhone, updateEl } from './utils.js'
+import { isValidEmail, isValidPhone } from './utils.js'
 
 
 
@@ -40,6 +40,30 @@ const els = {
 function pad(n) {
   return String(n).padStart(2, '0');
 }
+
+/**
+ * Updates a single countdown span.
+ * Only fires the tick animation when the value actually changes —
+ * so days/hours/mins don't animate every second unnecessarily.
+ */
+export function updateEl(el, newVal) {
+  if (el) {
+    if (el.textContent === newVal) return;
+  }
+
+  el.textContent = newVal;
+
+  // Remove first so re-adding always retriggers the animation,
+  // even if the previous one hasn't fully finished (e.g. on fast ticks).
+  el.classList.remove('ticking');
+  void el.offsetWidth; // force reflow — required to restart a CSS animation
+  el.classList.add('ticking');
+
+  el.addEventListener('animationend', () => {
+    el.classList.remove('ticking');
+  }, { once: true });
+}
+
 
 /** Called every second. Calculates remaining time and updates the DOM. */
 function tick() {
@@ -152,7 +176,7 @@ function validate() {
 }
  
 // ---- Success State ----
- 
+const TELEGRAM_LINK = "https://t.me/+RMV43jNrwVI5WI0";
 function showSuccess(firstName) {
   // Hide current card content
   const header      = card.querySelector('.waitlist-card__header');
@@ -172,11 +196,25 @@ function showSuccess(firstName) {
               stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
+    
     <h2 class="waitlist-success__title">You're on the list, ${firstName}.</h2>
+    
     <p class="waitlist-success__body">
       Your details have been logged. We'll be in touch shortly with your
       priority onboarding documentation.
     </p>
+
+    <div class="waitlist-success__tg-wrapper">
+      <p class="tg-cta-text">Join our early bird community for real-time launch updates:</p>
+      <a href="${TELEGRAM_LINK}" target="_blank" rel="noopener noreferrer" class="tg-join-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Join Telegram
+      </a>
+    </div>
+
     <div class="waitlist-success__badge badge-pill">
       <span class="badge-pill__dot"></span>
       <span class="badge-pill__label uppercase">Position secured</span>

@@ -2,6 +2,61 @@
 /* styles utility/reusable classes */
 
 /* Reusable Classes */
+/* ---- CTA Button ---- */
+
+.cta-btn {
+  width: 100%;
+  height: 52px;
+  background-color: var(--brand-primary);
+  color: var(--text-on-brand);
+  font-family: var(--ff-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.28);
+  transition: var(--transition-global);
+}
+
+.cta-btn:hover {
+  background-color: var(--brand-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.38);
+}
+
+.cta-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* Arrow icon inside button */
+.cta-btn [data-lucide] {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5px;
+  flex-shrink: 0;
+}
+
+.cta-btn-secondary{
+  border: 1px solid var(--text-secondary);
+  background-color: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.cta-btn-secondary:hover{
+  border: 1px solid var(--text-secondary);
+  background-color: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
 
 /* Button Disabled State */
 button.disbaled,

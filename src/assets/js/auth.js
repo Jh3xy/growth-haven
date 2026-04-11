@@ -1,28 +1,49 @@
 
 
 /**
- * supabase.js — GrowthHaven Supabase Client
+ * auth.js — GrowthHaven Auth Functions
  * Usage:
- *   import { supabase } from './supabase.js'
+ *   import { signUpUser, verifyEmailOtp, signInUser, createMemberProfile } from './auth.js'
  */
 
-import { createClient } from '@supabase/supabase-js';
 
-// Vite exposes .env variables prefixed with VITE_ via import.meta.env
-const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL
-const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
+import { supabase } from './supabase.js';
 
-// Fail loudly in development if the env variables are missing.
-// This prevents silent failures where Supabase just returns auth errors
-if (!SUPABASE_URL || !SUPABASE_ANON) {
-  throw new Error(
-    '[TaskVault] Supabase env variables are missing.\n' +
-    'Create a .env file at the project root with:\n' +
-    '  VITE_SUPABASE_URL=...\n' +
-    '  VITE_SUPABASE_ANON_KEY=...'
-  )
+// 1. Sign Up User (Sends the OTP email)
+export async function signUpUser(email, password, firstName, lastName) {
+  return await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+      }
+    }
+  });
 }
 
-// Create and export the single shared client instance
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
+// 2. Verify OTP (Logs them in if correct)
+export async function verifyEmailOtp(email, token) {
+  return await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: 'signup'
+  });
+}
+
+// 3. Log In User
+export async function signInUser(email, password) {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+}
+
+// 4. Create Member Profile (Called after successful OTP)
+export async function createMemberProfile(userId, email) {
+  return await supabase.from('members').insert([
+    { id: userId, email: email }
+  ]);
+}
 

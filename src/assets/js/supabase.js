@@ -1,7 +1,7 @@
 
 
 /**
- * supabase.js — TaskVault Supabase Client
+ * supabase.js — GrowthHaven Supabase Client
  * Usage:
  *   import { supabase } from './supabase.js'
  */

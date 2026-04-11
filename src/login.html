@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowthHaven | Sign In</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="./assets/js/script.js"></script>
+  <script type="module" src="./assets/js/login.js"></script>
+</head>
+<body>
+
+  <!-- LOGO -->
+  <a href="/" class="login-logo" aria-label="GrowthHaven home">
+    <div class="site-header__logo flex items-center">
+      <img src="/logo.svg" alt="logo" class="site-header__wordmark" onerror="this.onerror=null; this.src='fallback.jpg';">
+      <span class="site-header__wordmark">GrowthHaven</span>
+      <!-- <div class="site-header__divider hidden-mobile"></div>
+      <span class="site-header__tagline hidden-mobile uppercase">Institutional Grade</span> -->
+    </div>
+  </a>
+
+
+  <!-- PAGE -->
+  <div class="login-page">
+
+    <div class="login-card">
+
+      <h1 class="login-card__title">Sign in.</h1>
+      <p class="login-card__sub">Welcome back. Pick up where you left off.</p>
+
+      <!-- FORM -->
+      <form class="login-form" id="loginForm" novalidate>
+
+        <!-- Email -->
+        <div class="form-field">
+          <label class="form-label" for="loginEmail">Email</label>
+          <input
+            class="form-field__input"
+            id="loginEmail"
+            type="email"
+            placeholder="john.doe@institution.com"
+            autocomplete="email"
+            required
+          />
+          <span class="field-error" id="err-email"></span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-field">
+          <label class="form-label" for="loginPw">Password</label>
+          <div class="form-input-wrap">
+            <input
+              class="form-field__input form-input--pw"
+              id="loginPw"
+              type="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <button class="pw-toggle" type="button"
+                    aria-label="Toggle password visibility"
+                    data-target="loginPw">
+              <i data-lucide="eye" class="icon-eye"></i>
+              <i data-lucide="eye-off" class="icon-eye-off"></i>
+            </button>
+          </div>
+          <span class="field-error" id="err-pw"></span>
+        </div>
+
+        <!-- Forgot password -->
+        <a href="#" class="forgot-link">Forgot password?</a>
+
+        <!-- Submit -->
+        <button class="login-btn" type="submit" id="loginBtn">
+          Sign In
+          <i data-lucide="arrow-right"></i>
+        </button>
+
+      </form>
+
+    </div><!-- /login-card -->
+
+    <!-- Create account link — outside the card -->
+    <p class="create-account-link">
+      Don't have an account yet?
+      <a href="./register.html">Create Account</a>
+    </p>
+
+  </div><!-- /login-page -->
+
+
+  <!-- FOOTER -->
+  <footer class="login-footer">
+    <span class="login-footer__copy">
+      &copy; 2025 GrowthHaven. Institutional-grade security.
+    </span>
+    <nav class="login-footer__links">
+      <a href="#" class="login-footer__link">Security</a>
+      <a href="#" class="login-footer__link">Privacy</a>
+      <a href="#" class="login-footer__link">Terms</a>
+    </nav>
+  </footer>
+
+  <script>
+    // ---- Init Lucide ----
+    lucide.createIcons();
+  </script>
+</body>
+</html>
