@@ -1,10 +1,10 @@
 
 
-import '../styles/register.css' // inherit register styles
-import '../styles/login.css'    // and add login-specific ones
+import '../assets/styles/register.css' // inherit register styles
+import '../assets/styles/login.css'    // and add login-specific ones
 
 
-import { signInUser } from './auth.js';
+import { signInUser } from '../assets/js/auth.js';
 
 console.log('[auth]: loaded auth-login')
 
@@ -72,6 +72,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     if (window.lucide) window.lucide.createIcons();
   } else {
     loginBtn.innerText = 'Success! Redirecting...';
-    window.location.href = '/dashboard.html';
+    window.location.href = '/src/dashboard/';
   }
 });

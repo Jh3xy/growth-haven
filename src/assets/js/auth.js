@@ -10,7 +10,7 @@
 import { supabase } from './supabase.js';
 
 // 1. Sign Up User (Sends the OTP email)
-export async function signUpUser(email, password, firstName, lastName) {
+export async function signUpUser(email, password, firstName, lastName, inviteCode) {
   return await supabase.auth.signUp({
     email,
     password,
@@ -18,6 +18,7 @@ export async function signUpUser(email, password, firstName, lastName) {
       data: {
         first_name: firstName,
         last_name: lastName,
+        referrer_code: inviteCode || null,
       }
     }
   });

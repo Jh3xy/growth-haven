@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowthHaven | Dashboard</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="../assets/js/script.js"></script>
+  <script type="module" src="./dashboard.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header fixed top-0 z-50 w-full">
+    <div class="site-header__inner flex-between px-8">
+      <div class="site-header__logo flex items-center">
+        <div class="site-header__logo flex items-center">
+          <img src="/logo.svg" alt="logo" class="site-header__wordmark" onerror="this.onerror=null; this.src='fallback.jpg';">
+          <span class="site-header__wordmark">GrowthHaven</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="dash-user flex items-center gap-3">
+          <div class="dash-avatar flex-center" id="avatarInitials">—</div>
+          <span class="dash-user__name" id="headerName"></span>
+        </div>
+        <button class="dash-signout flex items-center gap-2" id="signoutBtn">
+          <i data-lucide="log-out" style="width:14px;height:14px"></i>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-main__inner flex-col">
+
+      <!-- Status pill -->
+      <div class="badge-pill flex items-center gap-2 self-start">
+        <span class="badge-pill__dot"></span>
+        <span class="badge-pill__label uppercase">Dashboard In Progress</span>
+      </div>
+
+      <!-- Hero -->
+      <div class="dash-hero flex-col">
+        <p class="dash-hero__greeting" id="greetingText">Welcome back.</p>
+        <h1 class="dash-hero__heading">
+          We're still building<br />
+          your <span class="dash-hero__accent italic">dashboard.</span>
+        </h1>
+        <p class="dash-hero__sub">
+          Your full dashboard will be ready at launch — we'll notify you the moment it goes live.
+          In the meantime, your referral tools are active and ready to use.
+        </p>
+      </div>
+
+      <!-- Divider -->
+      <div class="dash-divider">
+        <span class="dash-divider__label uppercase">Your Tools</span>
+      </div>
+
+      <!-- Cards -->
+      <div class="dash-cards">
+
+        <!-- Card 1 — Referral Code -->
+        <div class="dash-card">
+          <p class="dash-card__label flex items-center gap-2 uppercase">
+            <i data-lucide="key-round" style="width:13px;height:13px"></i>
+            Your Referral Code
+          </p>
+          <div class="dash-card__value-row flex-between">
+            <span class="dash-card__value skeleton" id="refCode">LOADING</span>
+            <button class="dash-copy-btn flex-center" id="copyCodeBtn" aria-label="Copy referral code" disabled>
+              <i data-lucide="copy" style="width:14px;height:14px"></i>
+            </button>
+          </div>
+          <p class="dash-card__hint">
+            Share this code directly. Anyone who enters it on sign-up is credited to you automatically.
+          </p>
+        </div>
+
+        <!-- Card 2 — Referral Link -->
+        <div class="dash-card">
+          <p class="dash-card__label flex items-center gap-2 uppercase">
+            <i data-lucide="link-2" style="width:13px;height:13px"></i>
+            Your Referral Link
+          </p>
+          <div class="dash-card__value-row flex-between">
+            <span class="dash-card__value dash-card__value--link skeleton" id="refLink">
+              Loading your link...
+            </span>
+            <button class="dash-copy-btn flex-center shrink-0" id="copyLinkBtn" aria-label="Copy referral link" disabled>
+              <i data-lucide="copy" style="width:14px;height:14px"></i>
+            </button>
+          </div>
+          <p class="dash-card__hint">
+            Anyone who clicks your link gets your code pre-filled on sign-up — no manual entry needed.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <!-- <footer class="site-footer">
+    <div class="site-footer__inner flex-between">
+      <div class="site-footer__brand flex items-center gap-4">
+        <span class="site-footer__name">GrowthHaven</span>
+        <span class="site-footer__copy">
+          &copy; 2025 GrowthHaven. Institutional-grade security. All rights reserved.
+        </span>
+      </div>
+      <nav class="site-footer__links flex gap-8" aria-label="Footer navigation">
+        <a href="#" class="site-footer__link">Security Architecture</a>
+        <a href="#" class="site-footer__link">Privacy Protocol</a>
+        <a href="#" class="site-footer__link">Terms of Service</a>
+      </nav>
+    </div>
+  </footer> -->
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

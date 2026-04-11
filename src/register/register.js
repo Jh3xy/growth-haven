@@ -6,10 +6,10 @@
  */
 
 
-import '../styles/register.css'
+import '../assets/styles/register.css'
 
 
-import { signUpUser, verifyEmailOtp, createMemberProfile } from './auth.js';
+import { signUpUser, verifyEmailOtp } from '../assets/js/auth.js';
 
 
 const slider       = document.getElementById('regSlider');
@@ -37,6 +37,24 @@ const SIMULATED_OTP = '123456';
 
 
 console.log({ firstNameEl, lastNameEl, emailEl, pwEl, pwConfirmEl });
+(function prefillReferralFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const ref    = params.get('ref');
+  if (!ref) {
+    console.log("[ref]; ref code not found")
+    return;
+  }
+
+  const input = document.getElementById('inviteCode');
+  if (!input) {
+    console.log("inviteCode input not found");
+    return;
+  }
+
+  // Uppercase to match the auto-uppercase listener already on the input
+  input.value = ref.toUpperCase();
+  console.log(ref);
+})();
 
 
 // INIT STATE
@@ -252,7 +270,8 @@ regForm.addEventListener('submit', async (e) => {
   regSubmitBtn.innerText = 'Creating Account...';
   
   try {
-    const { data, error } = await signUpUser(email, password, fName, lName);
+    const inviteCode = document.getElementById('inviteCode').value.trim() || null;
+    const { data, error } = await signUpUser(email, password, fName, lName, inviteCode);
     
     if (error) {
       // RESET THE BUTTON SO THEY CAN TRY AGAIN
@@ -373,19 +392,11 @@ verifyBtn.addEventListener('click', async () => {
     return;
   }
 
-  // 2. OTP is valid, user is now logged in! Create their members profile
-  const userId = data.user.id;
-  const { error: profileError } = await createMemberProfile(userId, data.user.email);
-
-  if (profileError) {
-    console.error('Failed to create member profile:', profileError);
-    // You can handle this silently or alert the user
-  }
-
-  // 3. Redirect to the authenticated dashboard
+  // Redirect to the authenticated dashboard
+  localStorage.removeItem('gh_reg_step');
   verifyBtn.innerText = 'Verified! Redirecting...';
   setTimeout(() => {
-    window.location.href = '/dashboard.html'; 
+    window.location.href = '/src/dashboard/';
   }, 1000);
 });
 
