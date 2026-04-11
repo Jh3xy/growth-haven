@@ -376,7 +376,7 @@ verifyBtn.addEventListener('click', async () => {
   // 3. Redirect to the authenticated dashboard
   verifyBtn.innerText = 'Verified! Redirecting...';
   setTimeout(() => {
-    window.location.href = '/dashboard'; 
+    window.location.href = '/dashboard.html'; 
   }, 1000);
 });
 

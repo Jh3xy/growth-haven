@@ -72,6 +72,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     if (window.lucide) window.lucide.createIcons();
   } else {
     loginBtn.innerText = 'Success! Redirecting...';
-    window.location.href = '/dashboard';
+    window.location.href = '/dashboard.html';
   }
 });
