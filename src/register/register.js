@@ -287,6 +287,17 @@ regForm.addEventListener('submit', async (e) => {
       lucide.createIcons(); // Re-initialize icons in case innerHTML was changed
       return;
     }
+
+    // If identities array is empty, the user already exists in Supabase
+    if (data?.user?.identities?.length === 0) {
+      regSubmitBtn.disabled = false;
+      regSubmitBtn.classList.remove('is-loading');
+      regSubmitBtn.innerHTML = 'Create Account <i data-lucide="shield-check"></i>';
+      
+      setError(emailEl, 'err-email', 'This email is already registered. Please sign in.');
+      lucide.createIcons();
+      return;
+    }
     
     // Success
     localStorage.setItem('gh_reg_email', email);
