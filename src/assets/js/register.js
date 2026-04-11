@@ -36,6 +36,8 @@ const backBtn      = document.getElementById('backBtn');
 const SIMULATED_OTP = '123456';
 
 
+console.log({ firstNameEl, lastNameEl, emailEl, pwEl, pwConfirmEl });
+
 
 // INIT STATE
 function initializeState() {
@@ -122,19 +124,19 @@ document.querySelectorAll('.pw-toggle').forEach(btn => {
 //  PASSWORD STRENGTH RULES
 
 
-const rules = {
-  length: val => val.length >= 8,
-  case:   val => /[a-z]/.test(val) && /[A-Z]/.test(val),
-  symbol: val => /[^a-zA-Z0-9]/.test(val),
-};
+// const rules = {
+//   length: val => val.length >= 8,
+//   case:   val => /[a-z]/.test(val) && /[A-Z]/.test(val),
+//   symbol: val => /[^a-zA-Z0-9]/.test(val),
+// };
 
-pwEl.addEventListener('input', () => {
-  const val = pwEl.value;
-  document.querySelectorAll('.pw-rule').forEach(el => {
-    const rule = el.dataset.rule;
-    el.classList.toggle('met', rules[rule](val));
-  });
-});
+// pwEl.addEventListener('input', () => {
+//   const val = pwEl.value;
+//   document.querySelectorAll('.pw-rule').forEach(el => {
+//     const rule = el.dataset.rule;
+//     el.classList.toggle('met', rules[rule](val));
+//   });
+// });
 
 
 
@@ -189,27 +191,34 @@ function validateForm() {
   }
 
   const pwVal = pwEl.value;
+  
+  // 1. Check if empty
   if (!pwVal) {
     setError(pwEl, 'err-pw', 'Password is required.');
     valid = false;
-  } else if (!rules.length(pwVal) || !rules.case(pwVal) || !rules.symbol(pwVal)) {
-    setError(pwEl, 'err-pw', 'Password doesn\'t meet all requirements.');
+  } 
+  // 2. Check minimum length
+  else if (pwVal.length < 8) {
+    setError(pwEl, 'err-pw', 'Password must be at least 8 characters.');
     valid = false;
   }
 
-  if (!pwConfirmEl.value) {
-    setError(pwConfirmEl, 'err-pwConfirm', 'Please confirm your password.');
-    valid = false;
-  } else if (pwConfirmEl.value !== pwVal) {
+  // This checks the match regardless of whether other fields are valid
+  if (pwConfirmEl.value !== pwVal) {
     setError(pwConfirmEl, 'err-pwConfirm', 'Passwords don\'t match.');
     valid = false;
   }
+  
 
   if (!termsEl.checked) {
-    // Brief visual hint on the checkbox row
+    // If you have an error element for terms, use setError
+    // setError(termsEl, 'err-terms', 'You must agree to the terms.'); 
+    
+    // Otherwise, keep your outline but maybe make it stay until they check it?
     termsEl.style.outline = '2px solid var(--status-error)';
-    setTimeout(() => (termsEl.style.outline = ''), 1800);
     valid = false;
+  } else {
+    termsEl.style.outline = '';
   }
 
   return valid;

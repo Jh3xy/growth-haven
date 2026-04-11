@@ -51,17 +51,21 @@ export function updateEl(el, newVal) {
     if (el.textContent === newVal) return;
   }
 
-  el.textContent = newVal;
+  if (el) {
+    el.textContent = newVal;
+  }
 
   // Remove first so re-adding always retriggers the animation,
   // even if the previous one hasn't fully finished (e.g. on fast ticks).
-  el.classList.remove('ticking');
-  void el.offsetWidth; // force reflow — required to restart a CSS animation
-  el.classList.add('ticking');
-
-  el.addEventListener('animationend', () => {
+  if (el) {
     el.classList.remove('ticking');
-  }, { once: true });
+    void el.offsetWidth; // force reflow — required to restart a CSS animation
+    el.classList.add('ticking');
+  
+    el.addEventListener('animationend', () => {
+      el.classList.remove('ticking');
+    }, { once: true });
+  }
 }
 
 
@@ -129,14 +133,17 @@ function clearErrors() {
   [nameInput, emailInput, phoneInput].forEach(el => el.classList.remove('is-error'));
 }
  
-// Clear a field's error the moment the user starts correcting it
-[nameInput, emailInput, phoneInput].forEach(input => {
-  input.addEventListener('input', () => {
-    input.classList.remove('is-error');
-    const next = input.nextElementSibling;
-    if (next?.classList.contains('form-field__error')) next.remove();
+// Inside script.js, around line 126
+if (form && nameInput) { 
+  [nameInput, emailInput, phoneInput].forEach(input => {
+    // Only add listener if the specific input exists
+    input?.addEventListener('input', () => {
+      input.classList.remove('is-error');
+      const next = input.nextElementSibling;
+      if (next?.classList.contains('form-field__error')) next.remove();
+    });
   });
-});
+}
  
 // ---- Validation ----
  
@@ -227,58 +234,60 @@ function showSuccess(firstName) {
 // ---- Submit handler ----
  
 // ---- Submit handler ----
- 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
- 
-  if (!validate()) return;
-
-  const submitBtn = form.querySelector('.cta-btn');
-  // Save the original innerHTML so we don't lose your Lucide icon when reverting
-  const originalBtnHTML = submitBtn.innerHTML; 
- 
-  // 1. Set Loading State
-  submitBtn.classList.add('disabled');
-  submitBtn.innerText = 'Securing Place...'; 
- 
-  const nameVal = nameInput.value.trim();
-  // Pass null if empty so Supabase doesn't trigger a unique constraint error on empty strings
-  const emailVal = emailInput.value.trim() || null; 
-  const phoneVal = phoneInput.value.trim() || null;
- 
-  // 2. Send Data to Supabase
-  const { error } = await supabase
-    .from('waitlist')
-    .insert([
-      { name: nameVal, email: emailVal, phone: phoneVal }
-    ]);
- 
-  // 3. Handle Response
-  if (error) {
-    console.error('Supabase Error:', error);
-    
-    // Check if it's a unique constraint violation (they already signed up)
-    if (error.code === '23505') {
-      showError(emailInput, 'This email is already on the waitlist!');
+ if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+  
+    if (!validate()) return;
+  
+    const submitBtn = form.querySelector('.cta-btn');
+    // Save the original innerHTML so we don't lose your Lucide icon when reverting
+    const originalBtnHTML = submitBtn.innerHTML; 
+  
+    // 1. Set Loading State
+    submitBtn.classList.add('disabled');
+    submitBtn.innerText = 'Securing Place...'; 
+  
+    const nameVal = nameInput.value.trim();
+    // Pass null if empty so Supabase doesn't trigger a unique constraint error on empty strings
+    const emailVal = emailInput.value.trim() || null; 
+    const phoneVal = phoneInput.value.trim() || null;
+  
+    // 2. Send Data to Supabase
+    const { error } = await supabase
+      .from('waitlist')
+      .insert([
+        { name: nameVal, email: emailVal, phone: phoneVal }
+      ]);
+  
+    // 3. Handle Response
+    if (error) {
+      console.error('Supabase Error:', error);
+      
+      // Check if it's a unique constraint violation (they already signed up)
+      if (error.code === '23505') {
+        showError(emailInput, 'This email is already on the waitlist!');
+      } else {
+        showError(emailInput, 'There was an issue securing your place. Please try again.');
+      }
+      
+      // Revert button state on error so they can try again
+      submitBtn.classList.remove('disabled');
+      submitBtn.innerHTML = originalBtnHTML; 
     } else {
-      showError(emailInput, 'There was an issue securing your place. Please try again.');
+      // Success! Grab first name for the success screen
+      const firstName = nameVal.split(' ')[0];
+    
+      // Clear form inputs
+      [nameInput, emailInput, phoneInput].forEach(el => (el.value = ''));
+    
+      // Revert button state (optional since the form hides, but good practice)
+      submitBtn.classList.remove('disabled');
+      submitBtn.innerHTML = originalBtnHTML;
+      
+      // Trigger your success UI
+      showSuccess(firstName);
     }
-    
-    // Revert button state on error so they can try again
-    submitBtn.classList.remove('disabled');
-    submitBtn.innerHTML = originalBtnHTML; 
-  } else {
-    // Success! Grab first name for the success screen
-    const firstName = nameVal.split(' ')[0];
-   
-    // Clear form inputs
-    [nameInput, emailInput, phoneInput].forEach(el => (el.value = ''));
-   
-    // Revert button state (optional since the form hides, but good practice)
-    submitBtn.classList.remove('disabled');
-    submitBtn.innerHTML = originalBtnHTML;
-    
-    // Trigger your success UI
-    showSuccess(firstName);
-  }
-});
+  });
+  
+ }
