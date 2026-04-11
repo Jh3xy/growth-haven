@@ -176,7 +176,7 @@ function validate() {
 }
  
 // ---- Success State ----
-const TELEGRAM_LINK = "https://t.me/+RMV43jNrwVI5WI0";
+const TELEGRAM_LINK = "https://t.me/+UHPnYhMx6aI3NzBk";
 function showSuccess(firstName) {
   // Hide current card content
   const header      = card.querySelector('.waitlist-card__header');
@@ -200,8 +200,8 @@ function showSuccess(firstName) {
     <h2 class="waitlist-success__title">You're on the list, ${firstName}.</h2>
     
     <p class="waitlist-success__body">
-      Your details have been logged. We'll be in touch shortly with your
-      priority onboarding documentation.
+      Your details have been logged. We'll be in touch shortly with the
+      priority onboarding documentation prepared for you.
     </p>
 
     <div class="waitlist-success__tg-wrapper">
