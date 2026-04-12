@@ -713,3 +713,33 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
+
+/* ============================================================
+    RECOVER PASSWORD — 3-STEP SLIDER OVERRIDES
+    Everything else (card, form fields, buttons, OTP boxes,
+    header, footer) is reused from the register styles above.
+============================================================ */
+
+/* 3 slides = 300% wide, each slide takes 1/3 */
+.recover-slider {
+  width: 300%;
+}
+
+.recover-slider .reg-slide {
+  width: 33.333%;
+}
+
+/* Slide transitions */
+.recover-slider.on-step-2 {
+  transform: translateX(-33.333%);
+}
+
+.recover-slider.on-step-3 {
+  transform: translateX(-66.666%);
+}
+
+/* Progress bar — 3 equal steps */
+.recover-progress          { width: 33%; }
+.recover-progress.step-2   { width: 66%; }
+.recover-progress.step-3   { width: 100%; }
+

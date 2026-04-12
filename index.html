@@ -84,77 +84,81 @@
            RIGHT COLUMN — Waitlist Card
       ===================== -->
       <div class="card-col">
-        <div class="waitlist-card">
-
-          <!-- Card Header -->
-          <div class="waitlist-card__header">
-            <h2 class="waitlist-card__title">Reserve Your Place</h2>
-            <p class="waitlist-card__subtitle">
-              Join our exclusive circle of institutional partners and receive priority onboarding documentation.
-            </p>
+        <div class="waitlist-wrap">
+          <div class="waitlist-card">
+  
+            <!-- Card Header -->
+            <div class="waitlist-card__header">
+              <h2 class="waitlist-card__title">Reserve Your Place</h2>
+              <p class="waitlist-card__subtitle">
+                Join our exclusive circle of institutional partners and receive priority onboarding documentation.
+              </p>
+            </div>
+  
+            <!-- Form -->
+            <form class="waitlist-form flex-col gap-6" novalidate>
+  
+              <!-- Name Field -->
+              <div class="form-field flex-col gap-2">
+                <label class="form-field__label uppercase required" for="text">
+                 Name
+                </label>
+                <input
+                  class="form-field__input"
+                  id="text"
+                  type="text"
+                  placeholder="John Doe"
+                  autocomplete="text"
+                  required
+                />
+              </div>
+  
+              <!-- Email Field -->
+              <div class="form-field flex-col gap-2">
+                <label class="form-field__label uppercase required" for="email">
+                 Email
+                </label>
+                <input
+                  class="form-field__input"
+                  id="email"
+                  type="email"
+                  placeholder="name@institution.com"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+  
+              <!-- Phone Field -->
+              <div class="form-field flex-col gap-2">
+                <label class="form-field__label uppercase" for="phone">
+                  Phone Number
+                </label>
+                <input
+                  class="form-field__input"
+                  id="phone"
+                  type="tel"
+                  placeholder="+234 (00) 000-000"
+                  autocomplete="tel"
+                />
+              </div>
+  
+              <!-- CTA Buttons -->
+              <div class="cta">
+                <button class="cta-btn flex-center gap-2" type="submit">
+                  Remind Me
+                  <i data-lucide="calendar-check-2"></i>
+                </button>
+              </div>
+  
+            </form>
+            
           </div>
-
-          <!-- Form -->
-          <form class="waitlist-form flex-col gap-6" novalidate>
-
-            <!-- Name Field -->
-            <div class="form-field flex-col gap-2">
-              <label class="form-field__label uppercase required" for="text">
-               Name
-              </label>
-              <input
-                class="form-field__input"
-                id="text"
-                type="text"
-                placeholder="John Doe"
-                autocomplete="text"
-                required
-              />
-            </div>
-
-            <!-- Email Field -->
-            <div class="form-field flex-col gap-2">
-              <label class="form-field__label uppercase required" for="email">
-               Email
-              </label>
-              <input
-                class="form-field__input"
-                id="email"
-                type="email"
-                placeholder="name@institution.com"
-                autocomplete="email"
-                required
-              />
-            </div>
-
-            <!-- Phone Field -->
-            <div class="form-field flex-col gap-2">
-              <label class="form-field__label uppercase" for="phone">
-                Phone Number
-              </label>
-              <input
-                class="form-field__input"
-                id="phone"
-                type="tel"
-                placeholder="+234 (00) 000-000"
-                autocomplete="tel"
-              />
-            </div>
-
-            <!-- CTA Buttons -->
-            <div class="cta">
-              <button class="cta-btn flex-center gap-2" type="submit">
-                Remind Me
-                <i data-lucide="calendar-check-2"></i>
-              </button>
-              <a href="/src/register/" class="cta-btn cta-btn-secondary flex-center gap-2">
-                Join Beta
-                <i data-lucide="move-right"></i>
-              </a>
-            </div>
-
-          </form>
-
+        </div>
+        <div class="card-col-secondary">
+          <a href="/src/register/" class="cta-btn cta-btn-secondary flex-center gap-2">
+            Join Beta
+            <i data-lucide="move-right"></i>
+          </a>
           <!-- Social Proof -->
           <div class="social-proof flex items-center gap-4">
             <div class="avatar-stack flex">
@@ -176,7 +180,6 @@
             </div>
             <p class="social-proof__text italic">Joining 400+ leading fund managers.</p>
           </div>
-
         </div>
       </div><!-- /card-col -->
 

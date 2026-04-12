@@ -11,6 +11,8 @@ export default defineConfig({
         login:     resolve(__dirname, 'src/login/index.html'),
         register:  resolve(__dirname, 'src/register/index.html'),
         dashboard: resolve(__dirname, 'src/dashboard/index.html'),
+        terms: resolve(__dirname, 'src/terms/index.html'),
+        privacy: resolve(__dirname, 'src/privacy/index.html'),
       }
     }
   }

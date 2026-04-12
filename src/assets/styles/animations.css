@@ -127,13 +127,13 @@
    together so the lift feels physical.
    ============================================ */
 
-.waitlist-card {
+.card-col {
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.waitlist-card:hover {
+.card-col:hover {
   transform: translateY(-5px);
   box-shadow:
     0 2px 4px rgba(17, 24, 39, 0.03),

@@ -100,25 +100,74 @@
         </div>
 
       </div>
+
+      <!-- Referrals Divider -->
+      <div class="dash-divider">
+        <span class="dash-divider__label uppercase">Your Referrals</span>
+      </div>
+
+      <!-- Referrals Section -->
+      <section class="dash-referrals flex-col gap-4">
+
+        <!-- Header row: title left, count badge right -->
+        <div class="flex-between dash-ref-header">
+          <h2 class="dash-ref-title">People You've Referred</h2>
+          <span class="dash-ref-count skeleton" id="refCount"></span>
+        </div>
+
+        <!-- List — 3 skeletons shown by default, replaced by JS -->
+        <div class="dash-ref-list flex-col gap-3" id="refList">
+
+          <div class="dash-ref-row flex-between">
+            <div class="flex items-center gap-3">
+              <div class="dash-ref-avatar skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="dash-ref-name skeleton"></span>
+                <span class="dash-ref-meta skeleton"></span>
+              </div>
+            </div>
+            <span class="dash-ref-pill skeleton"></span>
+          </div>
+
+          <div class="dash-ref-row flex-between">
+            <div class="flex items-center gap-3">
+              <div class="dash-ref-avatar skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="dash-ref-name skeleton"></span>
+                <span class="dash-ref-meta skeleton"></span>
+              </div>
+            </div>
+            <span class="dash-ref-pill skeleton"></span>
+          </div>
+
+          <div class="dash-ref-row flex-between">
+            <div class="flex items-center gap-3">
+              <div class="dash-ref-avatar skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="dash-ref-name skeleton"></span>
+                <span class="dash-ref-meta skeleton"></span>
+              </div>
+            </div>
+            <span class="dash-ref-pill skeleton"></span>
+          </div>
+
+        </div>
+
+        <!-- Empty state — hidden until JS confirms zero referrals -->
+        <div class="dash-ref-empty flex-col-center hidden" id="refEmpty">
+          <div class="dash-ref-empty__icon flex-center">
+            <i data-lucide="users" style="width:20px;height:20px"></i>
+          </div>
+          <p class="dash-ref-empty__title">No referrals yet</p>
+          <p class="dash-ref-empty__sub">
+            Share your link above — people you refer will appear here.
+          </p>
+        </div>
+
+      </section>
+      
     </div>
   </main>
-
-  <!-- FOOTER -->
-  <!-- <footer class="site-footer">
-    <div class="site-footer__inner flex-between">
-      <div class="site-footer__brand flex items-center gap-4">
-        <span class="site-footer__name">GrowthHaven</span>
-        <span class="site-footer__copy">
-          &copy; 2025 GrowthHaven. Institutional-grade security. All rights reserved.
-        </span>
-      </div>
-      <nav class="site-footer__links flex gap-8" aria-label="Footer navigation">
-        <a href="#" class="site-footer__link">Security Architecture</a>
-        <a href="#" class="site-footer__link">Privacy Protocol</a>
-        <a href="#" class="site-footer__link">Terms of Service</a>
-      </nav>
-    </div>
-  </footer> -->
 
   <script>
     lucide.createIcons();

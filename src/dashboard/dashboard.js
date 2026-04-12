@@ -4,8 +4,16 @@
  */
 
 // ─── CSS IMPORTS (Vite handles these) ────────────────────────
+import '../assets/styles/fonts.css'
+import '../assets/styles/variables.css'
+import '../assets/styles/utils.css'
+import '../assets/styles/style.css'
+import '../assets/styles/animations.css'
+import '../assets/styles/landing.css'
+import '../assets/styles/queries.css'
 import '../assets/styles/dashboard.css'   // dashboard-specific styles
 
+import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
 
 // ─── CONFIG ──────────────────────────────────────────────────
@@ -105,3 +113,66 @@ signoutBtn.addEventListener('click', async () => {
   localStorage.removeItem('gh_reg_email');
   window.location.href = '/src/login/';
 });
+
+
+// ─── REFERRALS ────────────────────────────────────────────────
+const refListEl  = document.getElementById('refList');
+const refEmptyEl = document.getElementById('refEmpty');
+const refCountEl = document.getElementById('refCount');
+
+function renderReferralRow(ref) {
+  const row = document.createElement('div');
+  row.className = 'dash-ref-row flex-between';
+
+  const deposited = ref.has_deposited;
+
+  row.innerHTML = `
+    <div class="flex items-center gap-3">
+      <div class="dash-ref-avatar">${getInitials(ref.first_name, ref.last_name)}</div>
+      <div class="flex-col gap-1">
+        <span class="dash-ref-name">${ref.first_name || ''} ${ref.last_name || ''}</span>
+        <span class="dash-ref-meta">Joined ${formatDate(ref.created_at)}</span>
+      </div>
+    </div>
+    <span class="dash-ref-pill ${deposited ? 'dash-ref-pill--deposited' : 'dash-ref-pill'}">
+      ${deposited ? 'Deposited' : 'Not Deposited'}
+    </span>
+  `;
+
+  return row;
+}
+
+(async () => {
+  const { data: referrals, error: refError } = await supabase.rpc('get_my_referrals');
+
+  // Clear skeletons regardless of outcome
+  refListEl.innerHTML = '';
+  refCountEl.classList.remove('skeleton');
+
+  if (refError) {
+    console.error('[dashboard] Referrals fetch error:', refError);
+    refCountEl.textContent = '—';
+    refEmptyEl.classList.remove('hidden');
+    return;
+  }
+  // remove empty state
+  if (referrals) {
+    refEmptyEl.style.display = 'none';
+  }
+  
+  if (!referrals || referrals.length === 0) {
+    refCountEl.textContent = '0';
+    refEmptyEl.style.display = 'flex';
+    refEmptyEl.classList.remove('hidden');
+    return;
+  }
+
+  // Populate count badge
+  refCountEl.textContent = `${referrals.length} total`;
+
+  // Render each row
+  referrals.forEach(ref => {
+    refListEl.appendChild(renderReferralRow(ref));
+  });
+})();
+

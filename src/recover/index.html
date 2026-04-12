@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowthHaven | Reset Password</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="./recover.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="reg-header">
+    <a href="/" class="reg-header__logo" aria-label="GrowthHaven home">
+      <div class="site-header__logo flex items-center">
+        <img src="/logo.svg" alt="logo" class="site-header__wordmark"
+             onerror="this.onerror=null; this.src='fallback.jpg';">
+        <span class="site-header__wordmark">GrowthHaven</span>
+      </div>
+    </a>
+  </header>
+
+  <!-- PAGE -->
+  <div class="reg-page">
+    <div class="reg-card" id="recoverCard">
+
+      <!-- Progress Bar -->
+      <div class="reg-progress" aria-hidden="true">
+        <div class="reg-progress__fill recover-progress" id="recoverProgress"></div>
+      </div>
+
+      <!-- SLIDER — 3 slides -->
+      <div class="reg-slider recover-slider" id="recoverSlider">
+
+
+        <!-- ====================================================
+             SLIDE 1 — EMAIL
+        ==================================================== -->
+        <div class="reg-slide" id="rcSlide1">
+
+          <div class="otp-icon">
+            <i data-lucide="lock-keyhole"></i>
+          </div>
+
+          <h1 class="slide-heading">Reset your password.</h1>
+          <p class="slide-subheading">
+            Enter your account email and we'll send you a verification code.
+          </p>
+
+          <form id="rcEmailForm" novalidate>
+
+            <div class="form-field" style="margin-top:1.5rem;">
+              <label class="form-label required" for="rcEmail">Email Address</label>
+              <input class="form-field__input" id="rcEmail" type="email"
+                     placeholder="john.doe@institution.com"
+                     autocomplete="email" required />
+              <span class="field-error" id="err-rcEmail"></span>
+            </div>
+
+            <button class="reg-btn" type="submit" id="rcSendBtn" style="margin-top:1.5rem;">
+              Send Verification Code
+              <i data-lucide="send"></i>
+            </button>
+
+          </form>
+
+          <p class="signin-link">
+            Remembered it? <a href="/src/login/">Sign In</a>
+          </p>
+
+        </div><!-- /rcSlide1 -->
+
+
+        <!-- ====================================================
+             SLIDE 2 — OTP
+        ==================================================== -->
+        <div class="reg-slide" id="rcSlide2" aria-live="polite">
+
+          <div class="otp-icon">
+            <i data-lucide="mail-open"></i>
+          </div>
+
+          <h2 class="slide-heading">Check your inbox.</h2>
+          <p class="slide-subheading">We've sent a 6-digit code to</p>
+          <span class="otp-email-hint" id="rcOtpHint">your email</span>
+
+          <div class="otp-boxes" id="rcOtpBoxes"
+               role="group" aria-label="One-time passcode">
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1"
+                   pattern="[0-9]" autocomplete="one-time-code" aria-label="Digit 1" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1"
+                   pattern="[0-9]" aria-label="Digit 2" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1"
+                   pattern="[0-9]" aria-label="Digit 3" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1"
+                   pattern="[0-9]" aria-label="Digit 4" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1"
+                   pattern="[0-9]" aria-label="Digit 5" />
+            <input class="otp-box" type="text" inputmode="numeric" maxlength="1"
+                   pattern="[0-9]" aria-label="Digit 6" />
+          </div>
+
+          <p class="otp-error" id="rcOtpError" role="alert"></p>
+
+          <button class="reg-btn" id="rcVerifyBtn" disabled>
+            Verify &amp; Continue
+            <i data-lucide="arrow-right"></i>
+          </button>
+
+          <div class="resend-row">
+            <span>Didn't receive it?</span>
+            <button class="resend-btn" id="rcResendBtn" disabled>Resend</button>
+            <span class="resend-timer" id="rcResendTimer"></span>
+          </div>
+
+          <button class="otp-back" id="rcBack1" type="button">
+            <i data-lucide="arrow-left"></i>
+            Edit email
+          </button>
+
+        </div><!-- /rcSlide2 -->
+
+
+        <!-- ====================================================
+             SLIDE 3 — NEW PASSWORD
+        ==================================================== -->
+        <div class="reg-slide" id="rcSlide3">
+
+          <div class="otp-icon">
+            <i data-lucide="shield-check"></i>
+          </div>
+
+          <h2 class="slide-heading">Set new password.</h2>
+          <p class="slide-subheading">
+            Choose a strong password for your account.
+          </p>
+
+          <form id="rcPwForm" novalidate style="margin-top:1.5rem;">
+
+            <div class="form-field">
+              <label class="form-label required" for="rcNewPw">New Password</label>
+              <div class="form-input-wrap">
+                <input class="form-field__input form-input--pw" id="rcNewPw"
+                       type="password" placeholder="••••••••"
+                       autocomplete="new-password" required />
+                <button class="pw-toggle" type="button"
+                        aria-label="Toggle password visibility"
+                        data-target="rcNewPw">
+                  <i data-lucide="eye" class="icon-eye"></i>
+                  <i data-lucide="eye-off" class="icon-eye-off"></i>
+                </button>
+              </div>
+              <span class="field-error" id="err-rcNewPw"></span>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label required" for="rcNewPwConfirm">
+                Confirm New Password
+              </label>
+              <div class="form-input-wrap">
+                <input class="form-field__input form-input--pw" id="rcNewPwConfirm"
+                       type="password" placeholder="••••••••"
+                       autocomplete="new-password" required />
+                <button class="pw-toggle" type="button"
+                        aria-label="Toggle confirm password visibility"
+                        data-target="rcNewPwConfirm">
+                  <i data-lucide="eye" class="icon-eye"></i>
+                  <i data-lucide="eye-off" class="icon-eye-off"></i>
+                </button>
+              </div>
+              <span class="field-error" id="err-rcNewPwConfirm"></span>
+            </div>
+
+            <button class="reg-btn" type="submit" id="rcSetPwBtn">
+              Update Password
+              <i data-lucide="shield-check"></i>
+            </button>
+
+          </form>
+
+        </div><!-- /rcSlide3 -->
+
+
+      </div><!-- /recover-slider -->
+    </div><!-- /reg-card -->
+  </div><!-- /reg-page -->
+
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

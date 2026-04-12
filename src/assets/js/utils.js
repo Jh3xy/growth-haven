@@ -13,3 +13,12 @@ export function isValidPhone(val) {
   return /^\d{7,15}$/.test(val.replace(/[\s\-().+]/g, ''));
 }
 
+export function formatDate(isoString) {
+  return new Date(isoString).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  });
+}
+
+export function getInitials(firstName, lastName) {
+  return ((firstName?.[0] || '') + (lastName?.[0] || '')).toUpperCase() || '?';
+}

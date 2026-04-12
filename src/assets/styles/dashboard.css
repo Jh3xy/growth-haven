@@ -243,6 +243,163 @@
   transform: translateX(-50%) translateY(0);
 }
 
+
+/* ─── REFERRALS SECTION ──────────────────────────────────── */
+
+.dash-referrals {
+  animation: dash-fade-up 0.45s ease both;
+  animation-delay: 2.2s;
+}
+
+.dash-ref-header {
+  margin-bottom: 1rem;
+}
+
+.dash-ref-title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  letter-spacing: var(--ls-tight);
+}
+
+.dash-ref-count {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  background-color: var(--brand-primary-soft);
+  border: 1px solid hsla(142, 71%, 45%, 0.2);
+  border-radius: var(--radius-md);
+  min-width: 48px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── ROW CARD ───────────────────────────────────────────── */
+.dash-ref-list{
+  min-height: 0;
+  align-self: flex-start;
+}
+
+.dash-ref-row {
+  background-color: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  gap: 0.75rem;
+  align-items: flex-start;
+  box-shadow: var(--shadow-low);
+  transition: border-color var(--transition-global);
+  /* min-height: 68px; */
+}
+
+.dash-ref-row:not(.skeleton-row):hover {
+  border-color: var(--brand-primary-soft);
+}
+
+/* ─── AVATAR ─────────────────────────────────────────────── */
+
+.dash-ref-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--brand-primary-soft);
+  border: 1px solid var(--brand-primary);
+  font-size: 0.7rem;
+  font-weight: var(--fw-semibold);
+  color: var(--brand-primary);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── NAME & META ────────────────────────────────────────── */
+
+.dash-ref-name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  min-width: 120px;
+  min-height: 16px;
+  border-radius: 4px;
+}
+
+.dash-ref-meta {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  min-width: 80px;
+  min-height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* ─── STATUS PILL ────────────────────────────────────────── */
+
+.dash-ref-pill {
+  font-size: 0.65rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-md);
+  padding: 0.25rem 0.65rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 80px;
+  min-height: 24px;
+  display: inline-flex;
+  align-self: flex-start;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.dash-ref-pill--deposited {
+  background-color: var(--status-success-bg);
+  color: var(--status-success-text);
+  border: 1px solid var(--status-success-border);
+}
+
+.dash-ref-pill--pending {
+  background-color: var(--surface-background);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ─── EMPTY STATE ────────────────────────────────────────── */
+
+.dash-ref-empty {
+  gap: 0.75rem;
+  padding: 3rem 1.5rem;
+  border: var(--border-width) dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.dash-ref-empty__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.dash-ref-empty__title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.dash-ref-empty__sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 280px;
+}
+
+
 /* ─── SKELETON LOADING ───────────────────────────────────── */
 
 .skeleton {
@@ -292,4 +449,10 @@
   .dash-signout span { display: none; }
   .dash-user__name { display: none; }
   .site-header__inner { padding: 0 1rem; }
+}
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .dash-ref-row { padding: 0.875rem 1rem; }
+  .dash-ref-title { font-size: var(--fs-caption); }
 }
