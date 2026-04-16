@@ -39,7 +39,8 @@ a { color: inherit; text-decoration: none; }
   text-decoration: none;
 }
 
-.login-logo img {
+.login-logo img,
+.login-logo svg {
   height: 26px;
   width: auto;
 }

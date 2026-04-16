@@ -170,6 +170,7 @@
 /* Withdraw button — reuses .cta-btn from utils.css, disabled style overridden */
 .aff-withdraw-btn {
   opacity: 1;
+  z-index: 999;
   width: fit-content;
   padding: .5rem 2rem;
   transition:
@@ -199,4 +200,71 @@
 .aff-hero__sub {
   max-width: 400px;
 }
+
+/* ─── PROMOTER REFERRAL ROW ──────────────────────────────────
+   ─────────────────────────────────────────────────────────── */
+
+/* Full-width inner flex — left block + right pill */
+.aff-ref-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.75rem;
+}
+
+/* Identity column: name row, joined, last active */
+.aff-ref-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* Name + promoter badge sit on one line */
+.aff-ref-name-row {
+  flex-wrap: nowrap;
+}
+
+/* ── Promoter badge ── */
+.aff-ref-promoter-badge {
+  font-size: 0.58rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--status-success-text);
+  background: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+/* ── Last active line ── */
+.aff-ref-active {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+/* The tiny filled dot before "Active X ago" */
+.aff-ref-active [data-lucide] {
+  color: var(--status-success);
+  opacity: 0.7;
+}
+
+/* On very small screens: stack pill below identity */
+@media (max-width: 360px) {
+  .aff-ref-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dash-ref-pill {
+    align-self: flex-start;
+  }
+}
+
+
 
