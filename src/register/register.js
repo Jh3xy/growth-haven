@@ -15,7 +15,7 @@ import '../assets/styles/queries.css'
 import '../assets/styles/register.css'
 
 
-import { signUpUser, verifyEmailOtp } from '../assets/js/auth.js';
+import { signUpUser, verifyEmailOtp, getUserStatus } from '../assets/js/auth.js';
 
 
 const slider       = document.getElementById('regSlider');
@@ -47,7 +47,7 @@ console.log({ firstNameEl, lastNameEl, emailEl, pwEl, pwConfirmEl });
   const params = new URLSearchParams(window.location.search);
   const ref    = params.get('ref');
   if (!ref) {
-    console.log("[ref]; ref code not found")
+    console.log("[ref]: Ref code not found") 
     return;
   }
 
@@ -61,6 +61,19 @@ console.log({ firstNameEl, lastNameEl, emailEl, pwEl, pwConfirmEl });
   input.value = ref.toUpperCase();
   console.log(ref);
 })();
+(
+  function handlePromoter () {
+    const params = new URLSearchParams(window.location.search);
+    const promoter = params.get('partner');
+
+    if (promoter === 'show') {
+      const codeBox = document.querySelector(".secret-code-box");
+      codeBox.classList.remove("hidden");
+    } else {
+      console.warn("Promoter URL param missing");
+    }
+  }
+)();
 
 
 // INIT STATE
@@ -262,6 +275,8 @@ regForm.addEventListener('submit', async (e) => {
   const password = pwEl.value;         
   const fName = firstNameEl.value.trim();
   const lName = lastNameEl.value.trim();  // Grab from your lastNameEl input
+  const inviteCode = document.getElementById('inviteCode').value.trim() || null;
+  const portalCode = document.getElementById('portal-code').value.trim() || null;
 
   // Show email in OTP hint (use first part before @)
   const mail = emailEl.value.trim();
@@ -276,8 +291,7 @@ regForm.addEventListener('submit', async (e) => {
   regSubmitBtn.innerText = 'Creating Account...';
   
   try {
-    const inviteCode = document.getElementById('inviteCode').value.trim() || null;
-    const { data, error } = await signUpUser(email, password, fName, lName, inviteCode);
+    const { data, error } = await signUpUser(email, password, fName, lName, inviteCode, portalCode);
     
     if (error) {
       // RESET THE BUTTON SO THEY CAN TRY AGAIN
@@ -409,11 +423,20 @@ verifyBtn.addEventListener('click', async () => {
     return;
   }
 
+  // TODO: check promoter status on members table to redirect to correct portal
   // Redirect to the authenticated dashboard
   localStorage.removeItem('gh_reg_step');
   verifyBtn.innerText = 'Verified! Redirecting...';
+
+  const { data: profile } = await getUserStatus(data.user.id);
+
   setTimeout(() => {
-    window.location.href = '/src/dashboard/';
+    if (profile?.promoter) {
+      window.location.href = '/src/affiliate/';
+    } else {
+      // Redirect to standard investor dashboard
+      window.location.href = '/src/dashboard/';
+    }
   }, 1000);
 });
 

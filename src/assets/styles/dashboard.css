@@ -6,7 +6,7 @@
 
 .dash-main {
   min-height: 100dvh;
-  padding-top: calc(var(--header-height, 72px) + 4rem);
+  padding-top: calc(var(--header-height, 60px) + 4rem);
   padding-bottom: 6rem;
   background-color: var(--surface-background);
 }
@@ -288,10 +288,17 @@
   border-radius: var(--radius-lg);
   padding: 1rem 1.25rem;
   gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: .7rem;
   align-items: flex-start;
   box-shadow: var(--shadow-low);
   transition: border-color var(--transition-global);
   /* min-height: 68px; */
+}
+.dash-ref-row .flex-col.gap-1{
+  display: flex;
+  flex-direction: column;
 }
 
 .dash-ref-row:not(.skeleton-row):hover {
@@ -314,6 +321,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.dash-ref-avatar + .flex-col {
+  display: flex;
 }
 
 /* ─── NAME & META ────────────────────────────────────────── */
@@ -339,18 +350,18 @@
 /* ─── STATUS PILL ────────────────────────────────────────── */
 
 .dash-ref-pill {
-  font-size: 0.65rem;
-  font-weight: var(--fw-semibold);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border-radius: var(--radius-md);
-  padding: 0.25rem 0.65rem;
+  padding-top: 0.65rem;
   white-space: nowrap;
   flex-shrink: 0;
   min-width: 80px;
   min-height: 24px;
   display: inline-flex;
-  align-self: flex-start;
+  align-self: flex-end;
   justify-content: center;
   border-radius: 999px;
 }

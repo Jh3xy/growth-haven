@@ -12,6 +12,7 @@ export default defineConfig({
         register:  resolve(__dirname, 'src/register/index.html'),
         dashboard: resolve(__dirname, 'src/dashboard/index.html'),
         terms: resolve(__dirname, 'src/terms/index.html'),
+        affiliate: resolve(__dirname, 'src/affiliate/index.html'),
         privacy: resolve(__dirname, 'src/privacy/index.html'),
       }
     }

@@ -10,7 +10,7 @@
 import { supabase } from './supabase.js';
 
 // 1. Sign Up User (Sends the OTP email)
-export async function signUpUser(email, password, firstName, lastName, inviteCode) {
+export async function signUpUser(email, password, firstName, lastName, inviteCode, portalCode) {
   return await supabase.auth.signUp({
     email,
     password,
@@ -19,6 +19,7 @@ export async function signUpUser(email, password, firstName, lastName, inviteCod
         first_name: firstName,
         last_name: lastName,
         referrer_code: inviteCode || null,
+        portal_code: portalCode || null, //Sent to Postgres Trigger to assign to correct portal
       }
     }
   });
@@ -47,4 +48,18 @@ export async function createMemberProfile(userId, email) {
     { id: userId, email: email }
   ]);
 }
+
+
+// 5. Get User promoter Status
+export async function getUserStatus(userId) {
+  const { data, error } = await supabase
+    .from('members')
+    .select('promoter')
+    .eq('id', userId)
+    .single();
+    
+  return { data, error };
+}
+
+
 

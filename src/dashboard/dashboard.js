@@ -122,21 +122,25 @@ const refCountEl = document.getElementById('refCount');
 
 function renderReferralRow(ref) {
   const row = document.createElement('div');
-  row.className = 'dash-ref-row flex-between';
+  row.className = 'dash-ref-row';
 
   const deposited = ref.has_deposited;
 
   row.innerHTML = `
-    <div class="flex items-center gap-3">
-      <div class="dash-ref-avatar">${getInitials(ref.first_name, ref.last_name)}</div>
-      <div class="flex-col gap-1">
-        <span class="dash-ref-name">${ref.first_name || ''} ${ref.last_name || ''}</span>
-        <span class="dash-ref-meta">Joined ${formatDate(ref.created_at)}</span>
+    <div class="flex flex-col items-center gap-3">
+      <div class="flex gap-1">
+        <div class="dash-ref-avatar">${getInitials(ref.first_name, ref.last_name)}</div>
+        <div class="flex-col">
+          <span class="dash-ref-name">${ref.first_name || ''} ${ref.last_name || ''}</span>
+          <span class="dash-ref-meta">Joined ${formatDate(ref.created_at)}</span>
+          <div class="flex">
+            <span class="dash-ref-pill ${deposited ? 'dash-ref-pill--deposited' : 'dash-ref-pill'}">
+              ${deposited ? 'Deposited' : 'Not Deposited'}
+            </span>
+          </div>
+        </div>
       </div>
-    </div>
-    <span class="dash-ref-pill ${deposited ? 'dash-ref-pill--deposited' : 'dash-ref-pill'}">
-      ${deposited ? 'Deposited' : 'Not Deposited'}
-    </span>
+      </div>
   `;
 
   return row;

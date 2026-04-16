@@ -1,0 +1,202 @@
+.dash-main{
+  padding-top: calc(var(--header-height, 30px) + 4rem) !important;
+}
+.dash-cards{
+  margin-bottom: 4rem;
+}
+
+/* ─── BALANCE (NORTH STAR) CARD ──────────────────────── */
+
+.aff-balance-card {
+  background: radial-gradient( 100px circle at calc(100% - 10px) calc(100% - 10px), hsla(142, 71%, 45%, 0.12) 0%, transparent 70% ), linear-gradient( 148deg, var(--surface-card) 0%, hsla(142, 71%, 45%, 0.045) 100% );
+  border-color: hsla(142, 71%, 45%, 0.28);
+  position: relative;
+  overflow: visible; /* Required for the pill to stick out */
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Remove the old ::before glow as it's now in the background property */
+.aff-balance-card::before {
+  display: none;
+}
+
+/* ─── THE "ATTACHED" COMMISSION PILL ─────────────────── */
+
+.aff-commission-pill {
+  position: absolute;
+  top: 0; /* Align exactly with the card's top edge */
+  right: 0.5rem;
+  transform: translateY(-100%); /* Pulls it above the card */
+  
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  
+  /* Institutional Palette: White background with green border */
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.09em;
+  /* text-transform: uppercase; */
+  color: var(--status-success-text); /* #166534 */
+  background: var(--surface-card);   /* #FFFFFF */
+  border: 1px solid var(--status-success-border); /* #86EFAC */
+  border-bottom: none; /* Merges into the card top */
+  
+  /* Smooth Top Curves */
+  border-radius: 12px 12px 0 0;
+  
+  /* JS Loading State */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  box-shadow: 0 1px 0 0 var(--surface-card);
+}
+
+/* ─── SMOOTH VECTOR FILLETS (CONCAVE JOIN) ───────────── */
+
+.aff-commission-pill::before,
+.aff-commission-pill::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 16px; /* Larger radius for a smoother transition */
+  height: 16px;
+  pointer-events: none;
+}
+
+/* Right Fillet: Adjusted for edge proximity */
+/* .aff-commission-pill::after {
+  right: -8px; 
+  width: 12px;
+  height: 12px;
+  bottom: 0;
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 100% 0, 
+    transparent 11px, 
+    var(--status-success-border) 11px, 
+    var(--status-success-border) 12px, 
+    var(--surface-card) 12px
+  );
+  box-shadow: -2px 1px 0 0 var(--surface-card);
+} */
+
+/* Ensure the left fillet stays consistent */
+.aff-commission-pill::before {
+  left: -12px;
+  width: 12px;
+  height: 12px;
+  bottom: 0;
+  content: '';
+  position: absolute;
+  background: radial-gradient(
+    circle at 0 0, 
+    transparent 11px, 
+    var(--status-success-border) 11px, 
+    var(--status-success-border) 12px, 
+    var(--surface-card) 12px
+  );
+}
+
+/* ─── SEAMLESS OVERLAP ────────────────────────────────── */
+
+/* This hides the card's top border directly under the tab */
+.aff-commission-pill::bottom-patch {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--surface-card);
+  z-index: 1;
+}
+
+.aff-commission-pill.is-loaded {
+  opacity: 1;
+}
+
+/* Adjust the header padding now that the pill is gone from the flow */
+.aff-balance__header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 24px;
+}
+
+.aff-balance__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.aff-balance__amount-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 1.1rem 0 0.25rem;
+}
+
+.aff-balance__currency {
+  font-size: 1.05rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  padding-top: 0.45rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.aff-balance__amount {
+  font-size: clamp(2.4rem, 10vw, 3.25rem);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.aff-balance__hint {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0.25rem 0 1.25rem;
+}
+
+/* Withdraw button — reuses .cta-btn from utils.css, disabled style overridden */
+.aff-withdraw-btn {
+  opacity: 1;
+  width: fit-content;
+  padding: .5rem 2rem;
+  transition:
+    background var(--transition-global),
+    transform 0.2s ease,
+    box-shadow var(--transition-global),
+    opacity var(--transition-global);
+}
+
+.aff-withdraw-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  transform: none !important;
+  pointer-events: none;
+}
+
+/* ─── PROMOTER BADGE ─────────────────────────────────── */
+
+/* .aff-partner-badge .badge-pill__dot {
+
+} */
+
+/* ─── HERO OVERRIDES ─────────────────────────────────── */
+
+/* The heading on the promoter portal loses the "We're still building"
+    message — it's intentionally authoritative and complete. */
+.aff-hero__sub {
+  max-width: 400px;
+}
+

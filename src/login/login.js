@@ -10,7 +10,7 @@ import '../assets/styles/queries.css'
 import '../assets/styles/login.css'    // and add login-specific ones
 
 
-import { signInUser } from '../assets/js/auth.js';
+import { signInUser, getUserStatus } from '../assets/js/auth.js';
 
 console.log('[auth]: loaded auth-login')
 
@@ -74,10 +74,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     setError(pwEl, 'err-pw', 'Invalid email or password.');
     loginBtn.disabled = false;
     loginBtn.innerHTML = 'Sign In <i data-lucide="arrow-right"></i>';
-    // Re-initialize lucide icons since innerHTML was changed
     if (window.lucide) window.lucide.createIcons();
   } else {
+    loginBtn.innerText = 'Authenticating Profile...';
+    
+    // 1. Fetch the user's promoter status
+    const { data: profile, error: profileError } = await getUserStatus(data.user.id);
+
     loginBtn.innerText = 'Success! Redirecting...';
-    window.location.href = '/src/dashboard/';
+
+    // 2. Perform the Stratified Redirect
+    setTimeout(() => {
+      if (profile && profile.promoter) {
+        window.location.href = '/src/affiliate/';
+      } else {
+        window.location.href = '/src/dashboard/';
+      }
+    }, 800);
   }
 });
