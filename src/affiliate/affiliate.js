@@ -195,51 +195,108 @@ signoutBtn.addEventListener('click', async () => {
   window.location.href = '/src/login/';
 });
 
-
 // ═══════════════════════════════════════════════════════════════
-// 7. REFERRAL LIST
-//    Reuses get_my_referrals() RPC — same as standard dashboard.
-//    Schema fields used: first_name, last_name, created_at, has_deposited.
+// 7. REFERRAL LIST — promoter-specific RPC
+//    Uses get_promoter_referrals() which returns:
+//      first_name, last_name, created_at, has_deposited,
+//      is_promoter, last_active_at
 // ═══════════════════════════════════════════════════════════════
 const refListEl  = document.getElementById('refList');
 const refEmptyEl = document.getElementById('refEmpty');
 const refCountEl = document.getElementById('refCount');
 
 /**
- * Renders a single referral row.
- * Strictly uses schema fields: first_name, last_name, created_at, has_deposited.
- * No invented fields.
+ * Converts a UTC timestamp into a human-readable relative string.
+ * Falls back to "Never" if null.
+ *
+ * Examples: "Just now", "3 hours ago", "2 days ago", "Aug 14"
+ */
+function formatRelativeTime(isoString) {
+  if (!isoString) return 'Never';
+
+  const then = new Date(isoString);
+  const diffMs = Date.now() - then.getTime();
+  const diffMins = Math.floor(diffMs / 60_000);
+
+  if (diffMins < 2)   return 'Just now';
+  if (diffMins < 60)  return `${diffMins}m ago`;
+
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7)   return `${diffDays}d ago`;
+
+  // Older than a week: show the actual date
+  return then.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Renders a single promoter-portal referral row.
+ *
+ * Fields used (all from get_promoter_referrals schema):
+ *   first_name, last_name, created_at, has_deposited,
+ *   is_promoter, last_active_at
+ *
+ * No invented data fields.
  */
 function renderReferralRow(ref) {
   const row = document.createElement('div');
   row.className = 'dash-ref-row';
 
   const deposited = ref.has_deposited;
+  const isPromoter = ref.is_promoter;
+  const relativeActive = formatRelativeTime(ref.last_active_at);
 
   row.innerHTML = `
-    <div class="flex flex-col items-center gap-3">
-      <div class="flex gap-1">
+    <div class="aff-ref-inner">
+
+      <!-- Left: avatar + identity block -->
+      <div class="flex items-center gap-3">
         <div class="dash-ref-avatar">${getInitials(ref.first_name, ref.last_name)}</div>
-        <div class="flex-col">
-          <span class="dash-ref-name">${(ref.first_name || '')} ${(ref.last_name || '')}</span>
-          <span class="dash-ref-meta">Joined ${formatDate(ref.created_at)}</span>
-          <div class="flex">
-            <span class="dash-ref-pill ${deposited ? 'dash-ref-pill--deposited' : 'dash-ref-pill--pending'}">
-              ${deposited ? 'Deposited' : 'Not Deposited'}
-            </span>
+
+        <div class="aff-ref-identity">
+
+          <!-- Name + promoter badge on the same line -->
+          <div class="aff-ref-name-row flex items-center gap-2">
+            <span class="dash-ref-name">${(ref.first_name || '')} ${(ref.last_name || '')}</span>
+            ${isPromoter ? `
+              <span class="aff-ref-promoter-badge flex items-center gap-1">
+                <i data-lucide="shield-check" style="width:9px;height:9px;stroke-width:2.5"></i>
+                Promoter
+              </span>` : ''}
           </div>
+
+          <!-- Joined date -->
+          <span class="dash-ref-meta">Joined ${formatDate(ref.created_at)}</span>
+
+          <!-- Last active -->
+          <span class="aff-ref-active flex items-center gap-1">
+            <i data-lucide="circle" style="width:6px;height:6px;fill:currentColor;stroke:none"></i>
+            Active ${relativeActive}
+          </span>
+
         </div>
       </div>
+
+      <!-- Right: deposit pill -->
+      <span class="dash-ref-pill ${deposited ? 'dash-ref-pill--deposited' : 'dash-ref-pill--pending'}">
+        ${deposited ? 'Deposited' : 'Pending'}
+      </span>
+
     </div>
   `;
+
+  // Re-init Lucide for the icons injected into innerHTML
+  if (window.lucide) lucide.createIcons({ nodes: [row] });
 
   return row;
 }
 
 (async () => {
-  const { data: referrals, error: refError } = await supabase.rpc('get_my_referrals');
+  // Use the promoter-specific RPC — not get_my_referrals
+  const { data: referrals, error: refError } = await supabase.rpc('get_promoter_referrals');
 
-  // Clear skeletons regardless of outcome
   refListEl.innerHTML = '';
   refCountEl.classList.remove('skeleton');
 
@@ -258,7 +315,12 @@ function renderReferralRow(ref) {
   }
 
   refEmptyEl.style.display = 'none';
-  refCountEl.textContent = `${referrals.length} total`;
+
+  // Count badge: show total + how many have deposited
+  const depositedCount = referrals.filter(r => r.has_deposited).length;
+  refCountEl.textContent = depositedCount > 0
+    ? `${referrals.length} total · ${depositedCount} deposited`
+    : `${referrals.length} total`;
 
   referrals.forEach(ref => refListEl.appendChild(renderReferralRow(ref)));
 })();
