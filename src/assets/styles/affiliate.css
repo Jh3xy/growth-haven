@@ -170,6 +170,7 @@
 /* Withdraw button — reuses .cta-btn from utils.css, disabled style overridden */
 .aff-withdraw-btn {
   opacity: 1;
+  z-index: 999;
   width: fit-content;
   padding: .5rem 2rem;
   transition:

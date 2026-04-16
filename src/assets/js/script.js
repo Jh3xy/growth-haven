@@ -18,6 +18,117 @@ import '../styles/queries.css'
 import { supabase } from './supabase.js';
 import { isValidEmail, isValidPhone } from './utils.js'
 
+const THEME_STORAGE_KEY = 'gh_theme';
+const THEME_ATTRIBUTE = 'data-theme';
+const THEME_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+let themeMediaQuery;
+let hasBoundThemeMediaListener = false;
+
+function getThemeMediaQuery() {
+  if (!window.matchMedia) return null;
+  if (!themeMediaQuery) {
+    themeMediaQuery = window.matchMedia(THEME_MEDIA_QUERY);
+  }
+  return themeMediaQuery;
+}
+
+function getSystemTheme() {
+  return getThemeMediaQuery()?.matches ? 'dark' : 'light';
+}
+
+export function getTheme() {
+  return document.documentElement.getAttribute(THEME_ATTRIBUTE) || getStoredTheme() || getSystemTheme();
+}
+
+export function getStoredTheme() {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  return storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : null;
+}
+
+function updateThemeToggleButtons(theme, root = document) {
+  root.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    const isDark = theme === 'dark';
+    const label = button.querySelector('[data-theme-label]');
+
+    button.setAttribute('aria-pressed', String(isDark));
+    button.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    button.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    button.dataset.themeState = theme;
+
+    if (label) {
+      label.textContent = isDark ? 'Light mode' : 'Dark mode';
+    }
+  });
+}
+
+export function applyTheme(theme, { persist = true, root = document } = {}) {
+  const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute(THEME_ATTRIBUTE, resolvedTheme);
+  updateThemeToggleButtons(resolvedTheme, root);
+
+  if (persist) {
+    localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
+  }
+
+  window.dispatchEvent(new CustomEvent('gh:themechange', { detail: { theme: resolvedTheme } }));
+  return resolvedTheme;
+}
+
+export function toggleTheme() {
+  const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+  return applyTheme(nextTheme);
+}
+
+function syncThemeWithSystemPreference() {
+  if (getStoredTheme()) return;
+  applyTheme(getSystemTheme(), { persist: false });
+}
+
+function bindSystemThemeListener() {
+  if (hasBoundThemeMediaListener) return;
+
+  const mediaQuery = getThemeMediaQuery();
+  if (!mediaQuery) return;
+
+  const handleThemeChange = () => syncThemeWithSystemPreference();
+  mediaQuery.addEventListener('change', handleThemeChange);
+  hasBoundThemeMediaListener = true;
+}
+
+export function initThemeToggle(root = document) {
+  const initialTheme = getStoredTheme() || getSystemTheme();
+  applyTheme(initialTheme, { persist: false, root });
+
+  root.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    if (button.dataset.themeBound === 'true') return;
+
+    button.addEventListener('click', () => {
+      toggleTheme();
+    });
+
+    button.dataset.themeBound = 'true';
+  });
+
+  bindSystemThemeListener();
+}
+
+function initializeSharedThemeUi() {
+  initThemeToggle();
+
+  window.addEventListener('storage', (event) => {
+    if (event.key !== THEME_STORAGE_KEY) return;
+
+    const nextTheme = event.newValue === 'dark' ? 'dark' : 'light';
+    applyTheme(nextTheme, { persist: false });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeSharedThemeUi, { once: true });
+} else {
+  initializeSharedThemeUi();
+}
+
 
 
 /**

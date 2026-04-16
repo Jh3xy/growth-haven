@@ -61,7 +61,8 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-primary);
 }
 
-.legal-logo img {
+.legal-logo img,
+.legal-logo svg {
   height: 24px;
   width: auto;
 }
