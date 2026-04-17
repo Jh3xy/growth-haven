@@ -63,6 +63,9 @@
   /* --- 3. TYPOGRAPHY SCALE --- */
   --ff-primary: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
+  --dash-header-h: 64px;
+  --dash-sidebar-w: 240px;
+
   /* Weights */
   --fw-regular: 400;
   --fw-medium: 500;

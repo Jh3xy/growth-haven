@@ -296,6 +296,7 @@ function renderReferralRow(ref) {
 (async () => {
   // Use the promoter-specific RPC — not get_my_referrals
   const { data: referrals, error: refError } = await supabase.rpc('get_promoter_referrals');
+  console.log(referrals)
 
   refListEl.innerHTML = '';
   refCountEl.classList.remove('skeleton');

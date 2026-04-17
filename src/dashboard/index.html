@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,15 +12,30 @@
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- ════════════════════════════════════════════════
+       HEADER
+       ════════════════════════════════════════════════ -->
   <header class="site-header fixed top-0 z-50 w-full">
     <div class="site-header__inner flex-between px-8">
-      <div class="site-header__logo flex items-center">
+
+      <!-- Left group: hamburger (mobile) + logo -->
+      <div class="flex items-center gap-3">
+        <button class="dash-hamburger flex-center" id="sidebarToggle"
+                aria-label="Open navigation" aria-expanded="false">
+          <i data-lucide="menu" style="width:20px;height:20px"></i>
+        </button>
         <div class="site-header__logo flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160" class="site-header__wordmark" aria-hidden="true" focusable="false"><g fill="currentColor"><path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/></g></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+               class="site-header__wordmark" aria-hidden="true" focusable="false">
+            <g fill="currentColor">
+              <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+            </g>
+          </svg>
           <span class="site-header__wordmark">GrowthHaven</span>
         </div>
       </div>
+
+      <!-- Right group: user + theme + signout -->
       <div class="flex items-center gap-4">
         <div class="dash-user flex items-center gap-3">
           <div class="dash-avatar flex-center" id="avatarInitials">—</div>
@@ -34,148 +50,352 @@
           <span>Sign Out</span>
         </button>
       </div>
+
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main class="dash-main">
-    <div class="dash-main__inner flex-col">
 
-      <!-- Status pill -->
-      <div class="badge-pill flex items-center gap-2 self-start">
-        <span class="badge-pill__dot"></span>
-        <span class="badge-pill__label uppercase">Dashboard In Progress</span>
+  <!-- ════════════════════════════════════════════════
+       MOBILE SIDEBAR OVERLAY
+       ════════════════════════════════════════════════ -->
+  <div class="dash-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+
+  <!-- ════════════════════════════════════════════════
+       APP SHELL — sidebar + main
+       ════════════════════════════════════════════════ -->
+  <div class="dash-shell">
+
+    <!-- ── SIDEBAR ─────────────────────────────────── -->
+    <aside class="dash-sidebar" id="dashSidebar" aria-label="Dashboard navigation">
+
+      <!-- Brand mark (top of sidebar) -->
+      <div class="dash-sidebar__brand flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+             class="dash-sidebar__logo-mark" aria-hidden="true" focusable="false">
+          <g fill="currentColor">
+            <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+          </g>
+        </svg>
+        <span class="dash-sidebar__wordmark">GrowthHaven</span>
       </div>
 
-      <!-- Hero -->
-      <div class="dash-hero flex-col">
-        <p class="dash-hero__greeting" id="greetingText">Welcome back.</p>
-        <h1 class="dash-hero__heading">
-          We're still building<br />
-          your <span class="dash-hero__accent italic">dashboard.</span>
-        </h1>
-        <p class="dash-hero__sub">
-          Your full dashboard will be ready at launch — we'll notify you the moment it goes live.
-          In the meantime, your referral tools are active and ready to use.
-        </p>
+      <!-- Nav links -->
+      <nav class="dash-sidebar__nav flex-col" role="navigation" aria-label="Main menu">
+        <button class="dash-nav-link flex items-center gap-3" data-nav="home" type="button">
+          <i data-lucide="home" style="width:16px;height:16px"></i>
+          <span>Home</span>
+        </button>
+        <button class="dash-nav-link flex items-center gap-3" data-nav="invest" type="button">
+          <i data-lucide="trending-up" style="width:16px;height:16px"></i>
+          <span>Investments</span>
+        </button>
+        <button class="dash-nav-link flex items-center gap-3" data-nav="sports" type="button">
+          <i data-lucide="trophy" style="width:16px;height:16px"></i>
+          <span>Sports</span>
+        </button>
+        <button class="dash-nav-link flex items-center gap-3" data-nav="transact" type="button">
+          <i data-lucide="arrow-left-right" style="width:16px;height:16px"></i>
+          <span>Transactions</span>
+        </button>
+        <button class="dash-nav-link flex items-center gap-3" data-nav="profile" type="button">
+          <i data-lucide="user" style="width:16px;height:16px"></i>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar footer: sign out -->
+      <div class="dash-sidebar__footer">
+        <button class="dash-sidebar__signout flex items-center gap-3" id="sidebarSignoutBtn" type="button">
+          <i data-lucide="log-out" style="width:16px;height:16px"></i>
+          <span>Sign Out</span>
+        </button>
       </div>
 
-      <!-- Divider -->
-      <div class="dash-divider">
-        <span class="dash-divider__label uppercase">Your Tools</span>
-      </div>
+    </aside><!-- /dash-sidebar -->
 
-      <!-- Cards -->
-      <div class="dash-cards">
 
-        <!-- Card 1 — Referral Code -->
-        <div class="dash-card">
-          <p class="dash-card__label flex items-center gap-2 uppercase">
-            <i data-lucide="key-round" style="width:13px;height:13px"></i>
-            Your Referral Code
-          </p>
-          <div class="dash-card__value-row flex-between">
-            <span class="dash-card__value skeleton" id="refCode">LOADING</span>
-            <button class="dash-copy-btn flex-center" id="copyCodeBtn" aria-label="Copy referral code" disabled>
-              <i data-lucide="copy" style="width:14px;height:14px"></i>
-            </button>
+    <!-- ── MAIN CONTENT ────────────────────────────── -->
+    <main class="dash-main" id="dashMain">
+
+
+      <!-- ══════════════════════════════════════════════════════
+           SECTION — HOME
+           ══════════════════════════════════════════════════════ -->
+      <section id="section-home" class="dash-section">
+        <div class="dash-section__inner flex-col">
+
+
+          <!-- ① WELCOME CARD ─────────────────────────────── -->
+          <!-- <div class="dash-welcome-card__status flex items-center gap-2">
+            <span class="badge-pill__dot"></span>
+            <span class="dash-welcome-card__label uppercase">Dashboard</span>
+          </div> -->
+          <div class="greeting">
+            <h1 class="dash-welcome-card__greeting" id="greetingText">Good day.</h1>
+            <p class="dash-welcome-card__sub">Your investments are secure.</p>
           </div>
-          <p class="dash-card__hint">
-            Share this code directly. Anyone who enters it on sign-up is credited to you automatically.
-          </p>
-        </div>
 
-        <!-- Card 2 — Referral Link -->
-        <div class="dash-card">
-          <p class="dash-card__label flex items-center gap-2 uppercase">
-            <i data-lucide="link-2" style="width:13px;height:13px"></i>
-            Your Referral Link
-          </p>
-          <div class="dash-card__value-row flex-between">
-            <span class="dash-card__value dash-card__value--link skeleton" id="refLink">
-              Loading your link...
-            </span>
-            <button class="dash-copy-btn flex-center shrink-0" id="copyLinkBtn" aria-label="Copy referral link" disabled>
-              <i data-lucide="copy" style="width:14px;height:14px"></i>
-            </button>
-          </div>
-          <p class="dash-card__hint">
-            Anyone who clicks your link gets your code pre-filled on sign-up — no manual entry needed.
-          </p>
-        </div>
 
-      </div>
+          <!-- ② WALLET CARD ─────────────────────────────── -->
+           <div class="dash-card dash-welcome-card">
 
-      <!-- Referrals Divider -->
-      <div class="dash-divider">
-        <span class="dash-divider__label uppercase">Your Referrals</span>
-      </div>
-
-      <!-- Referrals Section -->
-      <section class="dash-referrals flex-col gap-4">
-
-        <!-- Header row: title left, count badge right -->
-        <div class="flex-between dash-ref-header">
-          <h2 class="dash-ref-title">People You've Referred</h2>
-          <span class="dash-ref-count skeleton" id="refCount"></span>
-        </div>
-
-        <!-- List — 3 skeletons shown by default, replaced by JS -->
-        <div class="dash-ref-list flex-col gap-3" id="refList">
-
-          <div class="dash-ref-row flex-between">
-            <div class="flex items-center gap-3">
-              <div class="dash-ref-avatar skeleton"></div>
-              <div class="flex-col gap-1">
-                <span class="dash-ref-name skeleton"></span>
-                <span class="dash-ref-meta skeleton"></span>
+              <p class="dash-card__label flex items-center gap-2 uppercase">
+                <i data-lucide="circle-dollar-sign" style="width:13px;height:13px"></i>
+                Wallet (₦)
+              </p>
+              <div class="dash-wallet-card__balance flex items-baseline gap-1">
+                <span class="dash-wallet-card__currency">₦</span>
+                <span class="dash-wallet-card__amount skeleton" id="walletBalance">0.00</span>
               </div>
-            </div>
-            <span class="dash-ref-pill skeleton"></span>
-          </div>
-
-          <div class="dash-ref-row flex-between">
-            <div class="flex items-center gap-3">
-              <div class="dash-ref-avatar skeleton"></div>
-              <div class="flex-col gap-1">
-                <span class="dash-ref-name skeleton"></span>
-                <span class="dash-ref-meta skeleton"></span>
+              
+              <div class="dash-wallet-card__actions flex gap-3">
+                <button class="dash-action-btn dash-action-btn--primary" disabled title="Coming soon">
+                  <i data-lucide="arrow-down-to-line" style="width:14px;height:14px"></i>
+                  Deposit
+                </button>
+                <button class="dash-action-btn dash-action-btn--secondary" disabled title="Coming soon">
+                  <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i>
+                  Withdraw
+                </button>
               </div>
-            </div>
-            <span class="dash-ref-pill skeleton"></span>
+
           </div>
 
-          <div class="dash-ref-row flex-between">
-            <div class="flex items-center gap-3">
-              <div class="dash-ref-avatar skeleton"></div>
-              <div class="flex-col gap-1">
-                <span class="dash-ref-name skeleton"></span>
-                <span class="dash-ref-meta skeleton"></span>
+
+          <!-- ③ VAULT CARD ──────────────────────────────── -->
+          <div class="dash-card dash-welcome-card">
+            <div class="vault-card__wrap">
+              <p class="dash-card__label flex items-center gap-2 uppercase">
+                <i data-lucide="shield" style="width:13px;height:13px"></i>
+                Vault (₦)
+              </p>
+              <div class="dash-vault-card__balance flex-col gap-1">
+                <div class="flex items-baseline gap-1 dash-vault-card__wrap">
+                  <span class="dash-vault-card__currency">₦</span>
+                  <span class="dash-vault-card__amount skeleton" id="vaultBalance">0.00</span>
+                </div>
               </div>
+              <p class="dash-card__hint">Capital</p>
+              <span class="dash-vault-card__tier skeleton" id="vaultTierInfo">7-Day Plan · 5% daily</span>
+              <button class="dash-action-btn dash-action-btn--secondary w-fit" id="fundVaultBtn"
+                      disabled title="Coming soon">
+                <i data-lucide="arrow-left-right" style="width:14px;height:14px"></i>
+                Fund
+              </button>
             </div>
-            <span class="dash-ref-pill skeleton"></span>
           </div>
 
-        </div>
 
-        <!-- Empty state — hidden until JS confirms zero referrals -->
-        <div class="dash-ref-empty flex-col-center hidden" id="refEmpty">
-          <div class="dash-ref-empty__icon flex-center">
-            <i data-lucide="users" style="width:20px;height:20px"></i>
+
+          <!-- ④ RECENT ACTIVITY ─────────────────────────── -->
+          <div class="dash-divider">
+            <span class="dash-divider__label uppercase">Recent Activity</span>
           </div>
-          <p class="dash-ref-empty__title">No referrals yet</p>
-          <p class="dash-ref-empty__sub">
-            Share your link above — people you refer will appear here.
-          </p>
-        </div>
 
+          <div class="flex-col gap-2" id="activityList">
+
+            <!-- Skeleton rows — replaced by renderActivity() -->
+            <div class="dash-activity-row skeleton-row">
+              <div class="dash-activity-row__left flex items-center gap-3">
+                <div class="dash-activity-row__icon skeleton"></div>
+                <div class="flex-col gap-1">
+                  <span class="dash-activity-row__label skeleton"></span>
+                  <span class="dash-activity-row__date skeleton"></span>
+                </div>
+              </div>
+              <span class="dash-activity-row__amount skeleton"></span>
+            </div>
+
+            <div class="dash-activity-row skeleton-row">
+              <div class="dash-activity-row__left flex items-center gap-3">
+                <div class="dash-activity-row__icon skeleton"></div>
+                <div class="flex-col gap-1">
+                  <span class="dash-activity-row__label skeleton"></span>
+                  <span class="dash-activity-row__date skeleton"></span>
+                </div>
+              </div>
+              <span class="dash-activity-row__amount skeleton"></span>
+            </div>
+
+            <div class="dash-activity-row skeleton-row">
+              <div class="dash-activity-row__left flex items-center gap-3">
+                <div class="dash-activity-row__icon skeleton"></div>
+                <div class="flex-col gap-1">
+                  <span class="dash-activity-row__label skeleton"></span>
+                  <span class="dash-activity-row__date skeleton"></span>
+                </div>
+              </div>
+              <span class="dash-activity-row__amount skeleton"></span>
+            </div>
+
+          </div><!-- /#activityList -->
+
+
+          <!-- ⑤ REFERRAL TOOLS ──────────────────────────── -->
+          <div class="dash-divider">
+            <span class="dash-divider__label uppercase">Your Tools</span>
+          </div>
+
+          <div class="dash-cards">
+
+            <!-- Card: Referral Code -->
+            <div class="dash-card">
+              <p class="dash-card__label flex items-center gap-2 uppercase">
+                <i data-lucide="key-round" style="width:13px;height:13px"></i>
+                Your Referral Code
+              </p>
+              <div class="dash-card__value-row flex-between">
+                <span class="dash-card__value skeleton" id="refCode">LOADING</span>
+                <button class="dash-copy-btn flex-center" id="copyCodeBtn"
+                        aria-label="Copy referral code" disabled>
+                  <i data-lucide="copy" style="width:14px;height:14px"></i>
+                </button>
+              </div>
+              <p class="dash-card__hint">
+                Share this code directly. Anyone who enters it on sign-up is credited to you automatically.
+              </p>
+            </div>
+
+            <!-- Card: Referral Link -->
+            <div class="dash-card">
+              <p class="dash-card__label flex items-center gap-2 uppercase">
+                <i data-lucide="link-2" style="width:13px;height:13px"></i>
+                Your Referral Link
+              </p>
+              <div class="dash-card__value-row flex-between">
+                <span class="dash-card__value dash-card__value--link skeleton" id="refLink">
+                  Loading your link...
+                </span>
+                <button class="dash-copy-btn flex-center shrink-0" id="copyLinkBtn"
+                        aria-label="Copy referral link" disabled>
+                  <i data-lucide="copy" style="width:14px;height:14px"></i>
+                </button>
+              </div>
+              <p class="dash-card__hint">
+                Anyone who clicks your link gets your code pre-filled on sign-up — no manual entry needed.
+              </p>
+            </div>
+
+          </div><!-- /.dash-cards -->
+
+
+          <!-- ⑥ REFERRALS LIST ──────────────────────────── -->
+          <div class="dash-divider">
+            <span class="dash-divider__label uppercase">Your Referrals</span>
+          </div>
+
+          <section class="dash-referrals flex-col gap-4">
+
+            <div class="flex-between dash-ref-header">
+              <h2 class="dash-ref-title">People You've Referred</h2>
+              <span class="dash-ref-count skeleton" id="refCount"></span>
+            </div>
+
+            <!-- Skeleton rows — replaced by JS -->
+            <div class="dash-ref-list flex-col gap-3" id="refList">
+
+              <div class="dash-ref-row flex-between">
+                <div class="flex items-center gap-3">
+                  <div class="dash-ref-avatar skeleton"></div>
+                  <div class="flex-col gap-1">
+                    <span class="dash-ref-name skeleton"></span>
+                    <span class="dash-ref-meta skeleton"></span>
+                  </div>
+                </div>
+                <span class="dash-ref-pill skeleton"></span>
+              </div>
+
+              <div class="dash-ref-row flex-between">
+                <div class="flex items-center gap-3">
+                  <div class="dash-ref-avatar skeleton"></div>
+                  <div class="flex-col gap-1">
+                    <span class="dash-ref-name skeleton"></span>
+                    <span class="dash-ref-meta skeleton"></span>
+                  </div>
+                </div>
+                <span class="dash-ref-pill skeleton"></span>
+              </div>
+
+              <div class="dash-ref-row flex-between">
+                <div class="flex items-center gap-3">
+                  <div class="dash-ref-avatar skeleton"></div>
+                  <div class="flex-col gap-1">
+                    <span class="dash-ref-name skeleton"></span>
+                    <span class="dash-ref-meta skeleton"></span>
+                  </div>
+                </div>
+                <span class="dash-ref-pill skeleton"></span>
+              </div>
+
+            </div><!-- /#refList -->
+
+            <!-- Empty state — hidden until JS confirms 0 referrals -->
+            <div class="dash-ref-empty flex-col-center hidden" id="refEmpty">
+              <div class="dash-ref-empty__icon flex-center">
+                <i data-lucide="users" style="width:20px;height:20px"></i>
+              </div>
+              <p class="dash-ref-empty__title">No referrals yet</p>
+              <p class="dash-ref-empty__sub">
+                Share your link above — people you refer will appear here.
+              </p>
+            </div>
+
+          </section><!-- /.dash-referrals -->
+
+        </div><!-- /.dash-section__inner -->
+      </section><!-- /#section-home -->
+
+
+      <!-- ══════════════════════════════════════════════════════
+           SECTION — INVEST (shell only)
+           ══════════════════════════════════════════════════════ -->
+      <section id="section-invest" class="dash-section hidden">
+        <div class="dash-section__coming flex-col-center">
+          <div class="dash-section__coming-icon flex-center">
+            <i data-lucide="trending-up" style="width:24px;height:24px"></i>
+          </div>
+          <p class="dash-section__coming-title">Invest</p>
+          <span class="dash-section__coming-sub">This section is coming at launch.</span>
+        </div>
       </section>
-      
-    </div>
-  </main>
+
+
+      <!-- ══════════════════════════════════════════════════════
+           SECTION — TRANSACT (shell only)
+           ══════════════════════════════════════════════════════ -->
+      <section id="section-transact" class="dash-section hidden">
+        <div class="dash-section__coming flex-col-center">
+          <div class="dash-section__coming-icon flex-center">
+            <i data-lucide="arrow-left-right" style="width:24px;height:24px"></i>
+          </div>
+          <p class="dash-section__coming-title">Transact</p>
+          <span class="dash-section__coming-sub">This section is coming at launch.</span>
+        </div>
+      </section>
+
+
+      <!-- ══════════════════════════════════════════════════════
+           SECTION — PROFILE (shell only)
+           ══════════════════════════════════════════════════════ -->
+      <section id="section-profile" class="dash-section hidden">
+        <div class="dash-section__coming flex-col-center">
+          <div class="dash-section__coming-icon flex-center">
+            <i data-lucide="user" style="width:24px;height:24px"></i>
+          </div>
+          <p class="dash-section__coming-title">Profile</p>
+          <span class="dash-section__coming-sub">This section is coming at launch.</span>
+        </div>
+      </section>
+
+
+    </main><!-- /dash-main -->
+  </div><!-- /dash-shell -->
+
 
   <script>
     lucide.createIcons();
   </script>
+
 </body>
 </html>
