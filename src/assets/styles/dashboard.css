@@ -877,6 +877,9 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   background-color: var(--surface-card);
   gap: 0.75rem;
 }
+#fundVaultBtn{
+  margin-top: 1rem;
+}
  
 /* Adjust border-radius so it applies cleanly with the thick left border */
 .dash-vault-card {
@@ -1771,9 +1774,9 @@ html[data-theme='dark'] .invest-claim-warning {
   border: 1px solid var(--status-warning-border);
   border-radius: var(--radius-md);
   padding: 1rem 1.125rem;
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1rem; */
   margin-top: 2rem;
 }
 
@@ -2202,7 +2205,7 @@ html[data-theme='dark'] .invest-claim-warning {
 
 .invest-toast {
   position: fixed;
-  top: 3.5rem;
+  top: 2rem;
   left: 50%;
   transform: translateX(-50%) translateY(0);
   background-color: var(--surface-card);

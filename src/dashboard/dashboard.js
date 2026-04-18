@@ -260,11 +260,12 @@ function renderActivity(data) {
     withdrawal:     'arrow-up-right',
     vault_fund:     'shield',
     daily_claim:    'sun',
+    early_exit: 'door-open',
     referral_bonus: 'users',
     vault_maturity: 'lock-open',
   };
  
-  const inboundTypes = new Set(['deposit', 'daily_claim', 'referral_bonus', 'vault_maturity']);
+  const inboundTypes = new Set(['deposit', 'daily_claim', 'early_exit', 'referral_bonus', 'vault_maturity']);
  
   data.forEach(item => {
     const icon     = iconMap[item.type] || 'circle';
@@ -630,7 +631,7 @@ function populateEarningsCard(plan) {
 
   if (plan.claimedToday) {
     claimBtn.classList.add('invest-claim-btn--claimed');
-    claimBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> Claimed Today ✓';
+    claimBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> Claimed Today';
     claimBtn.disabled = true;
   } else if (!windowOpen) {
     claimBtn.classList.add('invest-claim-btn--missed');
@@ -736,13 +737,81 @@ function initEarlyExitToggle() {
 }
 
 
-// ─── STUB HANDLERS ────────────────────────────────────────────────
-// Wire each to a Supabase call when the backend is ready.
+async function handleClaim() {
+  const claimBtn    = document.getElementById('claimBtn');
+  const claimableEl = document.getElementById('claimableAmount');
+  const accruedEl   = document.getElementById('totalAccrued');
 
-function handleClaim() {
-  // TODO: call Supabase RPC or update 'investments' table row for today's claim
-  console.log('[invest] Claim triggered');
-  showToast('Claim coming soon — backend not wired yet.', 'warning');
+  if (!claimBtn) return;
+
+  // ── Optimistic lock: prevent double-tap immediately ──
+  claimBtn.disabled = true;
+  claimBtn.textContent = 'Claiming...';
+
+  const { data: claimedAmount, error } = await supabase.rpc('process_daily_claim');
+
+  if (error) {
+    // Restore the claimable state so they can retry
+    claimBtn.disabled = false;
+    claimBtn.classList.remove('invest-claim-btn--claimed');
+    claimBtn.classList.add('invest-claim-btn--claimable');
+    claimBtn.innerHTML = '<i data-lucide="sun" style="width:16px;height:16px"></i> Claim Today\'s Yield';
+    if (window.lucide) lucide.createIcons({ nodes: [claimBtn] });
+
+    // Re-attach the listener since { once: true } consumed it
+    claimBtn.addEventListener('click', handleClaim, { once: true });
+
+    showToast(error.message || 'Claim failed. Please try again.', 'warning');
+    return;
+  }
+
+  // ── Surgical DOM updates — no section reload ──
+
+  // Zero out the claimable display
+  if (claimableEl) claimableEl.textContent = '0.00';
+
+  // Add the returned amount to the running total
+  if (accruedEl) {
+    const current = parseFloat(
+      accruedEl.textContent.replace(/[₦,]/g, '')
+    ) || 0;
+    accruedEl.textContent = formatNaira(current + Number(claimedAmount));
+  }
+
+  // Switch the button to claimed state
+  claimBtn.classList.remove('invest-claim-btn--claimable');
+  claimBtn.classList.add('invest-claim-btn--claimed');
+  claimBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> Claimed Today ✓';
+  claimBtn.disabled = true;
+  if (window.lucide) lucide.createIcons({ nodes: [claimBtn] });
+
+  showToast('Yield claimed successfully!', 'success');
+
+  // Prepend the new transaction row to the activity list without refetching
+  const activityListEl = document.getElementById('activityList');
+  if (activityListEl) {
+    const emptyState = activityListEl.querySelector('.dash-ref-empty');
+    if (emptyState) emptyState.remove();
+
+    const row = document.createElement('div');
+    row.className = 'dash-activity-row';
+    row.innerHTML = `
+      <div class="dash-activity-row__left flex items-center gap-3">
+        <div class="dash-activity-row__icon dash-activity-row__icon--daily_claim flex-center">
+          <i data-lucide="sun" style="width:14px;height:14px"></i>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="dash-activity-row__label">Daily yield claimed</span>
+          <span class="dash-activity-row__date">${formatDate(new Date().toISOString())}</span>
+        </div>
+      </div>
+      <span class="dash-activity-row__amount dash-activity-row__amount--in">
+        +₦${Number(claimedAmount).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+      </span>
+    `;
+    activityListEl.insertBefore(row, activityListEl.firstChild);
+    if (window.lucide) lucide.createIcons({ nodes: [row] });
+  }
 }
 
 function handleEarlyExit() {
@@ -1074,6 +1143,8 @@ function populateReviewSummary() {
     await createPlan(selectedAmount, selectedDuration);
     const checkbox = document.getElementById('confirmCheckbox');
     if (checkbox) checkbox.checked = false;
+    const capitalValue = document.querySelector('.dash-card__hint-value');
+    capitalValue.textContent = formatNaira(selectedAmount);
   });
 })();
 
