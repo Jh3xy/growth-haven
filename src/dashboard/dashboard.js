@@ -288,8 +288,9 @@ function renderActivity(data) {
 }
  
 // Stub call — shows empty state until backend is wired
-// Replace with: renderActivity(await fetchTransactions(user.id));
-renderActivity([]);
+
+
+renderActivity(await fetchTransactions(user.id));
  
  
 // ─── SPA NAVIGATION ──────────────────────────────────────────────
@@ -369,14 +370,13 @@ sidebarSignoutBtn?.addEventListener('click', async () => {
 // ── Default: show Home on load ──
 switchSection('home');
  
-// ════════════════════════════════════════════════════════════════
-// INVESTMENTS SECTION 
-// ════════════════════════════════════════════════════════════════
 
+/**
+ * INVESTMENTS SECTION
+ */
 
 // ─── RATE TABLE ──────────────────────────────────────────────────
 // Source of truth for all rate lookups. Do not compute inline.
-
 const PLAN_DURATIONS = [
   { days: 7,  label: '7-Day Fast Plan',       shortLabel: 'Fast' },
   { days: 14, label: '14-Day Standard Plan',   shortLabel: 'Standard' },
@@ -384,6 +384,7 @@ const PLAN_DURATIONS = [
 ];
 
 const PLAN_AMOUNTS = [6000, 12000, 30000, 50000, 100000];
+
 
 /**
  * Returns { dailyRate, totalRate } for a given amount + duration combo.
