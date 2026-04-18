@@ -108,10 +108,17 @@ if (member) {
   // Home — Vault card display
   const vaultBal = Number(member.vault_balance || 0);
   const vaultBalanceEl = document.getElementById('vaultBalance');
+  const vaultBtn = document.getElementById('fundVaultBtn');
   if (vaultBalanceEl) {
     vaultBalanceEl.textContent = vaultBal.toLocaleString('en-NG', { minimumFractionDigits: 2 });
     vaultBalanceEl.classList.remove('skeleton');
   }
+  vaultBtn.textContent = vaultBal > 0 ? 'View Plan' : 'Fund Vault';
+  vaultBtn.disabled = vaultBal > 0 ? false : true;
+  vaultBtn.addEventListener("click", ()=> {
+    const investNavBtn = document.querySelector('[data-nav ="invest"]');
+    investNavBtn.click();
+  })
 
   // Home — Vault tier info: clear skeleton, show default until investments is wired
   const vaultTierEl = document.getElementById('vaultTierInfo');
@@ -272,7 +279,7 @@ function renderActivity(data) {
         <div class="dash-activity-row__icon dash-activity-row__icon--${item.type} flex-center">
           <i data-lucide="${icon}" style="width:14px;height:14px"></i>
         </div>
-        <div class="flex-col gap-1">
+        <div class="flex flex-col gap-1">
           <span class="dash-activity-row__label">${item.label || item.type}</span>
           <span class="dash-activity-row__date">${formatDate(item.created_at)}</span>
         </div>
@@ -290,7 +297,25 @@ function renderActivity(data) {
 // Stub call — shows empty state until backend is wired
 
 
-renderActivity(await fetchTransactions(user.id));
+async function fetchTransactions(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('type, label, amount, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    renderActivity([]);
+    return null;
+  }
+}
+
+const transactions = await fetchTransactions(user.id);
+if (transactions) renderActivity(transactions);
  
  
 // ─── SPA NAVIGATION ──────────────────────────────────────────────
@@ -474,21 +499,11 @@ function showToast(message, type = 'info') {
 //     dailyRate, accruedEarnings, claimedToday (bool),
 //     claimableAmount }
 
-const activePlan = null;
-// const activePlan = {
-//   amount: 12000,
-//   durationDays: 7,
-//   startDate: '2024-04-14T00:00:00Z',
-//   dailyRate: 5,
-//   accruedEarnings: 1200,
-//   claimedToday: false,
-//   claimableAmount: 600,
-// };
 
 
 // ─── INVESTMENTS — MAIN LOADER ────────────────────────────────────
 
-function loadInvestmentSection() {
+async function loadInvestmentSection() {
   const emptyState  = document.getElementById('investEmptyState');
   const activeState = document.getElementById('investActiveState');
   const createFlow  = document.getElementById('createPlanFlow');
@@ -499,6 +514,28 @@ function loadInvestmentSection() {
   emptyState.classList.add('hidden');
   activeState.classList.add('hidden');
   createFlow.classList.add('hidden');
+
+  let activePlan = null;
+  const { data, error } = await supabase
+    .from('investments')
+    .select('amount, duration_days, daily_rate, accrued_earnings, claimed_today, claimable_amount, start_date')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .single();
+
+  if (data) {
+    activePlan = {
+      amount: data.amount,
+      durationDays: data.duration_days,
+      startDate: data.start_date,
+      dailyRate: data.daily_rate * 100,
+      accruedEarnings: data.accrued_earnings,
+      claimedToday: data.claimed_today,
+      claimableAmount: data.claimable_amount,
+    };
+  } else if (error && error.code !== 'PGRST116') {
+    console.error('[invest] loadInvestmentSection error:', error);
+  }
 
   if (!activePlan) {
     emptyState.classList.remove('hidden');
@@ -732,7 +769,7 @@ async function createPlan(amount, duration) {
 
   showToast('Plan started successfully!', 'success');
   // Then reload the investment section to show State 2
-  loadInvestmentSection();
+  await loadInvestmentSection();
 }
 
 
@@ -1030,23 +1067,16 @@ function populateReviewSummary() {
   });
 
   // Confirm & Start Plan
-  document.getElementById('confirmPlanBtn')?.addEventListener('click', () => {
+  document.getElementById('confirmPlanBtn')?.addEventListener('click', async () => {
     if (selectedAmount === null || selectedDuration === null) return;
-
-    // Stub — replace with real call when backend is ready
-    createPlan(selectedAmount, selectedDuration);
-    showToast('Plan creation coming soon — backend not wired yet.', 'warning');
-
-    // Reset flow state
+    const btn = document.getElementById('confirmPlanBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Starting...'; }
+    await createPlan(selectedAmount, selectedDuration);
     const checkbox = document.getElementById('confirmCheckbox');
     if (checkbox) checkbox.checked = false;
-    const btn = document.getElementById('confirmPlanBtn');
-    if (btn) btn.disabled = true;
   });
 })();
 
 
 // ─── KICK OFF ────────────────────────────────────────────────────
-loadInvestmentSection();
-
-
+await loadInvestmentSection();

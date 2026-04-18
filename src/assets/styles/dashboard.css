@@ -853,7 +853,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
  
 .dash-wallet-card__amount {
   font-size: clamp(2rem, 5vw, 2.75rem);
-  font-size: 3rem;
+  font-size: 2.4rem;
   font-weight: var(--fw-semibold);
   letter-spacing: var(--ls-tight);
   color: var(--text-primary);
@@ -908,7 +908,7 @@ align-items: anchor-center;
  
 .dash-vault-card__amount {
   /* font-size: clamp(2rem, 5vw, 2.75rem); */
-  font-size: 3rem;
+  font-size: 2.4rem;
   font-weight: var(--fw-semibold);
   letter-spacing: var(--ls-tight);
   color: var(--text-primary);
@@ -933,7 +933,7 @@ align-items: anchor-center;
   min-width: 140px;
   min-height: 10px;
   position: absolute;
-  right: -10%;
+  right: -34%;
 }
  
  
@@ -960,6 +960,10 @@ align-items: anchor-center;
     color var(--transition-global),
     transform 0.2s var(--spring),
     opacity var(--transition-global);
+}
+
+.dash-action-btn:active {
+  transform: scale(.95);
 }
  
 .dash-action-btn--primary {
@@ -992,10 +996,10 @@ align-items: anchor-center;
   transform: none;
 }
  
- 
 /* ─── ACTIVITY ROW ───────────────────────────────────────────── */
  
 .dash-activity-row {
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1043,7 +1047,7 @@ align-items: anchor-center;
 .dash-activity-row__icon--vault_maturity { background-color: var(--status-success-bg); color: var(--status-success-text); }
  
 .dash-activity-row__label {
-  font-size: var(--fs-body);
+  font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
   color: var(--text-primary);
   min-width: 140px;
@@ -1064,7 +1068,7 @@ align-items: anchor-center;
 }
  
 .dash-activity-row__amount {
-  font-size: var(--fs-body);
+  font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
   color: var(--text-primary);
   min-width: 70px;
@@ -1380,13 +1384,17 @@ html[data-theme='dark'] .dash-activity-row:not(.skeleton-row):hover {
 
 .invest-active-plan-card {
   /* Premium vault feel: deeper surface + left accent + subtle green glow */
-  border-left: 3px solid var(--brand-primary);
+  /* border-left: 3px solid var(--brand-primary); */
   border-top-left-radius: calc(var(--radius-lg) - 2px);
   border-bottom-left-radius: calc(var(--radius-lg) - 2px);
   background:
     radial-gradient(circle at top right, var(--brand-primary-soft), transparent 50%),
     var(--surface-card);
   gap: 0.875rem;
+}
+
+.invest-active-plan-card__top {
+  margin-bottom: 12px;
 }
 
 .invest-active-badge {
@@ -1415,6 +1423,7 @@ html[data-theme='dark'] .invest-active-badge {
   align-items: baseline;
   gap: 0.25rem;
   line-height: 1;
+  margin-bottom: 1rem;
 }
 
 .invest-plan-currency {
@@ -1433,21 +1442,24 @@ html[data-theme='dark'] .invest-active-badge {
 }
 
 .invest-plan-invested-label {
-  font-size: 0.8125rem;
+  font-size: var(--fs-caption);
+  opacity: 0.5;
   font-weight: var(--fw-medium);
   color: var(--text-secondary);
-  align-self: flex-end;
+  align-self: flex-start;
   padding-bottom: 0.2rem;
 }
 
 .invest-plan-label {
   display: inline-block;
-  font-size: 0.8125rem;
+  font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
   color: var(--text-secondary);
   min-width: 160px;
   min-height: 14px;
   border-radius: 4px;
+  margin-top: -0.85rem;
+  opacity: 0.7;
 }
 
 /* Progress bar */
@@ -1501,6 +1513,7 @@ html[data-theme='dark'] .invest-active-badge {
   display: flex;
   align-items: center;
   gap: 0.375rem;
+  margin-bottom: 0;
   font-size: var(--fs-caption);
   color: var(--text-secondary);
   line-height: 1.4;
@@ -1553,6 +1566,7 @@ html[data-theme='dark'] .invest-active-badge {
   font-size: var(--fs-caption);
   color: var(--text-secondary);
   line-height: 1.5;
+  margin: 0;
 }
 
 .invest-accrued-line strong {
@@ -1627,7 +1641,9 @@ html[data-theme='dark'] .invest-active-badge {
 }
 
 .invest-claim-warning {
-  font-size: 0.6875rem;
+  font-size: 0.6rem;
+  opacity: 0.5;
+  margin-top: 1rem;
   color: var(--status-warning-text);
   line-height: 1.5;
   display: flex;
@@ -1712,6 +1728,7 @@ html[data-theme='dark'] .invest-claim-warning {
 
 /* Condition rows */
 .invest-exit-condition {
+  margin-top: 1rem;
   display: flex;
   align-items: flex-start;
   gap: 0.625rem;
@@ -1757,6 +1774,7 @@ html[data-theme='dark'] .invest-claim-warning {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
 .invest-exit-penalty__text {
@@ -2184,7 +2202,7 @@ html[data-theme='dark'] .invest-claim-warning {
 
 .invest-toast {
   position: fixed;
-  bottom: 2rem;
+  top: 3.5rem;
   left: 50%;
   transform: translateX(-50%) translateY(0);
   background-color: var(--surface-card);

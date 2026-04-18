@@ -150,11 +150,11 @@
               </div>
               
               <div class="dash-wallet-card__actions flex gap-3">
-                <button class="dash-action-btn dash-action-btn--primary" disabled title="Coming soon">
+                <button class="dash-action-btn dash-action-btn--primary">
                   <i data-lucide="arrow-down-to-line" style="width:14px;height:14px"></i>
                   Deposit
                 </button>
-                <button class="dash-action-btn dash-action-btn--secondary" disabled title="Coming soon">
+                <button class="dash-action-btn dash-action-btn--secondary">
                   <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i>
                   Withdraw
                 </button>
@@ -178,8 +178,7 @@
               </div>
               <p class="dash-card__hint">Capital</p>
               <span class="dash-vault-card__tier skeleton" id="vaultTierInfo">7-Day Plan · 5% daily</span>
-              <button class="dash-action-btn dash-action-btn--secondary w-fit" id="fundVaultBtn"
-                      disabled title="Coming soon">
+              <button class="dash-action-btn dash-action-btn--secondary w-fit" id="fundVaultBtn">
                 <i data-lucide="arrow-left-right" style="width:14px;height:14px"></i>
                 Fund
               </button>
@@ -414,7 +413,7 @@
           <!-- ════════════════════════════════════════════════════════
               STATE 2 — ACTIVE PLAN
               ════════════════════════════════════════════════════════ -->
-          <div id="investActiveState" class="hidden flex-col" style="gap:1.5rem;">
+          <div id="investActiveState" class="hidden flex-col" style="gap:1.5rem;display: flex;">
 
 
             <!-- ── Plan Summary Card ─────────────────────────────── -->
@@ -431,13 +430,13 @@
                 </span>
               </div>
 
-              <div class="invest-plan-amount-row flex items-baseline gap-1">
-                <span class="invest-plan-currency">₦</span>
-                <span class="invest-plan-amount skeleton" id="activePlanAmount">0.00</span>
+              <div class="invest-plan-amount-row flex flex-col">
+                <div class="flex items-center gap-1">
+                  <span class="invest-plan-currency">₦</span>
+                  <span class="invest-plan-amount skeleton" id="activePlanAmount">0.00</span>
+                </div>
                 <span class="invest-plan-invested-label">Invested</span>
               </div>
-
-              <span class="invest-plan-label skeleton" id="activePlanLabel">7-Day Fast Plan · 5% daily</span>
 
               <!-- Progress bar -->
               <div class="invest-progress-wrap">
@@ -456,6 +455,7 @@
                 Matures:
                 <span class="invest-maturity-date skeleton" id="activePlanMaturity">—</span>
               </p>
+              <span class="invest-plan-label skeleton" id="activePlanLabel">7-Day Fast Plan · 5% daily</span>
 
             </div><!-- /#activePlanCard -->
 
