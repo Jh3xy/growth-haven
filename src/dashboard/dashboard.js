@@ -814,10 +814,39 @@ async function handleClaim() {
   }
 }
 
-function handleEarlyExit() {
-  // TODO: call Supabase RPC to process early exit + penalty
-  console.log('[invest] Early exit triggered');
-  showToast('Early exit coming soon — backend not wired yet.', 'warning');
+async function handleEarlyExit() {
+  const exitBtn = document.getElementById('earlyExitBtn');
+
+  if (exitBtn) {
+    exitBtn.disabled = true;
+    exitBtn.textContent = 'Processing...';
+  }
+
+  const { data: netPayout, error } = await supabase.rpc('process_early_exit');
+
+  if (error) {
+    // Re-enable and re-attach so they can retry
+    if (exitBtn) {
+      exitBtn.disabled = false;
+      exitBtn.textContent = 'Exit Early';
+      exitBtn.addEventListener('click', handleEarlyExit, { once: true });
+    }
+    showToast(error.message || 'Exit failed. Please try again.', 'warning');
+    return;
+  }
+
+  // Update wallet balance on the Home tab
+  currentWalletBalance += Number(netPayout);
+  const walletBalanceEl = document.getElementById('walletBalance');
+  if (walletBalanceEl) {
+    walletBalanceEl.textContent = currentWalletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 });
+  }
+
+  showToast(`Exit successful. ${formatNaira(netPayout)} returned to your wallet.`, 'success');
+
+  // Reload the investment section — this is intentional unlike the claim flow.
+  // The entire active plan UI needs to disappear and show the empty state.
+  await loadInvestmentSection();
 }
 
 async function createPlan(amount, duration) {
