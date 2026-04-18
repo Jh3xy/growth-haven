@@ -31,6 +31,8 @@ const copyCodeBtn  = document.getElementById('copyCodeBtn');
 const copyLinkBtn  = document.getElementById('copyLinkBtn');
 const signoutBtn   = document.getElementById('signoutBtn');
 
+let currentWalletBalance = 0;
+
 // ─── AUTH GUARD ──────────────────────────────────────────────
 // Reads from localStorage — instant, no network call.
 const { data: { session } } = await supabase.auth.getSession();
@@ -57,7 +59,7 @@ if (firstName) {
 // ─── FETCH MEMBER DATA ────────────────────────────────────────
 const { data: member, error: memberError } = await supabase
   .from('members')
-  .select('referral_code')
+  .select('referral_code, wallet_balance, vault_balance')
   .eq('id', user.id)
   .single();
 
@@ -91,6 +93,35 @@ if (memberError || !member?.referral_code) {
   });
 }
 
+// ─── SET BALANCES FROM MEMBER ROW ────────────────────────────
+if (member) {
+  // Set the JS variable — this is what gates the invest tiles
+  currentWalletBalance = Number(member.wallet_balance || 0);
+
+  // Home — Wallet card display
+  const walletBalanceEl = document.getElementById('walletBalance');
+  if (walletBalanceEl) {
+    walletBalanceEl.textContent = currentWalletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 });
+    walletBalanceEl.classList.remove('skeleton');
+  }
+
+  // Home — Vault card display
+  const vaultBal = Number(member.vault_balance || 0);
+  const vaultBalanceEl = document.getElementById('vaultBalance');
+  if (vaultBalanceEl) {
+    vaultBalanceEl.textContent = vaultBal.toLocaleString('en-NG', { minimumFractionDigits: 2 });
+    vaultBalanceEl.classList.remove('skeleton');
+  }
+
+  // Home — Vault tier info: clear skeleton, show default until investments is wired
+  const vaultTierEl = document.getElementById('vaultTierInfo');
+  if (vaultTierEl) {
+    vaultTierEl.textContent = vaultBal > 0 ? 'Active plan' : 'No active plan';
+    vaultTierEl.classList.remove('skeleton');
+  }
+}
+
+
 // ─── COPY FEEDBACK ───────────────────────────────────────────
 function flashCopied(btn) {
   btn.classList.add('copied');
@@ -105,14 +136,16 @@ function flashCopied(btn) {
 }
 
 // ─── SIGN OUT ─────────────────────────────────────────────────
-signoutBtn.addEventListener('click', async () => {
-  signoutBtn.disabled = true;
-  signoutBtn.querySelector('span').textContent = 'Signing out...';
-  await supabase.auth.signOut();
-  localStorage.removeItem('gh_reg_step');
-  localStorage.removeItem('gh_reg_email');
-  window.location.href = '/src/login/';
-});
+if (signoutBtn) {
+  signoutBtn.addEventListener('click', async () => {
+    signoutBtn.disabled = true;
+    signoutBtn.querySelector('span').textContent = 'Signing out...';
+    await supabase.auth.signOut();
+    localStorage.removeItem('gh_reg_step');
+    localStorage.removeItem('gh_reg_email');
+    window.location.href = '/src/login/';
+  });
+}
 
 
 // ─── REFERRALS ────────────────────────────────────────────────
@@ -179,57 +212,24 @@ function renderReferralRow(ref) {
     refListEl.appendChild(renderReferralRow(ref));
   });
 })();
-
-
-
-
-
-// ─── WALLET & VAULT — STUB ───────────────────────────────────────
-// No backend wired yet. Clears skeletons with zero balances.
-// Replace the body of each IIFE with real Supabase queries when ready.
- 
-(async () => {
-  const walletBalanceEl = document.getElementById('walletBalance');
-  const vaultBalanceEl  = document.getElementById('vaultBalance');
-  const vaultTierEl     = document.getElementById('vaultTierInfo');
- 
-  // TODO: fetch from Supabase (e.g. members.wallet_balance, members.vault_balance)
-  // const { data } = await supabase.from('members').select('wallet_balance, vault_balance, plan_name, plan_rate').eq('id', user.id).single();
- 
-  if (walletBalanceEl) {
-    walletBalanceEl.textContent = '0.00';
-    walletBalanceEl.classList.remove('skeleton');
-  }
- 
-  if (vaultBalanceEl) {
-    vaultBalanceEl.textContent = '0.00';
-    vaultBalanceEl.classList.remove('skeleton');
-  }
- 
-  if (vaultTierEl) {
-    // Replace with real plan info when available: `${data.plan_name} · ${data.plan_rate}% daily`
-    vaultTierEl.textContent = 'No active plan';
-    vaultTierEl.classList.remove('skeleton');
-  }
-})();
  
  
 // ─── RECENT ACTIVITY ─────────────────────────────────────────────
-const activityListEl = document.getElementById('activityList');
- 
+
 /**
  * renderActivity(data)
  * Renders transaction rows into #activityList.
- *
- * Expected shape of each item in data[]:
- *   { type, label, amount, created_at }
- *
- * Types: 'deposit' | 'withdrawal' | 'vault_fund' |
- *        'daily_claim' | 'referral_bonus' | 'vault_maturity'
- *
- * Call with an empty array to show the empty state.
- * Wire to a real Supabase query when the transactions table is ready.
- */
+*
+* Expected shape of each item in data[]:
+*   { type, label, amount, created_at }
+*
+* Types: 'deposit' | 'withdrawal' | 'vault_fund' |
+*        'daily_claim' | 'referral_bonus' | 'vault_maturity'
+*
+* Call with an empty array to show the empty state.
+* Wire to a real Supabase query when the transactions table is ready.
+*/
+const activityListEl = document.getElementById('activityList');
 function renderActivity(data) {
   if (!activityListEl) return;
   activityListEl.innerHTML = '';
@@ -369,6 +369,683 @@ sidebarSignoutBtn?.addEventListener('click', async () => {
 // ── Default: show Home on load ──
 switchSection('home');
  
+// ════════════════════════════════════════════════════════════════
+// INVESTMENTS SECTION 
+// ════════════════════════════════════════════════════════════════
 
+
+// ─── RATE TABLE ──────────────────────────────────────────────────
+// Source of truth for all rate lookups. Do not compute inline.
+
+const PLAN_DURATIONS = [
+  { days: 7,  label: '7-Day Fast Plan',       shortLabel: 'Fast' },
+  { days: 14, label: '14-Day Standard Plan',   shortLabel: 'Standard' },
+  { days: 30, label: '30-Day VIP Plan',        shortLabel: 'VIP' },
+];
+
+const PLAN_AMOUNTS = [6000, 12000, 30000, 50000, 100000];
+
+/**
+ * Returns { dailyRate, totalRate } for a given amount + duration combo.
+ * dailyRate and totalRate are plain numbers (e.g. 5, 35 — not 0.05, 0.35).
+ */
+function getPlanRate(amount, durationDays) {
+  const isHighTier = amount >= 50000;
+  if (durationDays === 7)  return isHighTier ? { dailyRate: 6,   totalRate: 42  } : { dailyRate: 5,   totalRate: 35  };
+  if (durationDays === 14) return isHighTier ? { dailyRate: 4.5, totalRate: 63  } : { dailyRate: 4,   totalRate: 56  };
+  if (durationDays === 30) return isHighTier ? { dailyRate: 3.5, totalRate: 105 } : { dailyRate: 3,   totalRate: 90  };
+  return { dailyRate: 0, totalRate: 0 }; // fallback — should never hit
+}
+
+/**
+ * Returns projected earnings in ₦, capped at the original amount (2x hard cap).
+ */
+function getProjectedEarnings(amount, durationDays) {
+  const { totalRate } = getPlanRate(amount, durationDays);
+  const raw = amount * (totalRate / 100);
+  return Math.min(raw, amount); // 2x cap: earnings never exceed deposit
+}
+
+/**
+ * Returns the maturity Date object, shifted to Monday if it falls on a weekend.
+ */
+function getPayoutDate(startDate, durationDays) {
+  const maturity = new Date(startDate);
+  maturity.setDate(maturity.getDate() + durationDays);
+  const day = maturity.getDay(); // 0=Sun, 6=Sat
+  if (day === 6) maturity.setDate(maturity.getDate() + 2); // Sat → Mon
+  if (day === 0) maturity.setDate(maturity.getDate() + 1); // Sun → Mon
+  return maturity;
+}
+
+/**
+ * Formats a Date object as "Mon 24 Apr 2026".
+ */
+function formatPayoutDate(date) {
+  return date.toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+  });
+}
+
+/**
+ * Formats a number as ₦X,XXX.XX
+ */
+function formatNaira(amount) {
+  return '₦' + Number(amount).toLocaleString('en-NG', { minimumFractionDigits: 2 });
+}
+
+/**
+ * Returns whether the current time (WAT = UTC+1) has passed midnight.
+ * Used to determine if the claim window has closed for today.
+ */
+function isClaimWindowOpen() {
+  // WAT is UTC+1
+  const nowWAT = new Date(Date.now() + 60 * 60 * 1000); // shift to WAT
+  // Claim window: 9 AM – midnight WAT
+  const hours = nowWAT.getUTCHours();
+  return hours >= 9; // before midnight, after 9 AM WAT
+}
+
+
+// ─── TOAST ───────────────────────────────────────────────────────
+
+function showToast(message, type = 'info') {
+  const existing = document.querySelector('.invest-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `invest-toast invest-toast--${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.3s ease';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 320);
+  }, 3200);
+}
+
+
+// ─── STUB ACTIVE PLAN DATA ────────────────────────────────────────
+// Replace this with a real Supabase query when the schema is ready.
+// Shape:
+//   { amount, durationDays, startDate (ISO string),
+//     dailyRate, accruedEarnings, claimedToday (bool),
+//     claimableAmount }
+
+const activePlan = null;
+// const activePlan = {
+//   amount: 12000,
+//   durationDays: 7,
+//   startDate: '2024-04-14T00:00:00Z',
+//   dailyRate: 5,
+//   accruedEarnings: 1200,
+//   claimedToday: false,
+//   claimableAmount: 600,
+// };
+
+
+// ─── INVESTMENTS — MAIN LOADER ────────────────────────────────────
+
+function loadInvestmentSection() {
+  const emptyState  = document.getElementById('investEmptyState');
+  const activeState = document.getElementById('investActiveState');
+  const createFlow  = document.getElementById('createPlanFlow');
+
+  if (!emptyState || !activeState || !createFlow) return;
+
+  // Hide all three states first
+  emptyState.classList.add('hidden');
+  activeState.classList.add('hidden');
+  createFlow.classList.add('hidden');
+
+  if (!activePlan) {
+    emptyState.classList.remove('hidden');
+    initEarlyExitToggle(); // still bind it, safe if not in view
+    return;
+  }
+
+  // Active plan — populate all cards
+  populateActivePlan(activePlan);
+  populateEarningsCard(activePlan);
+  populateEarlyExit(activePlan);
+
+  activeState.classList.remove('hidden');
+}
+
+
+// ─── POPULATE — ACTIVE PLAN CARD ─────────────────────────────────
+
+function populateActivePlan(plan) {
+  const amountEl    = document.getElementById('activePlanAmount');
+  const labelEl     = document.getElementById('activePlanLabel');
+  const progressEl  = document.getElementById('activePlanProgress');
+  const progressLbl = document.getElementById('activePlanProgressLabel');
+  const remainingEl = document.getElementById('activePlanRemaining');
+  const maturityEl  = document.getElementById('activePlanMaturity');
+
+  if (!amountEl) return;
+
+  const { dailyRate } = getPlanRate(plan.amount, plan.durationDays);
+  const durationDef   = PLAN_DURATIONS.find(d => d.days === plan.durationDays);
+  const planLabel     = durationDef ? `${durationDef.label} · ${dailyRate}% daily` : `${plan.durationDays}-Day Plan`;
+
+  const start     = new Date(plan.startDate);
+  const today     = new Date();
+  const msPerDay  = 1000 * 60 * 60 * 24;
+  const daysIn    = Math.max(0, Math.floor((today - start) / msPerDay));
+  const daysLeft  = Math.max(0, plan.durationDays - daysIn);
+  const pct       = Math.min(100, Math.round((daysIn / plan.durationDays) * 100));
+
+  const payoutDate    = getPayoutDate(plan.startDate, plan.durationDays);
+  const payoutFormatted = formatPayoutDate(payoutDate);
+
+  amountEl.textContent = formatNaira(plan.amount).replace('₦', '');
+  amountEl.classList.remove('skeleton');
+
+  if (labelEl) {
+    labelEl.textContent = planLabel;
+    labelEl.classList.remove('skeleton');
+  }
+
+  if (progressEl) progressEl.style.width = `${pct}%`;
+
+  if (progressLbl) {
+    progressLbl.textContent = `Day ${daysIn} of ${plan.durationDays}`;
+    progressLbl.classList.remove('skeleton');
+  }
+
+  if (remainingEl) {
+    remainingEl.textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining`;
+    remainingEl.classList.remove('skeleton');
+  }
+
+  if (maturityEl) {
+    maturityEl.textContent = payoutFormatted;
+    maturityEl.classList.remove('skeleton');
+  }
+}
+
+
+// ─── POPULATE — EARNINGS CARD ─────────────────────────────────────
+
+function populateEarningsCard(plan) {
+  const claimableEl = document.getElementById('claimableAmount');
+  const accruedEl   = document.getElementById('totalAccrued');
+  const claimBtn    = document.getElementById('claimBtn');
+
+  if (!claimableEl) return;
+
+  claimableEl.textContent = formatNaira(plan.claimableAmount || 0).replace('₦', '');
+  claimableEl.classList.remove('skeleton');
+
+  if (accruedEl) {
+    accruedEl.textContent = formatNaira(plan.accruedEarnings || 0);
+  }
+
+  if (!claimBtn) return;
+
+  const windowOpen = isClaimWindowOpen();
+
+  // Remove all state classes before applying the correct one
+  claimBtn.classList.remove('invest-claim-btn--claimable', 'invest-claim-btn--claimed', 'invest-claim-btn--missed');
+
+  if (plan.claimedToday) {
+    claimBtn.classList.add('invest-claim-btn--claimed');
+    claimBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> Claimed Today ✓';
+    claimBtn.disabled = true;
+  } else if (!windowOpen) {
+    claimBtn.classList.add('invest-claim-btn--missed');
+    claimBtn.textContent = 'Missed — window closed';
+    claimBtn.disabled = true;
+  } else {
+    claimBtn.classList.add('invest-claim-btn--claimable');
+    claimBtn.innerHTML = '<i data-lucide="sun" style="width:16px;height:16px"></i> Claim Today\'s Yield';
+    claimBtn.disabled = false;
+    claimBtn.addEventListener('click', handleClaim, { once: true });
+  }
+
+  if (window.lucide) lucide.createIcons({ nodes: [claimBtn] });
+}
+
+
+// ─── EARLY EXIT ───────────────────────────────────────────────────
+
+function populateEarlyExit(plan) {
+  initEarlyExitToggle();
+
+  const conditionsEl  = document.getElementById('exitConditionsList');
+  const penaltySummEl = document.getElementById('exitPenaltySummary');
+  const penaltyTextEl = document.getElementById('exitPenaltyText');
+  const exitBtn       = document.getElementById('earlyExitBtn');
+
+  if (!conditionsEl || !penaltySummEl) return;
+
+  conditionsEl.innerHTML = '';
+
+  const start    = new Date(plan.startDate);
+  const today    = new Date();
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const daysIn   = Math.max(0, Math.floor((today - start) / msPerDay));
+  const pctDays  = daysIn / plan.durationDays;
+
+  const projEarnings = getProjectedEarnings(plan.amount, plan.durationDays);
+  const pctAccrued   = projEarnings > 0 ? (plan.accruedEarnings || 0) / projEarnings : 0;
+
+  const cond1Met = pctDays >= 0.5;
+  const cond2Met = pctAccrued >= 0.25;
+
+  function condRow(met, text) {
+    const icon = met
+      ? '<i data-lucide="check" style="width:11px;height:11px"></i>'
+      : '<i data-lucide="alert-circle" style="width:11px;height:11px"></i>';
+    return `
+      <div class="invest-exit-condition invest-exit-condition--${met ? 'met' : 'unmet'} flex items-start gap-2">
+        <div class="invest-exit-condition__icon flex-center">${icon}</div>
+        <span class="invest-exit-condition__text">${text}</span>
+      </div>
+    `;
+  }
+
+  const daysNeeded = Math.ceil(plan.durationDays * 0.5);
+  const c1Text = cond1Met
+    ? `You've completed ${daysIn} of ${plan.durationDays} days (${Math.round(pctDays * 100)}%) ✓`
+    : `You need to reach day ${daysNeeded} before exiting (currently day ${daysIn}).`;
+
+  const earned25 = (projEarnings * 0.25).toFixed(2);
+  const c2Text = cond2Met
+    ? `Your accrued earnings (${formatNaira(plan.accruedEarnings)}) meet the 25% threshold ✓`
+    : `Accrue at least ${formatNaira(earned25)} before you can exit early (currently ${formatNaira(plan.accruedEarnings || 0)}).`;
+
+  conditionsEl.innerHTML = condRow(cond1Met, c1Text) + condRow(cond2Met, c2Text);
+  if (window.lucide) lucide.createIcons({ nodes: [conditionsEl] });
+
+  if (cond1Met && cond2Met) {
+    // Determine penalty tier
+    const penaltyRate = pctDays < 0.7 ? 0.25 : 0.15;
+    const penaltyAmount = (plan.accruedEarnings || 0) * penaltyRate;
+    const net = plan.amount + (plan.accruedEarnings || 0) - penaltyAmount;
+
+    if (penaltyTextEl) {
+      penaltyTextEl.innerHTML =
+        `You are <strong>${Math.round(pctDays * 100)}%</strong> through your plan. ` +
+        `Exiting now forfeits <strong>${Math.round(penaltyRate * 100)}% of your accrued earnings ` +
+        `(${formatNaira(penaltyAmount.toFixed(2))})</strong>. ` +
+        `You will receive <strong>${formatNaira(net.toFixed(2))}</strong> back to your Wallet.`;
+    }
+
+    penaltySummEl.classList.remove('hidden');
+
+    if (exitBtn) {
+      exitBtn.addEventListener('click', handleEarlyExit, { once: true });
+    }
+  } else {
+    penaltySummEl.classList.add('hidden');
+  }
+}
+
+function initEarlyExitToggle() {
+  const card   = document.getElementById('earlyExitCard');
+  const toggle = document.getElementById('earlyExitToggle');
+  const panel  = document.getElementById('earlyExitPanel');
+
+  if (!toggle || !panel || !card) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = card.classList.toggle('is-open');
+    panel.setAttribute('aria-hidden', String(!isOpen));
+  });
+}
+
+
+// ─── STUB HANDLERS ────────────────────────────────────────────────
+// Wire each to a Supabase call when the backend is ready.
+
+function handleClaim() {
+  // TODO: call Supabase RPC or update 'investments' table row for today's claim
+  console.log('[invest] Claim triggered');
+  showToast('Claim coming soon — backend not wired yet.', 'warning');
+}
+
+function handleEarlyExit() {
+  // TODO: call Supabase RPC to process early exit + penalty
+  console.log('[invest] Early exit triggered');
+  showToast('Early exit coming soon — backend not wired yet.', 'warning');
+}
+
+async function createPlan(amount, duration) {
+  const { dailyRate, totalRate } = getPlanRate(amount, duration);
+  
+  const { data, error } = await supabase.rpc('create_investment_plan', {
+    p_amount:        amount,
+    p_duration_days: duration,
+    p_daily_rate:    dailyRate / 100,   // store as decimal
+    p_total_rate:    totalRate / 100,
+  });
+
+  if (error) {
+    console.error('[invest] createPlan error:', error);
+    showToast(error.message, 'warning');
+    return;
+  }
+
+  showToast('Plan started successfully!', 'success');
+  // Then reload the investment section to show State 2
+  loadInvestmentSection();
+}
+
+
+// ─── CREATE PLAN FLOW ─────────────────────────────────────────────
+
+let selectedAmount   = null;
+let selectedDuration = null; // number of days
+
+// ── Show / hide flow ──
+
+function showCreatePlanFlow() {
+  const emptyState = document.getElementById('investEmptyState');
+  const flow       = document.getElementById('createPlanFlow');
+  if (!flow) return;
+
+  emptyState?.classList.add('hidden');
+  flow.classList.remove('hidden');
+
+  // Sync wallet balance into the "current balance" label
+  updateCreateWalletDisplay();
+
+  // Render Step 1 tiles
+  renderAmountTiles();
+
+  // Ensure Step 1 is visible, others hidden
+  goToCreateStep(1);
+}
+
+function hideCreatePlanFlow() {
+  const emptyState = document.getElementById('investEmptyState');
+  const flow       = document.getElementById('createPlanFlow');
+  if (!flow) return;
+
+  flow.classList.add('hidden');
+  emptyState?.classList.remove('hidden');
+
+  // Reset selections
+  selectedAmount   = null;
+  selectedDuration = null;
+}
+
+// ── Step navigation ──
+
+function goToCreateStep(step) {
+  [1, 2, 3].forEach(n => {
+    const el = document.getElementById(`createStep${n}`);
+    if (!el) return;
+    el.classList.toggle('hidden', n !== step);
+    if (n === step) {
+      void el.offsetWidth;
+      el.classList.add('invest-step-enter');
+      el.addEventListener('animationend', () => el.classList.remove('invest-step-enter'), { once: true });
+    }
+  });
+
+  // Update progress bar
+  const fill = document.getElementById('createProgressFill');
+  if (fill) {
+    fill.className = 'invest-create-progress__fill';
+    if (step === 2) fill.classList.add('step-2');
+    if (step === 3) fill.classList.add('step-3');
+  }
+}
+
+// ── Step 1 — Amount tiles ──
+
+function updateCreateWalletDisplay() {
+  const el = document.getElementById('createWalletBalance');
+  if (el) el.textContent = formatNaira(currentWalletBalance);
+}
+
+// ── Step 1 — Amount tiles ──
+
+function renderAmountTiles() {
+  const grid = document.getElementById('amountTilesGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  PLAN_AMOUNTS.forEach(amount => {
+    const insufficient = amount > currentWalletBalance;
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'invest-amount-tile' + (insufficient ? ' is-disabled' : '');
+    if (insufficient) tile.title = 'Insufficient wallet balance';
+    tile.dataset.amount = amount;
+    tile.innerHTML = `
+      <span class="invest-amount-tile__amount">${formatNaira(amount)}</span>
+      <span class="invest-amount-tile__tier">${amount >= 50000 ? 'Premium tier' : 'Standard tier'}</span>
+    `;
+
+    if (!insufficient) {
+      tile.addEventListener('click', () => {
+        grid.querySelectorAll('.invest-amount-tile').forEach(t => t.classList.remove('is-selected'));
+        tile.classList.add('is-selected');
+        selectedAmount = amount;
+
+        // Clear custom input so there's no conflict
+        const ci = document.getElementById('investAmount');
+        if (ci) { ci.value = ''; ci.classList.remove('is-error'); }
+
+        const next = document.getElementById('step1NextBtn');
+        if (next) next.disabled = false;
+      });
+    }
+
+    grid.appendChild(tile);
+  });
+
+  // ── Custom amount input — wired ONCE, outside the loop ──
+  const customInput = document.getElementById('investAmount');
+  if (!customInput) return;
+  customInput.value = '';
+
+  // Remove any previous listener by cloning the node
+  const freshInput = customInput.cloneNode(true);
+  customInput.parentNode.replaceChild(freshInput, customInput);
+
+  freshInput.addEventListener('input', () => {
+    const raw = parseFloat(freshInput.value.replace(/[^0-9.]/g, ''));
+
+    // Deselect any tile when user types
+    grid.querySelectorAll('.invest-amount-tile').forEach(t => t.classList.remove('is-selected'));
+
+    const next = document.getElementById('step1NextBtn');
+
+    if (!raw || isNaN(raw)) {
+      selectedAmount = null;
+      if (next) next.disabled = true;
+      freshInput.classList.remove('is-error');
+      return;
+    }
+
+    if (raw < 6000) {
+      selectedAmount = null;
+      if (next) next.disabled = true;
+      freshInput.classList.add('is-error');
+      freshInput.title = 'Minimum investment is ₦6,000';
+      return;
+    }
+
+    if (raw > currentWalletBalance) {
+      selectedAmount = null;
+      if (next) next.disabled = true;
+      freshInput.classList.add('is-error');
+      freshInput.title = 'Amount exceeds your wallet balance';
+      return;
+    }
+
+    freshInput.classList.remove('is-error');
+    freshInput.title = '';
+    selectedAmount = raw;
+    if (next) next.disabled = false;
+  });
+}
+
+
+// ── Step 2 — Duration tiles ──
+
+function renderDurationTiles() {
+  const grid = document.getElementById('durationTilesGrid');
+  const amountDisplay = document.getElementById('selectedAmountDisplay');
+  if (!grid || selectedAmount === null) return;
+
+  if (amountDisplay) amountDisplay.textContent = formatNaira(selectedAmount);
+
+  grid.innerHTML = '';
+
+  const hypotheticalStart = new Date();
+
+  PLAN_DURATIONS.forEach(def => {
+    const { dailyRate, totalRate } = getPlanRate(selectedAmount, def.days);
+    const earnings    = getProjectedEarnings(selectedAmount, def.days);
+    const payout      = getPayoutDate(hypotheticalStart, def.days);
+    const payoutStr   = formatPayoutDate(payout);
+    const rawMaturity = new Date(hypotheticalStart.getTime() + def.days * 86400000);
+    const weekendNote = (rawMaturity.getDay() === 0 || rawMaturity.getDay() === 6)
+      ? ' (adjusted from weekend)' : '';
+
+    const tile = document.createElement('button');
+    tile.type  = 'button';
+    tile.className = 'invest-duration-tile';
+    tile.dataset.duration = def.days;
+    tile.innerHTML = `
+      <div class="invest-duration-tile__header">
+        <span class="invest-duration-tile__name">${def.label}</span>
+        <span class="invest-duration-tile__daily-rate">${dailyRate}% daily</span>
+      </div>
+      <div class="invest-duration-tile__meta">
+        <div class="invest-duration-tile__stat">
+          <span class="invest-duration-tile__stat-label">Total Return</span>
+          <span class="invest-duration-tile__stat-value">${totalRate}%</span>
+        </div>
+        <div class="invest-duration-tile__stat">
+          <span class="invest-duration-tile__stat-label">Projected Earnings</span>
+          <span class="invest-duration-tile__stat-value">${formatNaira(earnings)}</span>
+        </div>
+      </div>
+      <p class="invest-duration-tile__payout">
+        Payout: <strong>${payoutStr}</strong>${weekendNote
+          ? ` <em style="font-style:normal;font-size:0.6rem;color:var(--text-secondary)">${weekendNote}</em>`
+          : ''}
+      </p>
+    `;
+
+    tile.addEventListener('click', () => {
+      // Deselect other duration tiles (correct class this time)
+      grid.querySelectorAll('.invest-duration-tile').forEach(t => t.classList.remove('is-selected'));
+      tile.classList.add('is-selected');
+      selectedDuration = def.days; // correct variable
+
+      const next = document.getElementById('step2NextBtn');
+      if (next) next.disabled = false;
+    });
+
+    grid.appendChild(tile);
+  });
+}
+
+// ── Step 3 — Review summary ──
+
+function populateReviewSummary() {
+  if (selectedAmount === null || selectedDuration === null) return;
+
+  const { dailyRate, totalRate } = getPlanRate(selectedAmount, selectedDuration);
+  const earnings = getProjectedEarnings(selectedAmount, selectedDuration);
+  const payout   = getPayoutDate(new Date(), selectedDuration);
+
+  const def = PLAN_DURATIONS.find(d => d.days === selectedDuration);
+
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  set('reviewAmount',           formatNaira(selectedAmount));
+  set('reviewDuration',         def?.label || `${selectedDuration} days`);
+  set('reviewDailyRate',        `${dailyRate}% per day`);
+  set('reviewProjectedEarnings', formatNaira(earnings));
+  set('reviewPayoutDate',       formatPayoutDate(payout));
+
+  // Update checkbox label with actual maturity date
+  const checkLbl = document.getElementById('confirmCheckboxLabel');
+  if (checkLbl) {
+    checkLbl.textContent =
+      `I understand my funds will be locked until ${formatPayoutDate(payout)} and ` +
+      `daily claims must be made before midnight WAT.`;
+  }
+}
+
+
+// ─── WIRE UP INVEST SECTION EVENTS ───────────────────────────────
+
+(function initInvestEvents() {
+  // Start a plan button (empty state CTA)
+  document.getElementById('startPlanBtn')?.addEventListener('click', showCreatePlanFlow);
+
+  // Cancel button
+  document.getElementById('cancelCreateBtn')?.addEventListener('click', hideCreatePlanFlow);
+
+  // Step 1 → Step 2
+  document.getElementById('step1NextBtn')?.addEventListener('click', () => {
+    if (selectedAmount === null) return;
+    renderDurationTiles();
+    goToCreateStep(2);
+  });
+
+  // Step 2 → Step 1 (back)
+  document.getElementById('step2BackBtn')?.addEventListener('click', () => {
+    selectedDuration = null;
+    const next = document.getElementById('step2NextBtn');
+    if (next) next.disabled = true;
+    goToCreateStep(1);
+  });
+
+  // Step 2 → Step 3
+  document.getElementById('step2NextBtn')?.addEventListener('click', () => {
+    if (selectedDuration === null) return;
+    populateReviewSummary();
+    goToCreateStep(3);
+  });
+
+  // Step 3 → Step 2 (back)
+  document.getElementById('step3BackBtn')?.addEventListener('click', () => {
+    const checkbox = document.getElementById('confirmCheckbox');
+    if (checkbox) checkbox.checked = false;
+    const btn = document.getElementById('confirmPlanBtn');
+    if (btn) btn.disabled = true;
+    goToCreateStep(2);
+  });
+
+  // Confirm checkbox → enables confirm button
+  document.getElementById('confirmCheckbox')?.addEventListener('change', function() {
+    const btn = document.getElementById('confirmPlanBtn');
+    if (btn) btn.disabled = !this.checked;
+  });
+
+  // Confirm & Start Plan
+  document.getElementById('confirmPlanBtn')?.addEventListener('click', () => {
+    if (selectedAmount === null || selectedDuration === null) return;
+
+    // Stub — replace with real call when backend is ready
+    createPlan(selectedAmount, selectedDuration);
+    showToast('Plan creation coming soon — backend not wired yet.', 'warning');
+
+    // Reset flow state
+    const checkbox = document.getElementById('confirmCheckbox');
+    if (checkbox) checkbox.checked = false;
+    const btn = document.getElementById('confirmPlanBtn');
+    if (btn) btn.disabled = true;
+  });
+})();
+
+
+// ─── KICK OFF ────────────────────────────────────────────────────
+loadInvestmentSection();
 
 
