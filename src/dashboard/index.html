@@ -45,10 +45,10 @@
           <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
           <span class="dash-theme-toggle__label" data-theme-label>Dark mode</span>
         </button>
-        <button class="dash-signout flex items-center gap-2" id="signoutBtn">
+        <!-- <button class="dash-signout flex items-center gap-2" id="signoutBtn">
           <i data-lucide="log-out" style="width:14px;height:14px"></i>
           <span>Sign Out</span>
-        </button>
+        </button> -->
       </div>
 
     </div>
@@ -150,11 +150,11 @@
               </div>
               
               <div class="dash-wallet-card__actions flex gap-3">
-                <button class="dash-action-btn dash-action-btn--primary" disabled title="Coming soon">
+                <button class="dash-action-btn dash-action-btn--primary">
                   <i data-lucide="arrow-down-to-line" style="width:14px;height:14px"></i>
                   Deposit
                 </button>
-                <button class="dash-action-btn dash-action-btn--secondary" disabled title="Coming soon">
+                <button class="dash-action-btn dash-action-btn--secondary">
                   <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i>
                   Withdraw
                 </button>
@@ -176,10 +176,9 @@
                   <span class="dash-vault-card__amount skeleton" id="vaultBalance">0.00</span>
                 </div>
               </div>
-              <p class="dash-card__hint">Capital</p>
+              <!-- <p class="dash-card__hint">Capital <span class="dash-card__hint-value"></span></p> -->
               <span class="dash-vault-card__tier skeleton" id="vaultTierInfo">7-Day Plan · 5% daily</span>
-              <button class="dash-action-btn dash-action-btn--secondary w-fit" id="fundVaultBtn"
-                      disabled title="Coming soon">
+              <button class="dash-action-btn dash-action-btn--secondary w-fit" id="fundVaultBtn">
                 <i data-lucide="arrow-left-right" style="width:14px;height:14px"></i>
                 Fund
               </button>
@@ -351,12 +350,334 @@
            SECTION — INVEST (shell only)
            ══════════════════════════════════════════════════════ -->
       <section id="section-invest" class="dash-section hidden">
+        <div class="dash-section__inner flex-col">
+
+          <!-- Section heading — always visible regardless of state -->
+          <div class="invest-header">
+            <h2 class="invest-header__title">Investments</h2>
+            <p class="invest-header__sub">Grow your money. Lock it, earn daily, claim on time.</p>
+          </div>
+
+
+          <!-- ════════════════════════════════════════════════════════
+              STATE 1 — NO ACTIVE PLAN
+              ════════════════════════════════════════════════════════ -->
+          <div id="investEmptyState" class="hidden">
+
+            <!-- Overview: 3 plan tiers -->
+            <div class="invest-overview-grid">
+
+              <div class="invest-overview-tile">
+                <div class="invest-overview-tile__icon flex-center">
+                  <i data-lucide="zap" style="width:16px;height:16px"></i>
+                </div>
+                <span class="invest-overview-tile__duration">7-Day Fast Plan</span>
+                <span class="invest-overview-tile__rate">Up to 6% daily</span>
+                <span class="invest-overview-tile__total">Up to 42% total</span>
+              </div>
+
+              <div class="invest-overview-tile invest-overview-tile--featured">
+                <div class="invest-overview-tile__badge">Most Popular</div>
+                <div class="invest-overview-tile__icon flex-center">
+                  <i data-lucide="trending-up" style="width:16px;height:16px"></i>
+                </div>
+                <span class="invest-overview-tile__duration">14-Day Standard</span>
+                <span class="invest-overview-tile__rate">Up to 4.5% daily</span>
+                <span class="invest-overview-tile__total">Up to 63% total</span>
+              </div>
+
+              <div class="invest-overview-tile">
+                <div class="invest-overview-tile__icon flex-center">
+                  <i data-lucide="shield" style="width:16px;height:16px"></i>
+                </div>
+                <span class="invest-overview-tile__duration">30-Day VIP Plan</span>
+                <span class="invest-overview-tile__rate">Up to 3.5% daily</span>
+                <span class="invest-overview-tile__total">Up to 105% total</span>
+              </div>
+
+            </div><!-- /.invest-overview-grid -->
+
+            <button class="invest-start-btn" id="startPlanBtn" type="button">
+              <i data-lucide="plus-circle" style="width:18px;height:18px"></i>
+              Start a Plan
+            </button>
+
+            <p class="invest-empty-note">
+              <i data-lucide="info" style="width:12px;height:12px"></i>
+              Funds are moved from your Wallet into the Vault when you start a plan.
+            </p>
+
+          </div><!-- /#investEmptyState -->
+
+
+          <!-- ════════════════════════════════════════════════════════
+              STATE 2 — ACTIVE PLAN
+              ════════════════════════════════════════════════════════ -->
+          <div id="investActiveState" class="hidden flex-col" style="gap:1.5rem;display: flex;">
+
+
+            <!-- ── Plan Summary Card ─────────────────────────────── -->
+            <div class="dash-card invest-active-plan-card" id="activePlanCard">
+
+              <div class="invest-active-plan-card__top flex-between">
+                <p class="dash-card__label flex items-center gap-2 uppercase">
+                  <i data-lucide="shield" style="width:13px;height:13px"></i>
+                  Active Plan
+                </p>
+                <span class="invest-active-badge">
+                  <span class="badge-pill__dot" style="width:6px;height:6px;"></span>
+                  Live
+                </span>
+              </div>
+
+              <div class="invest-plan-amount-row flex flex-col">
+                <div class="flex items-center gap-1">
+                  <span class="invest-plan-currency">₦</span>
+                  <span class="invest-plan-amount skeleton" id="activePlanAmount">0.00</span>
+                </div>
+                <span class="invest-plan-invested-label">Invested</span>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="invest-progress-wrap">
+                <div class="invest-progress-meta flex-between">
+                  <span class="invest-progress-label skeleton" id="activePlanProgressLabel">Day 1 of 7</span>
+                  <span class="invest-progress-remaining skeleton" id="activePlanRemaining">6 days remaining</span>
+                </div>
+                <div class="invest-progress-track">
+                  <div class="invest-progress-fill" id="activePlanProgress" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- Maturity date -->
+              <p class="invest-maturity-line">
+                <i data-lucide="calendar" style="width:11px;height:11px"></i>
+                Matures:
+                <span class="invest-maturity-date skeleton" id="activePlanMaturity">—</span>
+              </p>
+              <span class="invest-plan-label skeleton" id="activePlanLabel">7-Day Fast Plan · 5% daily</span>
+
+            </div><!-- /#activePlanCard -->
+
+
+            <!-- ── Earnings / Claim Card ──────────────────────────── -->
+            <div class="dash-card invest-earnings-card" id="earningsCard">
+
+              <p class="dash-card__label flex items-center gap-2 uppercase">
+                <i data-lucide="sun" style="width:13px;height:13px"></i>
+                Today's Yield
+              </p>
+
+              <div class="invest-yield-row flex items-baseline gap-1">
+                <span class="invest-yield-currency">₦</span>
+                <span class="invest-yield-amount skeleton" id="claimableAmount">0.00</span>
+              </div>
+
+              <p class="invest-accrued-line">
+                Accrued this plan:
+                <strong id="totalAccrued">₦0.00</strong>
+              </p>
+
+              <button class="invest-claim-btn invest-claim-btn--claimable" id="claimBtn" type="button">
+                <i data-lucide="sun" style="width:16px;height:16px"></i>
+                Claim Today's Yield
+              </button>
+
+              <p class="invest-claim-warning flex items-center gap-1">
+                <i data-lucide="clock" style="width:11px;height:11px"></i>
+                Unclaimed yields are forfeited at midnight WAT.
+              </p>
+
+            </div><!-- /#earningsCard -->
+
+
+            <!-- ── Early Exit ─────────────────────────────────────── -->
+            <div class="invest-early-exit" id="earlyExitCard">
+
+              <button class="invest-exit-toggle flex items-center gap-2" id="earlyExitToggle" type="button">
+                <i data-lucide="door-open" style="width:13px;height:13px"></i>
+                Want to exit early?
+                <i data-lucide="chevron-down" class="invest-exit-chevron" style="width:13px;height:13px"></i>
+              </button>
+
+              <div class="invest-exit-panel" id="earlyExitPanel" aria-hidden="true">
+
+                <!-- Conditions list — populated by JS -->
+                <div class="invest-exit-conditions flex-col" id="exitConditionsList" style="gap:0.625rem;"></div>
+
+                <!-- Penalty summary — shown when qualified, hidden otherwise -->
+                <div class="invest-exit-penalty hidden" id="exitPenaltySummary">
+                  <p class="invest-exit-penalty__text" id="exitPenaltyText"></p>
+                  <button class="invest-exit-confirm-btn" id="earlyExitBtn" type="button">
+                    <i data-lucide="alert-triangle" style="width:14px;height:14px"></i>
+                    Exit Plan &amp; Withdraw
+                  </button>
+                </div>
+
+              </div><!-- /#earlyExitPanel -->
+
+            </div><!-- /#earlyExitCard -->
+
+
+          </div><!-- /#investActiveState -->
+
+
+          <!-- ════════════════════════════════════════════════════════
+              STATE 3 — CREATE PLAN FLOW
+              ════════════════════════════════════════════════════════ -->
+          <div id="createPlanFlow" class="hidden flex-col" style="gap:1.5rem;">
+
+            <!-- Progress bar -->
+            <div class="invest-create-progress" aria-hidden="true">
+              <div class="invest-create-progress__fill" id="createProgressFill"></div>
+            </div>
+
+
+            <!-- ── Step 1 — Choose Amount ─────────────────────────── -->
+            <div id="createStep1" class="step-one">
+
+              <div class="invest-create-header flex-col" style="gap:0.375rem;margin-bottom:1.5rem;">
+                <h3 class="invest-create-title">How much would you like to invest?</h3>
+                <p class="invest-create-sub" id="walletNote">
+                  Funds will be moved from your Wallet. Current balance:
+                  <strong id="createWalletBalance">₦0.00</strong>
+                </p>
+              </div>
+
+              <div class="invest-amount-grid" id="amountTilesGrid">
+                <!-- Tiles rendered by JS — allows dynamic disable based on wallet balance -->
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="investAmount">Enter Amount</label>
+                <div class="form-input-wrap">
+                  <input class="form-field__input form-input--pw" id="investAmount" type="tel"
+                        placeholder="Enter Amount" autocomplete="" />
+                </div>
+                <span class="field-error" id="err-pwConfirm"></span>
+              </div>
+              <div class="invest-step-nav flex-between" style="margin-top:1.75rem;">
+                <button class="invest-back-btn hidden" id="step1BackBtn" type="button">
+                  <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+                  Back
+                </button>
+                <button class="invest-next-btn" id="step1NextBtn" type="button" disabled>
+                  Continue
+                  <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+                </button>
+              </div>
+
+            </div><!-- /#createStep1 -->
+
+
+            <!-- ── Step 2 — Choose Duration ───────────────────────── -->
+            <div id="createStep2" class="hidden">
+
+              <div class="invest-create-header flex-col" style="gap:0.375rem;margin-bottom:1.5rem;">
+                <h3 class="invest-create-title">Choose your plan duration</h3>
+                <p class="invest-create-sub">Based on
+                  <strong id="selectedAmountDisplay">₦0</strong> investment
+                </p>
+              </div>
+
+              <div class="invest-duration-grid" id="durationTilesGrid">
+                <!-- Tiles rendered by JS with computed rates -->
+              </div>
+
+              <div class="invest-step-nav flex-between" style="margin-top:1.75rem;">
+                <button class="invest-back-btn" id="step2BackBtn" type="button">
+                  <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+                  Back
+                </button>
+                <button class="invest-next-btn" id="step2NextBtn" type="button" disabled>
+                  Review Plan
+                  <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+                </button>
+              </div>
+
+            </div><!-- /#createStep2 -->
+
+
+            <!-- ── Step 3 — Review & Confirm ──────────────────────── -->
+            <div id="createStep3" class="hidden">
+
+              <div class="invest-create-header flex-col" style="gap:0.375rem;margin-bottom:1.5rem;">
+                <h3 class="invest-create-title">Review your plan</h3>
+                <p class="invest-create-sub">Confirm the details before your funds are locked.</p>
+              </div>
+
+              <!-- Summary card — populated by JS -->
+              <div class="dash-card invest-review-summary" id="reviewSummaryCard">
+                <div class="invest-review-row flex-between">
+                  <span class="invest-review-row__label">Amount</span>
+                  <span class="invest-review-row__value" id="reviewAmount">—</span>
+                </div>
+                <div class="invest-review-divider"></div>
+                <div class="invest-review-row flex-between">
+                  <span class="invest-review-row__label">Duration</span>
+                  <span class="invest-review-row__value" id="reviewDuration">—</span>
+                </div>
+                <div class="invest-review-divider"></div>
+                <div class="invest-review-row flex-between">
+                  <span class="invest-review-row__label">Daily Rate</span>
+                  <span class="invest-review-row__value invest-review-row__value--accent" id="reviewDailyRate">—</span>
+                </div>
+                <div class="invest-review-divider"></div>
+                <div class="invest-review-row flex-between">
+                  <span class="invest-review-row__label">Projected Earnings</span>
+                  <span class="invest-review-row__value invest-review-row__value--accent" id="reviewProjectedEarnings">—</span>
+                </div>
+                <div class="invest-review-divider"></div>
+                <div class="invest-review-row flex-between">
+                  <span class="invest-review-row__label">Payout Date</span>
+                  <span class="invest-review-row__value" id="reviewPayoutDate">—</span>
+                </div>
+              </div>
+
+              <!-- Confirm checkbox -->
+              <label class="invest-confirm-checkbox-row flex items-start gap-3">
+                <input class="invest-confirm-checkbox" type="checkbox" id="confirmCheckbox" />
+                <span class="invest-confirm-checkbox-label" id="confirmCheckboxLabel">
+                  I understand my funds will be locked until the payout date and daily claims must be made before midnight WAT.
+                </span>
+              </label>
+
+              <div class="invest-step-nav flex-between" style="margin-top:1.5rem;">
+                <button class="invest-back-btn" id="step3BackBtn" type="button">
+                  <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+                  Back
+                </button>
+                <button class="invest-confirm-btn" id="confirmPlanBtn" type="button" disabled>
+                  <i data-lucide="shield-check" style="width:16px;height:16px"></i>
+                  Confirm &amp; Start Plan
+                </button>
+              </div>
+
+            </div><!-- /#createStep3 -->
+
+
+            <!-- Cancel flow -->
+            <button class="invest-cancel-btn" id="cancelCreateBtn" type="button">
+              Cancel
+            </button>
+
+          </div><!-- /#createPlanFlow -->
+
+
+        </div><!-- /.dash-section__inner -->
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════
+           SECTION — Sports (shell only)
+           ══════════════════════════════════════════════════════ -->
+      <section id="section-sports" class="dash-section hidden">
         <div class="dash-section__coming flex-col-center">
           <div class="dash-section__coming-icon flex-center">
-            <i data-lucide="trending-up" style="width:24px;height:24px"></i>
+            <i data-lucide="trophy" style="width:24px;height:24px"></i>
           </div>
-          <p class="dash-section__coming-title">Invest</p>
-          <span class="dash-section__coming-sub">This section is coming at launch.</span>
+          <p class="dash-section__coming-title">Sports</p>
+          <span class="dash-section__coming-sub">
+            Bet on live games directly from your Wallet. Coming soon.
+          </span>
         </div>
       </section>
 

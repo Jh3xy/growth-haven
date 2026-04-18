@@ -358,7 +358,7 @@ svg.site-header__wordmark {
 .form-field__input {
   height: var(--tap-target-min);
   padding: 0 1.25rem;
-  /* background-color: #F3F4F6; */
+  background-color: transparent;
   border: 1.5px solid var(--text-secondary);
   border-radius: var(--radius-md);
   font-family: var(--ff-primary);
