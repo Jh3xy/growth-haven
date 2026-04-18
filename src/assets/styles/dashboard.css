@@ -1,6 +1,9 @@
 
 /* dashboard.css — GrowthHaven Dashboard */
 /* Uses the existing Veridian design system tokens */
+#investActiveState.hidden{
+  display: none !important;
+}
 
 /* ─── LAYOUT ─────────────────────────────────────────────── */
 
