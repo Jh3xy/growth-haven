@@ -17,7 +17,7 @@ function formatNaira(amount) {
 }
 
 function formatDate(date) {
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleString('en-GB', {
     day: 'numeric', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
@@ -185,6 +185,90 @@ export const MODAL_TEMPLATES = {
       </button>
     `,
   }),
+  // ── TRANSACTION DETAIL ────────────────────────────────────────
+  txn_detail: (data) => {
+    const { txn } = data;
+    const isIn    = ['deposit','daily_claim','referral_bonus','vault_maturity','early_exit'].includes(txn.type);
+    const sign    = isIn ? '+' : '-';
+    const status  = txn.status || 'completed';
+
+    const ICON_MAP = {
+      deposit:        'arrow-down-to-line',
+      withdrawal:     'arrow-up-right',
+      vault_fund:     'shield',
+      vault_maturity: 'lock-open',
+      early_exit:     'door-open',
+      daily_claim:    'sun',
+      referral_bonus: 'users',
+    };
+
+    const icon = ICON_MAP[txn.type] || 'circle';
+
+    const statusClass = {
+      completed: 'txn-row__status--completed',
+      pending:   'txn-row__status--pending',
+      failed:    'txn-row__status--failed',
+    }[status] || 'txn-row__status--completed';
+
+    return {
+      title: 'Transaction Detail',
+      body: `
+        <div class="modal-receipt">
+
+          <div class="modal-receipt__icon" style="${isIn
+            ? ''
+            : 'background:var(--status-error-bg);border-color:var(--status-error-border);color:var(--status-error-text);'}">
+            <i data-lucide="${icon}"></i>
+          </div>
+
+          <p class="modal-receipt__heading">
+            ${sign}${formatNaira(txn.amount)}
+          </p>
+          <p class="modal-receipt__sub" style="margin-bottom:1.5rem;">${txn.label}</p>
+
+          <div class="modal-receipt__card">
+
+            <div class="modal-receipt__row">
+              <span class="modal-receipt__key">Type</span>
+              <span class="modal-receipt__val" style="text-transform:capitalize;">
+                ${txn.type.replace(/_/g, ' ')}
+              </span>
+            </div>
+            <div class="modal-receipt__divider"></div>
+
+            <div class="modal-receipt__row">
+              <span class="modal-receipt__key">Status</span>
+              <span class="txn-row__status ${statusClass}">
+                ${status}
+              </span>
+            </div>
+            <div class="modal-receipt__divider"></div>
+
+            <div class="modal-receipt__row">
+              <span class="modal-receipt__key">Date</span>
+              <span class="modal-receipt__val">${formatDate(txn.created_at)}</span>
+            </div>
+
+            ${txn.reference ? `
+            <div class="modal-receipt__divider"></div>
+            <div class="modal-receipt__row">
+              <span class="modal-receipt__key">Reference</span>
+              <span class="modal-receipt__val">${txn.reference.slice(2, 10)}</span>
+            </div>
+            ` : ''}
+
+          </div>
+
+          ${txn.reference
+            ? `<p class="modal-receipt__ref">ref: ${txn.reference}</p>`
+            : ''}
+
+          <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
+
+        </div>
+      `,
+    };
+  },
 };
 
 // ─── HANDLERS ────────────────────────────────────────────────────
@@ -192,6 +276,7 @@ export const MODAL_TEMPLATES = {
 export function initModalHandlers(type, data) {
   if (type === 'deposit')    initDepositHandlers(data);
   if (type === 'withdrawal') initWithdrawHandlers(data);
+  if (type === 'txn_detail')  document.getElementById('modalDoneBtn')?.addEventListener('click', closeModal);
 }
 
 // ── Deposit ──────────────────────────────────────────────────────

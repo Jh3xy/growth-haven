@@ -1,0 +1,409 @@
+
+/* ============================================================
+   transactions.css — GrowthHaven Transactions Section
+============================================================ */
+*.hidden{
+  display: none !important;
+}
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+
+.txn-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.txn-header__title {
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.txn-header__sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+
+/* ─── FILTER TABS ─────────────────────────────────────────────── */
+
+.txn-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 2px; /* room for focus ring */
+}
+
+.txn-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.txn-filter-tab {
+  height: 34px;
+  padding: 0 1rem;
+  font-family: var(--ff-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  min-height: unset;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    color var(--transition-global),
+    background-color var(--transition-global),
+    border-color var(--transition-global);
+}
+
+.txn-filter-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.txn-filter-tab.is-active {
+  background: var(--brand-primary-soft);
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.txn-filter-tab:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+
+/* ─── SUMMARY STRIP ───────────────────────────────────────────── */
+
+.txn-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--surface-card-muted);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  min-height: 44px;
+}
+
+.txn-summary__count {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  min-width: 80px;
+  min-height: 12px;
+  border-radius: 4px;
+}
+
+.txn-summary__total {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  min-width: 100px;
+  min-height: 12px;
+  border-radius: 4px;
+  text-align: right;
+}
+
+
+/* ─── TRANSACTION LIST ────────────────────────────────────────── */
+
+.txn-list {
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ─── TRANSACTION ROW ─────────────────────────────────────────── */
+
+.txn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  gap: 0.75rem;
+  border-bottom: var(--border-width) solid var(--border-subtle);
+  cursor: pointer;
+  transition: background-color var(--transition-global);
+  border-radius: 0;
+  position: relative;
+}
+
+/* First row: no top border bleed */
+.txn-row:first-child {
+  border-top: var(--border-width) solid var(--border-subtle);
+}
+
+.txn-row:hover:not(.txn-row--skeleton) {
+  background-color: var(--surface-card-muted);
+  /* Extend hover bg edge to edge with negative margin trick */
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Chevron hint — appears on hover */
+.txn-row::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18l6-6-6-6'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity var(--transition-global);
+}
+
+.txn-row:hover:not(.txn-row--skeleton)::after {
+  opacity: 1;
+}
+
+.txn-row--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+
+/* ─── ROW LEFT ────────────────────────────────────────────────── */
+
+.txn-row__left {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.txn-row__icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+}
+
+/* Type-specific icon colours — mirrors dashboard.css activity rows */
+.txn-row__icon--deposit        { background: var(--status-success-bg);  color: var(--status-success-text); }
+.txn-row__icon--withdrawal     { background: var(--status-error-bg);    color: var(--status-error-text); }
+.txn-row__icon--vault_fund     { background: var(--brand-primary-soft); color: var(--brand-primary); }
+.txn-row__icon--vault_maturity { background: var(--status-success-bg);  color: var(--status-success-text); }
+.txn-row__icon--early_exit     { background: var(--status-warning-bg);  color: var(--status-warning-text); }
+.txn-row__icon--daily_claim    { background: var(--status-warning-bg);  color: var(--status-warning-text); }
+.txn-row__icon--referral_bonus { background: var(--status-info-bg);     color: var(--status-info-text); }
+
+.txn-row__label {
+  font-size: 0.875rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 100px;
+  min-height: 14px;
+  border-radius: 4px;
+}
+
+.txn-row__meta {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  min-width: 80px;
+  min-height: 11px;
+  border-radius: 4px;
+  display: block;
+}
+
+
+/* ─── ROW RIGHT ───────────────────────────────────────────────── */
+
+.txn-row__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.txn-row__amount {
+  font-size: 0.875rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  min-width: 80px;
+  min-height: 14px;
+  border-radius: 4px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.txn-row__amount--in {
+  color: var(--status-success-text);
+}
+
+html[data-theme='dark'] .txn-row__amount--in {
+  color: var(--status-success);
+}
+
+/* Status pill */
+.txn-row__status {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  min-width: 60px;
+  min-height: 11px;
+  border-radius: 4px;
+}
+
+.txn-row__status--completed {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  border: 1px solid var(--status-success-border);
+  border-radius: 999px;
+}
+
+.txn-row__status--pending {
+  background: var(--status-warning-bg);
+  color: var(--status-warning-text);
+  border: 1px solid var(--status-warning-border);
+  border-radius: 999px;
+}
+
+.txn-row__status--failed {
+  background: var(--status-error-bg);
+  color: var(--status-error-text);
+  border: 1px solid var(--status-error-border);
+  border-radius: 999px;
+}
+
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────── */
+
+.txn-empty {
+  gap: 0.75rem;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.txn-empty__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-low);
+}
+
+.txn-empty__title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.txn-empty__sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 260px;
+  margin: 0;
+}
+
+
+/* ─── LOAD MORE ───────────────────────────────────────────────── */
+
+.txn-load-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0 0;
+}
+
+.txn-load-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 38px;
+  padding: 0 1.25rem;
+  font-family: var(--ff-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  min-height: unset;
+  transition: var(--transition-global);
+}
+
+.txn-load-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.txn-load-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.txn-load-btn [data-lucide] {
+  transition: transform 0.2s var(--spring);
+}
+
+.txn-load-btn:hover [data-lucide] {
+  transform: translateY(2px);
+}
+
+
+/* ─── DARK MODE ───────────────────────────────────────────────── */
+
+html[data-theme='dark'] .txn-filter-tab {
+  background: var(--surface-card);
+}
+
+html[data-theme='dark'] .txn-row:hover:not(.txn-row--skeleton) {
+  background-color: var(--surface-card-muted);
+}
+
+html[data-theme='dark'] .txn-summary {
+  background: var(--surface-card);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .txn-row__label { font-size: var(--fs-caption); }
+  .txn-row__amount { font-size: var(--fs-caption); }
+  .txn-row__icon { width: 34px; height: 34px; min-width: 34px; }
+}
+

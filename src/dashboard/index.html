@@ -683,17 +683,120 @@
 
 
       <!-- ══════════════════════════════════════════════════════
-           SECTION — TRANSACT (shell only)
-           ══════════════════════════════════════════════════════ -->
-      <section id="section-transact" class="dash-section hidden">
-        <div class="dash-section__coming flex-col-center">
-          <div class="dash-section__coming-icon flex-center">
-            <i data-lucide="arrow-left-right" style="width:24px;height:24px"></i>
-          </div>
-          <p class="dash-section__coming-title">Transact</p>
-          <span class="dash-section__coming-sub">This section is coming at launch.</span>
+     SECTION — TRANSACTIONS
+     ══════════════════════════════════════════════════════ -->
+    <section id="section-transact" class="dash-section hidden">
+      <div class="dash-section__inner flex-col">
+
+        <!-- Heading -->
+        <div class="txn-header">
+          <h2 class="txn-header__title">Transactions</h2>
+          <p class="txn-header__sub">Your complete activity ledger.</p>
         </div>
-      </section>
+
+        <!-- Filter Tabs -->
+        <div class="txn-filters" role="tablist" aria-label="Filter transactions">
+          <button class="txn-filter-tab is-active" role="tab" aria-selected="true"
+                  data-filter="all">All</button>
+          <button class="txn-filter-tab" role="tab" aria-selected="false"
+                  data-filter="deposit">Deposits</button>
+          <button class="txn-filter-tab" role="tab" aria-selected="false"
+                  data-filter="withdrawal">Withdrawals</button>
+          <button class="txn-filter-tab" role="tab" aria-selected="false"
+                  data-filter="vault">Vault</button>
+          <button class="txn-filter-tab" role="tab" aria-selected="false"
+                  data-filter="earnings">Earnings</button>
+        </div>
+
+        <!-- Summary strip -->
+        <div class="txn-summary" id="txnSummary" aria-live="polite">
+          <span class="txn-summary__count skeleton" id="txnCount"></span>
+          <span class="txn-summary__total skeleton" id="txnTotal"></span>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="txn-list flex-col" id="txnList" role="list">
+
+          <!-- Skeleton rows — replaced by JS -->
+          <div class="txn-row txn-row--skeleton" aria-hidden="true">
+            <div class="txn-row__left flex items-center gap-3">
+              <div class="txn-row__icon skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="txn-row__label skeleton"></span>
+                <span class="txn-row__meta skeleton"></span>
+              </div>
+            </div>
+            <div class="txn-row__right flex-col items-end gap-1">
+              <span class="txn-row__amount skeleton"></span>
+              <span class="txn-row__status skeleton"></span>
+            </div>
+          </div>
+
+          <div class="txn-row txn-row--skeleton" aria-hidden="true">
+            <div class="txn-row__left flex items-center gap-3">
+              <div class="txn-row__icon skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="txn-row__label skeleton"></span>
+                <span class="txn-row__meta skeleton"></span>
+              </div>
+            </div>
+            <div class="txn-row__right flex-col items-end gap-1">
+              <span class="txn-row__amount skeleton"></span>
+              <span class="txn-row__status skeleton"></span>
+            </div>
+          </div>
+
+          <div class="txn-row txn-row--skeleton" aria-hidden="true">
+            <div class="txn-row__left flex items-center gap-3">
+              <div class="txn-row__icon skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="txn-row__label skeleton"></span>
+                <span class="txn-row__meta skeleton"></span>
+              </div>
+            </div>
+            <div class="txn-row__right flex-col items-end gap-1">
+              <span class="txn-row__amount skeleton"></span>
+              <span class="txn-row__status skeleton"></span>
+            </div>
+          </div>
+
+          <div class="txn-row txn-row--skeleton" aria-hidden="true">
+            <div class="txn-row__left flex items-center gap-3">
+              <div class="txn-row__icon skeleton"></div>
+              <div class="flex-col gap-1">
+                <span class="txn-row__label skeleton"></span>
+                <span class="txn-row__meta skeleton"></span>
+              </div>
+            </div>
+            <div class="txn-row__right flex-col items-end gap-1">
+              <span class="txn-row__amount skeleton"></span>
+              <span class="txn-row__status skeleton"></span>
+            </div>
+          </div>
+
+        </div><!-- /#txnList -->
+
+        <!-- Empty state — hidden until JS confirms 0 results -->
+        <div class="txn-empty flex-col-center hidden" id="txnEmpty">
+          <div class="txn-empty__icon flex-center">
+            <i data-lucide="inbox" style="width:20px;height:20px"></i>
+          </div>
+          <p class="txn-empty__title">No transactions found</p>
+          <p class="txn-empty__sub" id="txnEmptySub">
+            Your activity will appear here once you make a deposit.
+          </p>
+        </div>
+
+        <!-- Load more -->
+        <div class="txn-load-wrap hidden" id="txnLoadWrap">
+          <button class="txn-load-btn" id="txnLoadMore" type="button">
+            Load more
+            <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
 
 
       <!-- ══════════════════════════════════════════════════════

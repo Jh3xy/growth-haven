@@ -11,12 +11,14 @@ import '../assets/styles/style.css'
 import '../assets/styles/animations.css'
 import '../assets/styles/landing.css'
 import '../assets/styles/queries.css'
-import '../assets/styles/dashboard.css'   // dashboard-specific styles
+import '../assets/styles/transactions.css'
+import '../assets/styles/dashboard.css'   
 
 // ── Modal system ──
-import { openModal } from './modal.js';
 import './modal.css';
 
+import { initTransactions } from './transactions.js';
+import { openModal } from './modal.js';
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
 
@@ -399,6 +401,9 @@ sidebarSignoutBtn?.addEventListener('click', async () => {
  
 // ── Default: show Home on load ──
 switchSection('home');
+
+// ── Init transactions section (lazy-loads data on first visit) ──
+initTransactions(user.id);
  
 
 /**
