@@ -387,6 +387,15 @@ document.addEventListener('keydown', (e) => {
 navLinks.forEach(link => {
   link.addEventListener('click', () => switchSection(link.dataset.nav));
 });
+
+// In initInvestEvents or after switchSection is defined:
+const investSection = document.getElementById('section-invest');
+const investObserver = new MutationObserver(() => {
+  if (!investSection.classList.contains('hidden')) {
+    loadInvestmentSection();
+  }
+});
+investObserver.observe(investSection, { attributes: true, attributeFilter: ['class'] });
  
 // ── Sidebar sign-out button ──
 const sidebarSignoutBtn = document.getElementById('sidebarSignoutBtn');
@@ -739,6 +748,10 @@ function initEarlyExitToggle() {
 
   if (!toggle || !panel || !card) return;
 
+  // ── Guard: don't stack listeners on repeated nav visits ──
+  if (toggle.dataset.bound === 'true') return;
+  toggle.dataset.bound = 'true';
+
   toggle.addEventListener('click', () => {
     const isOpen = card.classList.toggle('is-open');
     panel.setAttribute('aria-hidden', String(!isOpen));
@@ -795,6 +808,12 @@ async function handleClaim() {
   if (window.lucide) lucide.createIcons({ nodes: [claimBtn] });
 
   showToast('Yield claimed successfully!', 'success');
+
+  currentWalletBalance += Number(claimedAmount);
+  const walletBalanceEl = document.getElementById('walletBalance');
+  if (walletBalanceEl) {
+    walletBalanceEl.textContent = currentWalletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 });
+  }
 
   // Prepend the new transaction row to the activity list without refetching
   const activityListEl = document.getElementById('activityList');
