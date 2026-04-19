@@ -150,11 +150,11 @@
               </div>
               
               <div class="dash-wallet-card__actions flex gap-3">
-                <button class="dash-action-btn dash-action-btn--primary">
+                <button class="dash-action-btn dash-action-btn--primary" id="depositBtn">
                   <i data-lucide="arrow-down-to-line" style="width:14px;height:14px"></i>
                   Deposit
                 </button>
-                <button class="dash-action-btn dash-action-btn--secondary">
+                <button class="dash-action-btn dash-action-btn--secondary" id="withdrawBtn">
                   <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i>
                   Withdraw
                 </button>
@@ -713,6 +713,19 @@
     </main><!-- /dash-main -->
   </div><!-- /dash-shell -->
 
+  <!-- MODAL SHELL -->
+  <div class="modal-shell" id="modalShell" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-shell__backdrop" id="modalBackdrop"></div>
+    <div class="modal-shell__panel">
+      <div class="modal-shell__header">
+        <h2 class="modal-shell__title" id="modalTitle"></h2>
+        <button class="modal-shell__close" id="modalClose" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-shell__body" id="modalBody"></div>
+    </div>
+  </div>
 
   <script>
     lucide.createIcons();

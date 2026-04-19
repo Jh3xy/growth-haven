@@ -36,6 +36,8 @@ label.required::after{
 
 .site-header {
   padding: 1rem 0;
+  /* position: sticky; */
+  z-index: 100;
   background-color: var(--surface-overlay);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

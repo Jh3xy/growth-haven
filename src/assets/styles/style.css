@@ -1,6 +1,10 @@
 
 
 /* main css module */
+html {
+  scrollbar-gutter: stable;
+}
+
 [data-lucide] {
  width: 15px;
   height: 15px;

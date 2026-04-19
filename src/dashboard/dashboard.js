@@ -13,6 +13,10 @@ import '../assets/styles/landing.css'
 import '../assets/styles/queries.css'
 import '../assets/styles/dashboard.css'   // dashboard-specific styles
 
+// ── Modal system ──
+import { openModal } from './modal.js';
+import './modal.css';
+
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
 
@@ -168,7 +172,7 @@ function renderReferralRow(ref) {
 
   row.innerHTML = `
     <div class="flex flex-col items-center gap-3">
-      <div class="flex gap-1">
+      <div class="flex gap-4">
         <div class="dash-ref-avatar">${getInitials(ref.first_name, ref.last_name)}</div>
         <div class="flex-col">
           <span class="dash-ref-name">${ref.first_name || ''} ${ref.last_name || ''}</span>
@@ -1180,3 +1184,26 @@ function populateReviewSummary() {
 
 // ─── KICK OFF ────────────────────────────────────────────────────
 await loadInvestmentSection();
+
+
+
+const depositBtn = document.getElementById('depositBtn');
+const withdrawBtn = document.getElementById('withdrawBtn');
+
+// ─── DEPOSIT / WITHDRAW TRIGGERS ─────────────────────────────────
+depositBtn?.addEventListener('click', () => {
+  openModal('deposit', {
+    walletBalance: currentWalletBalance,
+    userName:      `${firstName} ${lastName}`.trim(),
+    userId:        user.id,
+  });
+});
+
+withdrawBtn?.addEventListener('click', () => {
+  openModal('withdrawal', {
+    walletBalance: currentWalletBalance,
+    userName:      `${firstName} ${lastName}`.trim(),
+    userId:        user.id,
+  });
+});
+
