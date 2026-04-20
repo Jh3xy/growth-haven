@@ -12,12 +12,14 @@ import '../assets/styles/animations.css'
 import '../assets/styles/landing.css'
 import '../assets/styles/queries.css'
 import '../assets/styles/transactions.css'
-import '../assets/styles/dashboard.css'   
+import '../assets/styles/dashboard.css'  
 
-// ── Modal system ──
+// ── Modal & Profile system ──
 import './modal.css';
+import '../assets/styles/profile.css';
 
-import { initTransactions } from './transactions.js';
+import { initProfile } from './profile.js';
+import { initTransactions, resetTransactions } from './transactions.js';
 import { openModal } from './modal.js';
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
@@ -26,6 +28,16 @@ import { supabase } from '../assets/js/supabase.js';
 // This is the full URL of your register page.
 // In prod, change this to your actual domain.
 const REGISTER_URL = `${window.location.origin}/src/register/`;
+
+
+// ─── GLOBALS ──────────────────────────────────────────────────
+window.__ghResetTransactions = resetTransactions;
+
+window.__ghUpdateWalletBalance = (newBalance) => {
+  currentWalletBalance = newBalance;
+  const el = document.getElementById('walletBalance');
+  if (el) el.textContent = Number(newBalance).toLocaleString('en-NG', { minimumFractionDigits: 2 });
+};
 
 // ─── DOM REFS ────────────────────────────────────────────────
 const greetingText = document.getElementById('greetingText');
@@ -346,7 +358,10 @@ function openSidebar() {
   document.body.style.overflow = 'hidden'; // prevent scroll behind overlay on mobile
 }
  
-function switchSection(name) {
+export function switchSection(name) {
+  // save current section to Local Storage
+  localStorage.setItem('gh_current_tab', name);
+
   // Hide all, strip active class
   sections.forEach(s => {
     s.classList.add('hidden');
@@ -407,9 +422,10 @@ sidebarSignoutBtn?.addEventListener('click', async () => {
   localStorage.removeItem('gh_reg_email');
   window.location.href = '/src/login/';
 });
- 
-// ── Default: show Home on load ──
-switchSection('home');
+
+
+// ── Initialize user Profile ──
+initProfile(user);
 
 // ── Init transactions section (lazy-loads data on first visit) ──
 initTransactions(user.id);

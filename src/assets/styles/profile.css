@@ -1,0 +1,312 @@
+
+/* ============================================================
+   profile.css — GrowthHaven Dashboard Profile Section
+============================================================ */
+*{
+  box-sizing: border-box;
+}
+
+/* ─── IDENTITY BLOCK ──────────────────────────────────────────── */
+
+.profile-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 0 0.5rem;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--brand-primary-soft);
+  border: 2px solid var(--brand-primary-ring);
+  font-size: 1.5rem;
+  font-weight: var(--fw-semibold);
+  color: var(--brand-primary);
+  text-transform: uppercase;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.375rem;
+  /* subtle outer ring matching the dash-avatar pattern, scaled up */
+  box-shadow: 0 0 0 4px var(--brand-primary-soft);
+}
+
+.profile-identity__name {
+  font-size: 1.25rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: 0;
+  min-width: 160px;
+  min-height: 22px;
+  border-radius: 4px;
+}
+
+.profile-identity__email {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  margin: 0;
+  min-width: 180px;
+  min-height: 13px;
+  border-radius: 4px;
+}
+
+.profile-identity__since {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  margin: 0;
+  min-width: 80px;
+  min-height: 12px;
+  border-radius: 4px;
+}
+
+.profile-ref-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.35rem 0.875rem;
+  background-color: var(--brand-primary-soft);
+  border: 1px solid var(--brand-primary-ring);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  color: var(--brand-primary);
+  margin-top: 0.5rem;
+  min-width: 100px;
+  min-height: 28px;
+}
+
+.profile-ref-pill [data-lucide] {
+  flex-shrink: 0;
+}
+
+/* When skeleton, hide the icon so it doesn't ghost-render */
+.profile-ref-pill.skeleton [data-lucide] {
+  display: none;
+}
+
+
+/* ─── PERSONAL INFO CARD ──────────────────────────────────────── */
+
+.profile-card__header {
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.profile-edit-controls {
+  flex-shrink: 0;
+  gap: 0.625rem;
+}
+
+/* Inline cancel — text link style, no box */
+.profile-cancel-link {
+  font-family: var(--ff-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  min-height: unset;
+  line-height: 1;
+  transition: color var(--transition-global);
+}
+
+.profile-cancel-link:hover {
+  color: var(--text-primary);
+}
+
+
+/* ─── FORM FIELDS ─────────────────────────────────────────────── */
+
+/* Label — mirrors register/login style, self-contained */
+.profile-form-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.profile-form-label__optional {
+  font-size: 0.6rem;
+  font-weight: var(--fw-regular);
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+/* Base input — fully self-contained, not relying on register.css */
+.profile-field-input {
+  display: block;
+  width: 100%;
+  height: var(--tap-target-min);
+  padding: 0 1rem;
+  font: inherit;
+  font-size: var(--fs-body);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-subtle);
+  outline: none;
+  transition:
+    border-color var(--transition-global),
+    background-color var(--transition-global),
+    box-shadow var(--transition-global),
+    color var(--transition-global);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* READ-ONLY STATE — muted, clearly non-interactive */
+.profile-field-input[readonly] {
+  background-color: var(--surface-background);
+  border-color: var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: context-menu;
+  pointer-events: none;
+  opacity: .9;
+}
+
+/* Defeat dashboard.css .dash-section .form-field input { background: transparent } */
+#section-profile .profile-field-input[readonly] {
+  background-color: var(--surface-background);
+}
+
+.profile-field-input[readonly]:focus {
+  border-color: var(--border-subtle);
+  box-shadow: none;
+}
+
+/* EDITABLE STATE */
+.profile-field-input:not([readonly]) {
+  background-color: var(--surface-card);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  cursor: text;
+}
+
+#section-profile .profile-field-input:not([readonly]) {
+  background-color: var(--surface-card);
+}
+
+.profile-field-input:not([readonly]):focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-primary-soft);
+}
+
+/* ERROR STATE */
+.profile-field-input.is-error {
+  border-color: var(--status-error);
+}
+
+.profile-field-input.is-error:focus {
+  border-color: var(--status-error);
+  box-shadow: 0 0 0 3px var(--status-error-bg);
+}
+
+/* Inline field error text */
+.profile-field-error {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: var(--fw-medium);
+  color: var(--status-error);
+  min-height: 1rem;
+  margin-top: 0.2rem;
+}
+
+/* Fields container */
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.profile-fields .form-field {
+  margin-top: 0;
+  margin-bottom: 1.125rem;
+}
+
+.profile-fields .form-field:last-child {
+  margin-bottom: 0;
+}
+
+/* Inline success message */
+.profile-success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--status-success-text);
+}
+
+.profile-success [data-lucide] {
+  color: var(--status-success-text);
+  flex-shrink: 0;
+}
+
+
+/* ─── SECURITY CARD ───────────────────────────────────────────── */
+
+.profile-change-pw-btn {
+  width: fit-content;
+  margin-top: 0.25rem;
+}
+
+
+/* ─── DARK MODE ───────────────────────────────────────────────── */
+
+html[data-theme='dark'] .profile-field-input[readonly],
+html[data-theme='dark'] #section-profile .profile-field-input[readonly] {
+  background-color: var(--surface-background);
+  border-color: var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+html[data-theme='dark'] .profile-field-input:not([readonly]),
+html[data-theme='dark'] #section-profile .profile-field-input:not([readonly]) {
+  background-color: var(--surface-card-muted);
+  border-color: var(--border-strong);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
+
+  .profile-identity__name {
+    font-size: 1.1rem;
+  }
+
+  .profile-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .profile-edit-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+

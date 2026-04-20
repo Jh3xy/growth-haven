@@ -171,7 +171,9 @@ function renderList() {
 
   const slice = filteredTxns.slice(0, currentPage * PAGE_SIZE);
 
+  // with this:
   slice.forEach(txn => listEl.appendChild(renderRow(txn)));
+  if (window.lucide) lucide.createIcons({ nodes: [listEl] });
 
   // Load more visibility
   if (filteredTxns.length > slice.length) {
@@ -250,5 +252,13 @@ export function initTransactions(userId) {
   });
 
   observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+}
+
+
+
+export function resetTransactions() {
+  isLoaded = false;
+  allTransactions = [];
+  filteredTxns = [];
 }
 

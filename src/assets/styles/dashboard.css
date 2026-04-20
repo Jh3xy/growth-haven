@@ -1060,7 +1060,8 @@ align-items: anchor-center;
   font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
   color: var(--text-primary);
-  min-width: 140px;
+  /* min-width: 140px; */
+  max-width: 140px;
   min-height: 14px;
   border-radius: 4px;
   white-space: nowrap;

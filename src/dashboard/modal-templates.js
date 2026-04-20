@@ -4,6 +4,7 @@
  */
 
 import { closeModal } from './modal.js';
+import { supabase } from '../assets/js/supabase.js';
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const MIN_DEPOSIT    = 6000;
@@ -81,6 +82,26 @@ function swapToReceipt(receiptHTML) {
   if (window.lucide) lucide.createIcons({ nodes: [bodyEl] });
 
   document.getElementById('modalDoneBtn')?.addEventListener('click', closeModal);
+}
+
+
+
+async function writeTransaction({ userId, type, label, amount }) {
+  const { data, error } = await supabase
+    .from('transactions')
+    .insert([{
+      user_id: userId,
+      type,
+      label,
+      amount,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    }])
+    .select()
+    .single();
+
+  if (error) console.error('[transactions] Write error:', error);
+  return data ?? null;
 }
 
 // ─── TEMPLATES ───────────────────────────────────────────────────
@@ -185,6 +206,7 @@ export const MODAL_TEMPLATES = {
       </button>
     `,
   }),
+
   // ── TRANSACTION DETAIL ────────────────────────────────────────
   txn_detail: (data) => {
     const { txn } = data;
@@ -269,6 +291,61 @@ export const MODAL_TEMPLATES = {
       `,
     };
   },
+
+  // ── CHANGE PASSWORD ───────────────────────────────────────────
+  change_password: () => ({
+    title: 'Change Password',
+    body: `
+      <div class="modal-field">
+        <label class="modal-label" for="modalCurrentPw">Current Password</label>
+        <div style="position:relative;">
+          <input class="modal-input" id="modalCurrentPw" type="password"
+                 placeholder="••••••••" autocomplete="current-password"
+                 style="padding-right:3rem;" />
+          <button class="modal-pw-toggle" type="button" data-target="modalCurrentPw"
+                  aria-label="Toggle password visibility">
+            <i data-lucide="eye"     style="width:16px;height:16px;"></i>
+            <i data-lucide="eye-off" style="width:16px;height:16px;display:none;"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-field">
+        <label class="modal-label" for="modalNewPw">New Password</label>
+        <div style="position:relative;">
+          <input class="modal-input" id="modalNewPw" type="password"
+                 placeholder="••••••••" autocomplete="new-password"
+                 style="padding-right:3rem;" />
+          <button class="modal-pw-toggle" type="button" data-target="modalNewPw"
+                  aria-label="Toggle new password visibility">
+            <i data-lucide="eye"     style="width:16px;height:16px;"></i>
+            <i data-lucide="eye-off" style="width:16px;height:16px;display:none;"></i>
+          </button>
+        </div>
+        <span class="modal-field-error" id="modalNewPwError"></span>
+      </div>
+
+      <div class="modal-field">
+        <label class="modal-label" for="modalConfirmPw">Confirm New Password</label>
+        <div style="position:relative;">
+          <input class="modal-input" id="modalConfirmPw" type="password"
+                 placeholder="••••••••" autocomplete="new-password"
+                 style="padding-right:3rem;" />
+          <button class="modal-pw-toggle" type="button" data-target="modalConfirmPw"
+                  aria-label="Toggle confirm password visibility">
+            <i data-lucide="eye"     style="width:16px;height:16px;"></i>
+            <i data-lucide="eye-off" style="width:16px;height:16px;display:none;"></i>
+          </button>
+        </div>
+        <span class="modal-field-error" id="modalConfirmPwError"></span>
+      </div>
+
+      <button class="modal-submit-btn" id="modalChangePwBtn" type="button">
+        Update Password
+        <i data-lucide="shield-check"></i>
+      </button>
+    `,
+  }),
 };
 
 // ─── HANDLERS ────────────────────────────────────────────────────
@@ -276,6 +353,7 @@ export const MODAL_TEMPLATES = {
 export function initModalHandlers(type, data) {
   if (type === 'deposit')    initDepositHandlers(data);
   if (type === 'withdrawal') initWithdrawHandlers(data);
+  if (type === 'change_password') initChangePwHandlers();
   if (type === 'txn_detail')  document.getElementById('modalDoneBtn')?.addEventListener('click', closeModal);
 }
 
@@ -294,10 +372,9 @@ function initDepositHandlers(data) {
     if (errorEl) errorEl.textContent = '';
   });
 
-  btn?.addEventListener('click', () => {
+  btn?.addEventListener('click', async () => {
     const amount = parseFloat(inputEl.value);
 
-    // Validate
     if (!inputEl.value || isNaN(amount)) {
       showFieldError(inputEl, errorEl, 'Please enter an amount.');
       return;
@@ -307,69 +384,49 @@ function initDepositHandlers(data) {
       return;
     }
 
-    // Submit
     btn.disabled    = true;
     btn.textContent = 'Processing...';
 
-    console.log('[deposit] Paystack payment initiated', {
-      amount,
-      userId: data.userId,
+    const { data: result, error } = await supabase.rpc('process_deposit', {
+      p_amount: amount,
     });
 
-    // Show toast
-    showToast('Payment gateway coming soon — deposit logged.', 'info');
+    if (error || result?.error) {
+      btn.disabled    = false;
+      btn.textContent = 'Proceed to Payment';
+      showFieldError(inputEl, errorEl, result?.error || 'Something went wrong. Try again.');
+      return;
+    }
 
-    // Fake async — swap to receipt after 800ms
-    setTimeout(() => {
-      const ref            = generateRef('DEP');
-      const projectedBal   = (data.walletBalance ?? 0) + amount;
+    if (window.__ghResetTransactions) window.__ghResetTransactions();
 
-      swapToReceipt(`
-        <div class="modal-receipt">
-          <div class="modal-receipt__icon">
-            <i data-lucide="check"></i>
-          </div>
-          <p class="modal-receipt__heading">Deposit Initiated</p>
-          <p class="modal-receipt__sub">Your payment is being processed.</p>
-
-          <div class="modal-receipt__card">
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Name</span>
-              <span class="modal-receipt__val">${data.userName || '—'}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Amount</span>
-              <span class="modal-receipt__val">${formatNaira(amount)}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Type</span>
-              <span class="modal-receipt__val">Deposit</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Reference</span>
-              <span class="modal-receipt__val">${ref}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Date</span>
-              <span class="modal-receipt__val">${formatDate(new Date())}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Wallet Balance</span>
-              <span class="modal-receipt__val">${formatNaira(projectedBal)}</span>
-            </div>
-          </div>
-
-          <p class="modal-receipt__ref">ref: ${ref}</p>
-
-          <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
+    swapToReceipt(`
+      <div class="modal-receipt">
+        <div class="modal-receipt__icon">
+          <i data-lucide="check"></i>
         </div>
-      `);
-    }, 800);
+        <p class="modal-receipt__heading">Deposit Initiated</p>
+        <p class="modal-receipt__sub">Your payment is being processed.</p>
+        <div class="modal-receipt__card">
+          <div class="modal-receipt__row">
+            <span class="modal-receipt__key">Amount</span>
+            <span class="modal-receipt__val">${formatNaira(amount)}</span>
+          </div>
+          <div class="modal-receipt__divider"></div>
+          <div class="modal-receipt__row">
+            <span class="modal-receipt__key">Reference</span>
+            <span class="modal-receipt__val">${result.reference}</span>
+          </div>
+          <div class="modal-receipt__divider"></div>
+          <div class="modal-receipt__row">
+            <span class="modal-receipt__key">Status</span>
+            <span class="modal-receipt__val">Pending confirmation</span>
+          </div>
+        </div>
+        <p class="modal-receipt__ref">ref: ${result.reference}</p>
+        <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
+      </div>
+    `);
   });
 }
 
@@ -396,116 +453,158 @@ function initWithdrawHandlers(data) {
     accNumEl.value = accNumEl.value.replace(/\D/g, '').slice(0, 10);
   });
 
-  btn?.addEventListener('click', () => {
-    const amount     = parseFloat(amountEl.value);
-    const bank       = bankEl.value.trim();
-    const accNum     = accNumEl.value.trim();
-    const accName    = accNameEl.value.trim();
-    const walletBal  = data.walletBalance ?? 0;
+  btn?.addEventListener('click', async () => {
+  const amount  = parseFloat(amountEl.value);
+  const bank    = bankEl.value.trim();
+  const accNum  = accNumEl.value.trim();
+  const accName = accNameEl.value.trim();
 
-    // Validate — show only the first error at a time
-    if (!amountEl.value || isNaN(amount)) {
-      showFieldError(amountEl, errorEl, 'Please enter an amount.');
-      return;
-    }
-    if (amount < MIN_WITHDRAWAL) {
-      showFieldError(amountEl, errorEl, `Minimum withdrawal is ${formatNaira(MIN_WITHDRAWAL)}.`);
-      return;
-    }
-    if (amount > walletBal) {
-      showFieldError(amountEl, errorEl, 'Amount exceeds your available balance.');
-      return;
-    }
-    if (!bank) {
-      bankEl.classList.add('is-error');
-      bankEl.focus();
-      return;
-    }
-    if (accNum.length !== 10) {
-      accNumEl.classList.add('is-error');
-      accNumEl.focus();
-      return;
-    }
-    if (!accName) {
-      accNameEl.classList.add('is-error');
-      accNameEl.focus();
-      return;
-    }
+  // Client-side validation first (UX only — server re-validates)
+  if (!amountEl.value || isNaN(amount)) {
+    showFieldError(amountEl, errorEl, 'Please enter an amount.');
+    return;
+  }
+  if (amount < MIN_WITHDRAWAL) {
+    showFieldError(amountEl, errorEl, `Minimum withdrawal is ${formatNaira(MIN_WITHDRAWAL)}.`);
+    return;
+  }
+  if (!bank)              { bankEl.classList.add('is-error');   bankEl.focus();   return; }
+  if (accNum.length !== 10) { accNumEl.classList.add('is-error'); accNumEl.focus(); return; }
+  if (!accName)           { accNameEl.classList.add('is-error'); accNameEl.focus(); return; }
 
-    // Submit
-    btn.disabled    = true;
-    btn.textContent = 'Submitting...';
+  btn.disabled    = true;
+  btn.textContent = 'Submitting...';
 
-    console.log('[withdrawal] Request submitted', {
-      amount,
-      bank,
-      accountNumber: accNum,
-      accountName:   accName,
-      userId:        data.userId,
-    });
+  const { data: result, error } = await supabase.rpc('process_withdrawal', {
+    p_amount:     amount,
+    p_bank:       bank,
+    p_acc_number: accNum,
+    p_acc_name:   accName,
+  });
 
-    showToast('Withdrawal request received — processing within 2–3 business days.', 'info');
+  if (error || result?.error) {
+    btn.disabled    = false;
+    btn.textContent = 'Request Withdrawal';
+    showFieldError(amountEl, errorEl, result?.error || 'Something went wrong. Try again.');
+    return;
+  }
 
-    setTimeout(() => {
-      const ref        = generateRef('WDR');
-      const remaining  = walletBal - amount;
+  if (window.__ghResetTransactions) window.__ghResetTransactions();
 
-      swapToReceipt(`
-        <div class="modal-receipt">
-          <div class="modal-receipt__icon">
-            <i data-lucide="check"></i>
-          </div>
-          <p class="modal-receipt__heading">Withdrawal Requested</p>
-          <p class="modal-receipt__sub">Your request has been submitted.</p>
+  // Update wallet balance in home card without reload
+  if (window.__ghUpdateWalletBalance) window.__ghUpdateWalletBalance(result.remaining_balance);
 
-          <div class="modal-receipt__card">
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Name</span>
-              <span class="modal-receipt__val">${data.userName || '—'}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Amount</span>
-              <span class="modal-receipt__val">${formatNaira(amount)}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Bank</span>
-              <span class="modal-receipt__val">${bank}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Account Number</span>
-              <span class="modal-receipt__val">${accNum}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Account Name</span>
-              <span class="modal-receipt__val">${accName}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Reference</span>
-              <span class="modal-receipt__val">${ref}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Date</span>
-              <span class="modal-receipt__val">${formatDate(new Date())}</span>
-            </div>
-            <div class="modal-receipt__divider"></div>
-            <div class="modal-receipt__row">
-              <span class="modal-receipt__key">Remaining Balance</span>
-              <span class="modal-receipt__val">${formatNaira(remaining)}</span>
-            </div>
-          </div>
-
-          <p class="modal-receipt__ref">ref: ${ref}</p>
-
-          <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
+  swapToReceipt(`
+    <div class="modal-receipt">
+      <div class="modal-receipt__icon">
+        <i data-lucide="check"></i>
+      </div>
+      <p class="modal-receipt__heading">Withdrawal Requested</p>
+      <p class="modal-receipt__sub">Your request has been submitted.</p>
+      <div class="modal-receipt__card">
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Amount</span>
+          <span class="modal-receipt__val">${formatNaira(amount)}</span>
         </div>
-      `);
-    }, 800);
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Bank</span>
+          <span class="modal-receipt__val">${bank}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Account</span>
+          <span class="modal-receipt__val">${accNum} · ${accName}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Reference</span>
+          <span class="modal-receipt__val">${result.reference}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Remaining Balance</span>
+          <span class="modal-receipt__val">${formatNaira(result.remaining_balance)}</span>
+        </div>
+      </div>
+      <p class="modal-receipt__ref">ref: ${result.reference}</p>
+      <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
+    </div>
+  `);
+});
+}
+
+
+// ── Change Password ──────────────────────────────────────────────
+
+function initChangePwHandlers() {
+  // Wire toggle buttons — lucide icons already rendered by openModal
+  document.querySelectorAll('#modalBody .modal-pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.querySelectorAll('[data-lucide]').forEach(icon => {
+        // first icon = eye, second = eye-off
+        const isEyeOff = icon.getAttribute('data-lucide') === 'eye-off';
+        icon.style.display = showing ? (isEyeOff ? 'none' : '') : (isEyeOff ? '' : 'none');
+      });
+    });
+  });
+
+  const newPwEl   = document.getElementById('modalNewPw');
+  const confirmEl = document.getElementById('modalConfirmPw');
+  const newErrEl  = document.getElementById('modalNewPwError');
+  const confErrEl = document.getElementById('modalConfirmPwError');
+  const submitBtn = document.getElementById('modalChangePwBtn');
+
+  newPwEl?.addEventListener('input',   () => { newPwEl.classList.remove('is-error');   if (newErrEl)  newErrEl.textContent  = ''; });
+  confirmEl?.addEventListener('input', () => { confirmEl.classList.remove('is-error'); if (confErrEl) confErrEl.textContent = ''; });
+
+  submitBtn?.addEventListener('click', async () => {
+    const newPw   = newPwEl?.value   || '';
+    const confirm = confirmEl?.value || '';
+    let valid = true;
+
+    if (newPw.length < 8) {
+      newPwEl?.classList.add('is-error');
+      if (newErrEl) newErrEl.textContent = 'Password must be at least 8 characters.';
+      valid = false;
+    }
+
+    if (newPw !== confirm) {
+      confirmEl?.classList.add('is-error');
+      if (confErrEl) confErrEl.textContent = "Passwords don't match.";
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    submitBtn.disabled    = true;
+    submitBtn.textContent = 'Updating...';
+
+    const { error } = await supabase.auth.updateUser({ password: newPw });
+
+    if (error) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Update Password <i data-lucide="shield-check"></i>';
+      if (window.lucide) lucide.createIcons({ nodes: [submitBtn] });
+      newPwEl?.classList.add('is-error');
+      if (newErrEl) newErrEl.textContent = error.message || 'Update failed. Please try again.';
+      return;
+    }
+
+    swapToReceipt(`
+      <div class="modal-receipt">
+        <div class="modal-receipt__icon">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <p class="modal-receipt__heading">Password Updated</p>
+        <p class="modal-receipt__sub">Your password has been changed successfully.</p>
+        <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
+      </div>
+    `);
   });
 }
 

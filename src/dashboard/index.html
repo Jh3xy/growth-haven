@@ -9,6 +9,13 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script type="module" src="../assets/js/script.js"></script>
   <script type="module" src="./dashboard.js"></script>
+  <script type="module">
+    import { switchSection } from "./dashboard.js";
+
+    // ── Recall last visited section on load ──
+    const savedTab = localStorage.getItem('gh_current_tab') || 'home';
+    switchSection(savedTab);
+  </script>
 </head>
 <body>
 
@@ -802,15 +809,110 @@
       <!-- ══════════════════════════════════════════════════════
            SECTION — PROFILE (shell only)
            ══════════════════════════════════════════════════════ -->
-      <section id="section-profile" class="dash-section hidden">
-        <div class="dash-section__coming flex-col-center">
-          <div class="dash-section__coming-icon flex-center">
-            <i data-lucide="user" style="width:24px;height:24px"></i>
+      <!-- ══════════════════════════════════════════════════════
+     SECTION — PROFILE
+     ══════════════════════════════════════════════════════ -->
+    <section id="section-profile" class="dash-section hidden">
+      <div class="dash-section__inner flex-col">
+
+
+        <!-- ① ACCOUNT IDENTITY ───────────────────────────── -->
+        <div class="profile-identity flex-col items-center">
+
+          <div class="profile-avatar flex-center" id="profileAvatar">—</div>
+
+          <h2 class="profile-identity__name skeleton" id="profileName">&nbsp;</h2>
+          <p class="profile-identity__email skeleton" id="profileEmail">&nbsp;</p>
+          <p class="profile-identity__since skeleton" id="profileSince">&nbsp;</p>
+
+          <div class="profile-ref-pill flex items-center gap-2 skeleton" id="profileRefPill">
+            <i data-lucide="key-round" style="width:11px;height:11px"></i>
+            <span id="profileRefCode">&nbsp;</span>
           </div>
-          <p class="dash-section__coming-title">Profile</p>
-          <span class="dash-section__coming-sub">This section is coming at launch.</span>
+
         </div>
-      </section>
+
+
+        <!-- ② PERSONAL INFO ──────────────────────────────── -->
+        <div class="dash-card profile-info-card" id="profileInfoCard">
+
+          <div class="profile-card__header flex-between">
+            <p class="dash-card__label flex items-center gap-2 uppercase">
+              <i data-lucide="user" style="width:13px;height:13px"></i>
+              Personal Info
+            </p>
+            <div class="profile-edit-controls flex items-center gap-3">
+              <button class="dash-action-btn dash-action-btn--secondary profile-edit-btn"
+                      id="profileEditBtn" type="button">
+                <i data-lucide="pencil" style="width:12px;height:12px"></i>
+                Edit
+              </button>
+              <button class="dash-action-btn dash-action-btn--primary hidden"
+                      id="profileSaveBtn" type="button">
+                <i data-lucide="check" style="width:12px;height:12px"></i>
+                Save Changes
+              </button>
+              <button class="profile-cancel-link hidden" id="profileCancelBtn" type="button">
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-success hidden" id="profileSuccess" role="alert">
+            <i data-lucide="check-circle" style="width:13px;height:13px"></i>
+            Profile updated successfully.
+          </div>
+
+          <div class="profile-fields flex-col">
+
+            <div class="form-field">
+              <label class="profile-form-label" for="profileFirstName">First Name</label>
+              <input class="profile-field-input" id="profileFirstName"
+                    type="text" placeholder="First name" readonly />
+              <span class="profile-field-error" id="err-profileFirstName"></span>
+            </div>
+
+            <div class="form-field">
+              <label class="profile-form-label" for="profileLastName">Last Name</label>
+              <input class="profile-field-input" id="profileLastName"
+                    type="text" placeholder="Last name" readonly />
+              <span class="profile-field-error" id="err-profileLastName"></span>
+            </div>
+
+            <div class="form-field">
+              <label class="profile-form-label" for="profilePhone">
+                Phone Number
+                <span class="profile-form-label__optional">— optional</span>
+              </label>
+              <input class="profile-field-input" id="profilePhone"
+                    type="tel" placeholder="e.g. +234 801 234 5678" readonly />
+              <span class="profile-field-error" id="err-profilePhone"></span>
+            </div>
+
+          </div><!-- /.profile-fields -->
+
+        </div><!-- /.profile-info-card -->
+
+
+        <!-- ③ SECURITY ───────────────────────────────────── -->
+        <div class="dash-card">
+          <p class="dash-card__label flex items-center gap-2 uppercase">
+            <i data-lucide="shield" style="width:13px;height:13px"></i>
+            Security
+          </p>
+          <p class="dash-card__hint">
+            Keep your account secure with a strong, unique password.
+          </p>
+          <button class="dash-action-btn dash-action-btn--secondary profile-change-pw-btn"
+                  id="changePasswordBtn" type="button">
+            <i data-lucide="lock" style="width:13px;height:13px"></i>
+            Change Password
+          </button>
+        </div>
+
+
+      </div>
+    </section>
 
 
     </main><!-- /dash-main -->
