@@ -113,6 +113,10 @@
 
       <!-- Sidebar footer: sign out -->
       <div class="dash-sidebar__footer">
+        <button class="dash-nav-link flex items-center gap-3" data-nav="support" type="button">
+          <i data-lucide="help-circle" style="width:16px;height:16px"></i>
+          <span>Support</span>
+        </button>
         <button class="dash-sidebar__signout flex items-center gap-3" id="sidebarSignoutBtn" type="button">
           <i data-lucide="log-out" style="width:16px;height:16px"></i>
           <span>Sign Out</span>
@@ -914,6 +918,109 @@
       </div>
     </section>
 
+    <!-- ══════════════════════════════════════════════════════
+     SECTION — SUPPORT
+     ══════════════════════════════════════════════════════ -->
+    <section id="section-support" class="dash-section hidden">
+      <div class="dash-section__inner flex-col">
+
+        <!-- Heading -->
+        <div class="support-header">
+          <h2 class="support-header__title">Support</h2>
+          <p class="support-header__sub">Answers to common questions. For anything else, reach us on Telegram.</p>
+        </div>
+
+        <!-- FAQ Accordion -->
+        <div class="support-faq" id="supportFaq">
+
+          <div class="support-faq-item" data-faq="0">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">What is GrowthHaven?</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                GrowthHaven is a platform that lets your money grow across multiple avenues — the Vault for savings and fixed-term investments, Sports for live betting, and a referral system that rewards you for growing the community. It's not a one-size-fits-all product. You choose where your money works and how aggressively.
+              </p>
+            </div>
+          </div>
+
+          <div class="support-faq-item" data-faq="1">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">How does the Vault work?</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                You lock a sum of money into a fixed plan — 7, 14, or 30 days — and earn a set daily yield for the duration. Each day, you must claim your yield before midnight WAT or it is forfeited for that day. When your plan matures, your original principal is returned to your wallet. Early exit is available under certain conditions, but comes with a penalty on accrued earnings.
+              </p>
+            </div>
+          </div>
+
+          <div class="support-faq-item" data-faq="2">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">Where does the funding come from?</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                GrowthHaven pools member capital and deploys it across diversified market instruments, including index-style positions in top-performing companies. The platform is also sustained through community activity and the referral network — growth feeds the ecosystem. Your plan's returns are fixed at the point of commitment, not tied to real-time market swings.
+              </p>
+            </div>
+          </div>
+
+          <div class="support-faq-item" data-faq="3">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">Is my money safe?</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                Funds are managed under strict internal controls. Withdrawal requests are processed within 2–3 business days, excluding weekends. We do not guarantee returns beyond what your chosen plan explicitly specifies. Only invest what you are prepared to commit for the plan's duration.
+              </p>
+            </div>
+          </div>
+
+          <div class="support-faq-item" data-faq="4">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">How do referrals work?</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                Every member receives a unique referral code and link at registration. When someone signs up using your code and becomes an active member, referral credit is applied to your account automatically — no manual claiming needed. Promoter Partners earn an assigned commission rate on their referrals' platform activity, tracked in the Promoter Portal.
+              </p>
+            </div>
+          </div>
+
+          <div class="support-faq-item" data-faq="5">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">How do I withdraw funds?</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                Go to your wallet on the Home tab and click Withdraw. Enter your bank name, account number, account name, and the amount you want to withdraw. The minimum withdrawal is ₦10,000. Requests are processed within 2–3 business days, excluding weekends. Funds locked in an active Vault plan cannot be withdrawn until the plan matures or you exit early.
+              </p>
+            </div>
+          </div>
+
+          <div class="support-faq-item" data-faq="6">
+            <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
+              <span class="support-faq-item__question">My question isn't answered here.</span>
+              <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
+            </button>
+            <div class="support-faq-item__body" aria-hidden="true">
+              <p class="support-faq-item__answer">
+                Use the Telegram button at the bottom-right of your screen to reach our support team directly. We respond to all messages — provide your registered email when you write in so we can look up your account quickly.
+              </p>
+            </div>
+          </div>
+
+        </div><!-- /#supportFaq -->
+
+      </div>
+    </section><!-- /#section-support -->
 
     </main><!-- /dash-main -->
   </div><!-- /dash-shell -->
@@ -931,6 +1038,19 @@
       <div class="modal-shell__body" id="modalBody"></div>
     </div>
   </div>
+
+  <!-- FLOATING TELEGRAM SUPPORT BUTTON -->
+  <a
+    class="tg-float-btn flex items-center gap-2"
+    id="tgFloatBtn"
+    href="https://t.me/growthhavensupport"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Contact support on Telegram"
+  >
+    <i data-lucide="send" style="width:18px;height:18px;flex-shrink:0;"></i>
+    <span class="tg-float-btn__label">Support</span>
+  </a>
 
   <script>
     lucide.createIcons();

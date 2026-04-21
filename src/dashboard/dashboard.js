@@ -13,6 +13,7 @@ import '../assets/styles/landing.css'
 import '../assets/styles/queries.css'
 import '../assets/styles/transactions.css'
 import '../assets/styles/dashboard.css'  
+import '../assets/styles/support.css';
 
 // ── Modal & Profile system ──
 import './modal.css';
@@ -1256,4 +1257,40 @@ withdrawBtn?.addEventListener('click', () => {
     userId:        user.id,
   });
 });
+
+
+
+// ─── SUPPORT — FAQ ACCORDION ──────────────────────────────────
+
+(function initSupportFaq() {
+  const faq = document.getElementById('supportFaq');
+  if (!faq) return;
+
+  let openItem = null;
+
+  faq.addEventListener('click', (e) => {
+    const trigger = e.target.closest('.support-faq-item__trigger');
+    if (!trigger) return;
+
+    const item = trigger.closest('.support-faq-item');
+    const body = item.querySelector('.support-faq-item__body');
+    const isAlreadyOpen = item === openItem;
+
+    // Close whatever is currently open
+    if (openItem) {
+      openItem.classList.remove('is-open');
+      openItem.querySelector('.support-faq-item__trigger').setAttribute('aria-expanded', 'false');
+      openItem.querySelector('.support-faq-item__body').setAttribute('aria-hidden', 'true');
+      openItem = null;
+    }
+
+    // If we clicked a different item, open it
+    if (!isAlreadyOpen) {
+      item.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+      body.setAttribute('aria-hidden', 'false');
+      openItem = item;
+    }
+  });
+})();
 

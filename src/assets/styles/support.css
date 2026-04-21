@@ -1,0 +1,219 @@
+/* ============================================================
+   support.css — GrowthHaven Support Section
+============================================================ */
+
+/* ─── SECTION HEADER ─────────────────────────────────────────── */
+
+.support-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.support-header__title {
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.support-header__sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+
+/* ─── FAQ ACCORDION ──────────────────────────────────────────── */
+
+.support-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.support-faq-item {
+  background-color: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: 0.625rem;
+  overflow: hidden;
+  transition: border-color var(--transition-global), box-shadow var(--transition-global);
+}
+
+.support-faq-item:last-child {
+  margin-bottom: 0;
+}
+
+.support-faq-item.is-open {
+  border-color: var(--brand-primary-ring);
+  box-shadow: 0 4px 20px 0 hsla(142, 71%, 45%, 0.07);
+}
+
+/* ─── TRIGGER ─────────────────────────────────────────────────── */
+
+.support-faq-item__trigger {
+  width: 100%;
+  padding: 1.125rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--ff-primary);
+  text-align: left;
+  min-height: unset;
+  border-radius: 0;
+  gap: 1rem;
+  transition: background-color var(--transition-global);
+}
+
+.support-faq-item__trigger:hover {
+  background-color: var(--surface-card-muted);
+}
+
+.support-faq-item.is-open .support-faq-item__trigger {
+  background-color: var(--surface-card-muted);
+}
+
+.support-faq-item__question {
+  font-size: 0.9375rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+}
+
+.support-faq-item__chevron {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: transform 0.3s var(--spring), color var(--transition-global);
+}
+
+.support-faq-item.is-open .support-faq-item__chevron {
+  transform: rotate(180deg);
+  color: var(--brand-primary);
+}
+
+
+/* ─── BODY / ANSWER ──────────────────────────────────────────── */
+
+.support-faq-item__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--spring);
+}
+
+.support-faq-item.is-open .support-faq-item__body {
+  grid-template-rows: 1fr;
+}
+
+/* Inner wrapper needed for the grid-rows trick to work */
+.support-faq-item__body > * {
+  overflow: hidden;
+}
+
+.support-faq-item__answer {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin: 0;
+  padding: 0 1.25rem 1.25rem;
+  border-top: var(--border-width) solid var(--border-subtle);
+  padding-top: 1rem;
+}
+
+
+/* ─── FLOATING TELEGRAM BUTTON ───────────────────────────────── */
+
+.tg-float-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 1.5rem;
+  z-index: 150;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  height: 48px;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-full);
+
+  background-color: #24A1DE;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--ff-primary);
+  font-size: 0.875rem;
+  font-weight: var(--fw-semibold);
+
+  /* box-shadow: 0 6px 24px rgba(36, 161, 222, 0.35); */
+  transition:
+    transform 0.2s var(--spring),
+    box-shadow 0.2s var(--spring),
+    background-color var(--transition-global);
+}
+
+.tg-float-btn:hover {
+  background-color: #1a8fc7;
+  transform: translateY(-2px);
+  box-shadow: 2px 3px 10px rgba(36, 161, 222, 0.45);
+}
+
+.tg-float-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(36, 161, 222, 0.25);
+}
+
+.tg-float-btn__label {
+  line-height: 1;
+}
+
+
+/* ─── DARK MODE ───────────────────────────────────────────────── */
+
+html[data-theme='dark'] .support-faq-item.is-open {
+  border-color: var(--brand-primary-ring);
+}
+
+html[data-theme='dark'] .support-faq-item__trigger:hover,
+html[data-theme='dark'] .support-faq-item.is-open .support-faq-item__trigger {
+  background-color: var(--surface-card-muted);
+}
+
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .tg-float-btn {
+    bottom: 1.5rem;
+    right: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .support-faq-item__trigger {
+    padding: 1rem;
+  }
+
+  .support-faq-item__answer {
+    padding: 0 1rem 1rem;
+    padding-top: 0.875rem;
+  }
+
+  .tg-float-btn__label {
+    display: none;
+  }
+
+  .tg-float-btn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+}
+
