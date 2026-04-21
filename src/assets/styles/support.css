@@ -157,6 +157,13 @@
     background-color var(--transition-global);
 }
 
+.tg-float-btn [data-lucide] {
+  width: 21px !important;
+  height: 21px !important;
+  stroke-width: 3px;
+  flex-shrink: 0;
+}
+
 .tg-float-btn:hover {
   background-color: #1a8fc7;
   transform: translateY(-2px);
@@ -189,8 +196,8 @@ html[data-theme='dark'] .support-faq-item.is-open .support-faq-item__trigger {
 
 @media (max-width: 767px) {
   .tg-float-btn {
-    bottom: 1.5rem;
-    right: 1rem;
+    bottom: 3rem;
+    right: 2rem;
   }
 }
 
@@ -209,8 +216,8 @@ html[data-theme='dark'] .support-faq-item.is-open .support-faq-item__trigger {
   }
 
   .tg-float-btn {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     padding: 0;
     justify-content: center;
     border-radius: 50%;

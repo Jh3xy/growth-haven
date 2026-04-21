@@ -356,6 +356,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   flex-direction: column;
   margin-bottom: .7rem;
   align-items: flex-start;
+  overflow: hidden;
   box-shadow: var(--shadow-low);
   border-radius: var(--radius-lg);
   background-color: var(--surface-card);
