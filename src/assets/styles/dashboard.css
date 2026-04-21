@@ -602,7 +602,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   padding: 0.5rem 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 0.3rem;
 }
  
 /* ── Nav Link ── */
@@ -943,7 +943,8 @@ align-items: anchor-center;
   min-width: 140px;
   min-height: 10px;
   position: absolute;
-  right: -23%;
+  right: -6%;
+  top: -6px;
 }
  
  

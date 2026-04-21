@@ -553,7 +553,7 @@ async function loadInvestmentSection() {
   let activePlan = null;
   const { data, error } = await supabase
     .from('investments')
-    .select('amount, duration_days, daily_rate, accrued_earnings, claimed_today, claimable_amount, start_date')
+    .select('amount, duration_days, daily_rate, accrued_earnings, claimed_today, claimable_amount, start_date, last_claimed_at')
     .eq('user_id', user.id)
     .eq('status', 'active')
     .single();
@@ -565,7 +565,10 @@ async function loadInvestmentSection() {
       startDate: data.start_date,
       dailyRate: data.daily_rate * 100,
       accruedEarnings: data.accrued_earnings,
-      claimedToday: data.claimed_today,
+      claimedToday: data.last_claimed_at
+        ? new Date(data.last_claimed_at).toLocaleDateString('en-GB', { timeZone: 'Africa/Lagos' }) 
+          === new Date().toLocaleDateString('en-GB', { timeZone: 'Africa/Lagos' })
+        : false,
       claimableAmount: data.claimable_amount,
     };
   } else if (error && error.code !== 'PGRST116') {
@@ -649,7 +652,14 @@ function populateEarningsCard(plan) {
 
   if (!claimableEl) return;
 
-  claimableEl.textContent = formatNaira(plan.claimableAmount || 0).replace('₦', '');
+  const expectedYield = Math.round(plan.amount * plan.dailyRate) / 100;
+  // dailyRate comes in as a percentage (e.g. 5 for 5%), amount * rate / 100
+  const displayYield = plan.claimedToday
+    ? 0
+    : plan.claimableAmount > 0
+      ? plan.claimableAmount
+      : +(plan.amount * (plan.dailyRate / 100)).toFixed(2);
+  claimableEl.textContent = formatNaira(displayYield).replace('₦', '');
   claimableEl.classList.remove('skeleton');
 
   if (accruedEl) {
@@ -819,7 +829,7 @@ async function handleClaim() {
   // Switch the button to claimed state
   claimBtn.classList.remove('invest-claim-btn--claimable');
   claimBtn.classList.add('invest-claim-btn--claimed');
-  claimBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> Claimed Today ✓';
+  claimBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> Claimed Today';
   claimBtn.disabled = true;
   if (window.lucide) lucide.createIcons({ nodes: [claimBtn] });
 
