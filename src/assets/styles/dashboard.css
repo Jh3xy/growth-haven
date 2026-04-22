@@ -568,7 +568,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   border-right: var(--border-width) solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  z-index: 40;
+  z-index: 99;
   overflow-y: auto;
   transition: transform 0.3s var(--spring);
 }
