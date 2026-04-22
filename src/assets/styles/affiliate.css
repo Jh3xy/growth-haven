@@ -1,8 +1,23 @@
-.dash-main{
-  padding-top: calc(var(--header-height, 30px) + 4rem) !important;
+*,
+*::after,
+*::before{
+  box-sizing: border-box;
+}
+/* Shell handles layout — dashboard.css sets margin-left and padding-top:0 */
+.dash-main {
+  padding-top: 0 !important;
 }
 .dash-cards{
   margin-bottom: 4rem;
+}
+.dash-section {
+  padding: 0;
+}
+.dash-section__inner{
+padding: 3rem 1rem;
+}
+.dash-sidebar__nav{
+  padding: 1.5rem 0.5rem;
 }
 
 /* ─── BALANCE (NORTH STAR) CARD ──────────────────────── */

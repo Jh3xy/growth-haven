@@ -58,7 +58,8 @@ const { data: { session } } = await supabase.auth.getSession();
 
 if (!session) {
   window.location.href = '/src/login/';
-  throw new Error('No session.');
+  console.error("[auth guard]: No Session Found - Redirecting");
+  throw "Redirecting to Login"
 }
 
 const user = session.user;
@@ -83,11 +84,14 @@ const { data: member, error: memberError } = await supabase
   .single();
 
 if (memberError || !member?.referral_code) {
-  console.error('[dashboard] Member profile error:', memberError);
   refCodeEl.textContent = 'Error — contact support';
   refCodeEl.classList.remove('skeleton');
   refLinkEl.textContent = 'Could not load link';
   refLinkEl.classList.remove('skeleton');
+  console.error('[dashboard] Member profile error:', memberError);
+  // TODO: Find a simple way to show a "something went wrong - try refresh" with this renderFatalState function
+  // renderFatalState(); // show “something went wrong”
+  throw "Something went wrong try refreshing your browser"
 } else {
   const code = member.referral_code;
   const link = `${REGISTER_URL}?ref=${code}`;
@@ -115,7 +119,11 @@ if (memberError || !member?.referral_code) {
 // ─── SET BALANCES FROM MEMBER ROW ────────────────────────────
 if (member) {
   // Set the JS variable — this is what gates the invest tiles
-  currentWalletBalance = Number(member.wallet_balance || 0);
+  const balance = Number(member.wallet_balance);
+  if (isNaN(balance)) {
+    console.warn('Invalid balance');
+  }
+  currentWalletBalance = isNaN(balance) ? 0 : balance;
 
   // Home — Wallet card display
   const walletBalanceEl = document.getElementById('walletBalance');
@@ -132,12 +140,15 @@ if (member) {
     vaultBalanceEl.textContent = vaultBal.toLocaleString('en-NG', { minimumFractionDigits: 2 });
     vaultBalanceEl.classList.remove('skeleton');
   }
-  vaultBtn.textContent = vaultBal > 0 ? 'View Plan' : 'Fund Vault';
-  vaultBtn.disabled = vaultBal > 0 ? false : true;
-  vaultBtn.addEventListener("click", ()=> {
-    const investNavBtn = document.querySelector('[data-nav ="invest"]');
-    investNavBtn.click();
-  })
+
+  if (vaultBtn) {
+    vaultBtn.textContent = vaultBal > 0 ? 'View Plan' : 'Fund Vault';
+    vaultBtn.disabled = vaultBal > 0 ? false : true;
+    vaultBtn.addEventListener("click", ()=> {
+      const investNavBtn = document.querySelector('[data-nav ="invest"]');
+      investNavBtn.click();
+    })
+  }
 
   // Home — Vault tier info: clear skeleton, show default until investments is wired
   const vaultTierEl = document.getElementById('vaultTierInfo');
@@ -358,10 +369,17 @@ function openSidebar() {
   hamburger?.setAttribute('aria-expanded', 'true');
   document.body.style.overflow = 'hidden'; // prevent scroll behind overlay on mobile
 }
- 
+
+
+// Define valid sections outside the function for better performance
+const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'support', 'transact', 'sports', 'invest']);
+
 export function switchSection(name) {
-  // save current section to Local Storage
-  localStorage.setItem('gh_current_tab', name);
+  //Validate the input. If it's trash, default to 'home'.
+  const activeSection = VALID_SECTIONS.has(name) ? name : 'home';
+
+  // save active section to Local Storage
+  localStorage.setItem('gh_current_tab', activeSection);
 
   // Hide all, strip active class
   sections.forEach(s => {
