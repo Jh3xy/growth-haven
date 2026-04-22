@@ -6,6 +6,9 @@
 #section-home{
   padding-bottom: 4rem;
 }
+#refList {
+  margin-bottom: 4rem;
+}
 /* Shell handles layout — dashboard.css sets margin-left and padding-top:0 */
 .dash-main {
   padding-top: 0 !important;

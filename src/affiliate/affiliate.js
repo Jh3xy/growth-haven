@@ -360,13 +360,22 @@ async function handlePromoterWithdraw() {
     ?.addEventListener('click', closePromoterWithdrawModal);
 }
 
-// ── Wire the shell's close button and backdrop ──
-// (modal.js is not imported here so these listeners are unbound)
-modalCloseBtn?.addEventListener('click', closePromoterWithdrawModal);
-modalBackdrop?.addEventListener('click', closePromoterWithdrawModal);
+// ── Generic close — works for any modal opened from this file ──
+function closeActiveModal() {
+  modalShell.classList.remove('is-open');
+  modalShell.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    if (modalTitleEl) modalTitleEl.textContent = '';
+    if (modalBodyEl)  modalBodyEl.innerHTML    = '';
+  }, 350);
+}
+
+modalCloseBtn?.addEventListener('click', closeActiveModal);
+modalBackdrop?.addEventListener('click', closeActiveModal);
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && modalShell?.classList.contains('is-open')) {
-    closePromoterWithdrawModal();
+    closeActiveModal();
   }
 });
 
@@ -736,3 +745,179 @@ async function loadWithdrawalsSection() {
   });
   if (window.lucide) lucide.createIcons({ nodes: [listEl] });
 }
+
+
+// ═══════  CHANGE PASSWORD MODAL ═══════════════════════════════════════
+
+function openChangePasswordModal() {
+  modalTitleEl.textContent = 'Change Password';
+  modalBodyEl.innerHTML = `
+    <div class="modal-field">
+      <label class="modal-label" for="affNewPw">New Password</label>
+      <div style="position:relative;">
+        <input
+          class="modal-input"
+          id="affNewPw"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="new-password"
+          style="padding-right:3rem;"
+        />
+        <button class="modal-pw-toggle" type="button"
+                data-target="affNewPw"
+                aria-label="Toggle password visibility">
+          <i data-lucide="eye"     style="width:16px;height:16px;"></i>
+          <i data-lucide="eye-off" style="width:16px;height:16px;display:none;"></i>
+        </button>
+      </div>
+      <span class="modal-field-error" id="affNewPwError"></span>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label" for="affConfirmPw">Confirm New Password</label>
+      <div style="position:relative;">
+        <input
+          class="modal-input"
+          id="affConfirmPw"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="new-password"
+          style="padding-right:3rem;"
+        />
+        <button class="modal-pw-toggle" type="button"
+                data-target="affConfirmPw"
+                aria-label="Toggle confirm password visibility">
+          <i data-lucide="eye"     style="width:16px;height:16px;"></i>
+          <i data-lucide="eye-off" style="width:16px;height:16px;display:none;"></i>
+        </button>
+      </div>
+      <span class="modal-field-error" id="affConfirmPwError"></span>
+    </div>
+
+    <button class="modal-submit-btn" id="affChangePwBtn" type="button">
+      Update Password
+      <i data-lucide="shield-check"></i>
+    </button>
+  `;
+
+  modalShell.setAttribute('aria-hidden', 'false');
+  modalShell.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+
+  if (window.lucide) lucide.createIcons({ nodes: [modalBodyEl] });
+
+  // ── Eye toggles ──
+  modalBodyEl.querySelectorAll('.modal-pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.querySelectorAll('[data-lucide]').forEach(icon => {
+        const isEyeOff = icon.getAttribute('data-lucide') === 'eye-off';
+        icon.style.display = showing
+          ? (isEyeOff ? 'none' : '')
+          : (isEyeOff ? '' : 'none');
+      });
+    });
+  });
+
+  // ── Clear errors on input ──
+  document.getElementById('affNewPw')
+    ?.addEventListener('input', () => {
+      document.getElementById('affNewPw')?.classList.remove('is-error');
+      const el = document.getElementById('affNewPwError');
+      if (el) el.textContent = '';
+    });
+
+  document.getElementById('affConfirmPw')
+    ?.addEventListener('input', () => {
+      document.getElementById('affConfirmPw')?.classList.remove('is-error');
+      const el = document.getElementById('affConfirmPwError');
+      if (el) el.textContent = '';
+    });
+
+  document.getElementById('affChangePwBtn')
+    ?.addEventListener('click', handleChangePassword);
+}
+
+function closeChangePasswordModal() {
+  modalShell.classList.remove('is-open');
+  modalShell.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+
+  setTimeout(() => {
+    if (modalTitleEl) modalTitleEl.textContent = '';
+    if (modalBodyEl)  modalBodyEl.innerHTML    = '';
+  }, 350);
+}
+
+async function handleChangePassword() {
+  const newPwEl    = document.getElementById('affNewPw');
+  const confirmEl  = document.getElementById('affConfirmPw');
+  const newErrEl   = document.getElementById('affNewPwError');
+  const confErrEl  = document.getElementById('affConfirmPwError');
+  const submitBtn  = document.getElementById('affChangePwBtn');
+
+  const newPw   = newPwEl?.value   || '';
+  const confirm = confirmEl?.value || '';
+  let valid = true;
+
+  // Clear previous errors
+  newPwEl?.classList.remove('is-error');
+  confirmEl?.classList.remove('is-error');
+  if (newErrEl)  newErrEl.textContent  = '';
+  if (confErrEl) confErrEl.textContent = '';
+
+  if (newPw.length < 8) {
+    newPwEl?.classList.add('is-error');
+    if (newErrEl) newErrEl.textContent = 'Password must be at least 8 characters.';
+    valid = false;
+  }
+
+  if (newPw !== confirm) {
+    confirmEl?.classList.add('is-error');
+    if (confErrEl) confErrEl.textContent = "Passwords don't match.";
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  submitBtn.disabled    = true;
+  submitBtn.textContent = 'Updating...';
+
+  const { error } = await supabase.auth.updateUser({ password: newPw });
+
+  if (error) {
+    submitBtn.disabled  = false;
+    submitBtn.innerHTML = 'Update Password <i data-lucide="shield-check"></i>';
+    if (window.lucide) lucide.createIcons({ nodes: [submitBtn] });
+    newPwEl?.classList.add('is-error');
+    if (newErrEl) newErrEl.textContent = error.message || 'Update failed. Please try again.';
+    return;
+  }
+
+  // ── Receipt state ──
+  modalBodyEl.innerHTML = `
+    <div class="modal-receipt">
+      <div class="modal-receipt__icon">
+        <i data-lucide="shield-check"></i>
+      </div>
+      <p class="modal-receipt__heading">Password Updated</p>
+      <p class="modal-receipt__sub">
+        Your password has been changed successfully.
+      </p>
+      <button class="modal-done-btn" id="affPwDoneBtn" type="button">Done</button>
+    </div>
+  `;
+
+  if (window.lucide) lucide.createIcons({ nodes: [modalBodyEl] });
+
+  document.getElementById('affPwDoneBtn')
+    ?.addEventListener('click', closeChangePasswordModal);
+}
+
+// ── Wire change password button ──
+document.getElementById('affChangePasswordBtn')
+  ?.addEventListener('click', openChangePasswordModal);
+
