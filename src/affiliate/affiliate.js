@@ -39,6 +39,10 @@ const commissionRateVal = document.getElementById('commissionRateVal');
 const withdrawBtn       = document.getElementById('withdrawBtn');
 
 
+// ─── PROMOTER WALLET STATE ────────────────────────────────────
+let promoterWalletBalance = 0;
+
+
 // ═══════════════════════════════════════════════════════════════
 // 1. AUTH GUARD
 // ═══════════════════════════════════════════════════════════════
@@ -93,15 +97,32 @@ if (!member.promoter) {
 (async () => {
   const { data: promoterProfile, error: promoterError } = await supabase
     .from('promoters')
-    .select('assigned_commission_rate')
+    .select('assigned_commission_rate, wallet_balance')
     .eq('user_id', user.id)
     .single();
 
-  if (promoterError || promoterProfile?.assigned_commission_rate == null) return;
+  if (promoterError || !promoterProfile) return;
 
-  const rate = Math.round(promoterProfile.assigned_commission_rate * 100);
-  commissionRateVal.textContent = `${rate}%`;
-  commissionPill.classList.add('is-loaded');
+  // ── Commission rate pill ──
+  if (promoterProfile.assigned_commission_rate != null) {
+    const rate = Math.round(promoterProfile.assigned_commission_rate * 100);
+    commissionRateVal.textContent = `${rate}%`;
+    commissionPill.classList.add('is-loaded');
+  }
+
+  // ── Wallet balance ──
+  promoterWalletBalance = Number(promoterProfile.wallet_balance ?? 0);
+
+  if (affiliateBalance) {
+    affiliateBalance.textContent = promoterWalletBalance.toLocaleString('en-NG', {
+      minimumFractionDigits: 2,
+    });
+  }
+
+  // Enable withdraw only if balance > 0
+  if (withdrawBtn) {
+    withdrawBtn.disabled = promoterWalletBalance <= 0;
+  }
 })();
 
 
@@ -151,9 +172,206 @@ function flashCopied(btn) {
 
 
 // ═══════════════════════════════════════════════════════════════
-// 5. WITHDRAW STUB — unchanged
+// 5. PROMOTER WITHDRAWAL MODAL
+//    Self-contained — uses the modal shell already in the HTML
+//    but calls process_promoter_withdrawal (not process_withdrawal)
+//    so the dashboard modal-templates.js is never touched.
 // ═══════════════════════════════════════════════════════════════
-// withdrawBtn.addEventListener('click', async () => { ... });
+
+const modalShell    = document.getElementById('modalShell');
+const modalTitleEl  = document.getElementById('modalTitle');
+const modalBodyEl   = document.getElementById('modalBody');
+const modalCloseBtn = document.getElementById('modalClose');
+const modalBackdrop = document.getElementById('modalBackdrop');
+
+function openPromoterWithdrawModal() {
+  modalTitleEl.textContent = 'Withdraw Earnings';
+  modalBodyEl.innerHTML = `
+    <p class="modal-balance-hint">
+      Available: <span>₦${promoterWalletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
+    </p>
+
+    <div class="modal-field">
+      <label class="modal-label" for="pwAmount">Amount (₦)</label>
+      <input class="modal-input" id="pwAmount" type="number"
+             min="1" placeholder="Enter amount" inputmode="numeric" />
+      <span class="modal-field-error" id="pwAmountError"></span>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label" for="pwBank">Bank Name</label>
+      <input class="modal-input" id="pwBank" type="text"
+             placeholder="e.g. First Bank" autocomplete="organization" />
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label" for="pwAccNum">Account Number</label>
+      <input class="modal-input" id="pwAccNum" type="text"
+             inputmode="numeric" maxlength="10" placeholder="10-digit number" />
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label" for="pwAccName">Account Name</label>
+      <input class="modal-input" id="pwAccName" type="text"
+             placeholder="As registered with bank" autocomplete="name" />
+    </div>
+
+    <button class="modal-submit-btn" id="pwSubmitBtn" type="button">
+      Request Withdrawal
+      <i data-lucide="arrow-up-right"></i>
+    </button>
+  `;
+
+  modalShell.setAttribute('aria-hidden', 'false');
+  modalShell.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+
+  if (window.lucide) lucide.createIcons({ nodes: [modalBodyEl] });
+
+  // Digits-only enforcement on account number
+  document.getElementById('pwAccNum')?.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+  });
+
+  document.getElementById('pwSubmitBtn')
+    ?.addEventListener('click', handlePromoterWithdraw);
+}
+
+function closePromoterWithdrawModal() {
+  modalShell.classList.remove('is-open');
+  modalShell.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+
+  // Clear after the CSS transition finishes
+  setTimeout(() => {
+    if (modalTitleEl) modalTitleEl.textContent = '';
+    if (modalBodyEl)  modalBodyEl.innerHTML    = '';
+  }, 350);
+}
+
+async function handlePromoterWithdraw() {
+  const amountEl  = document.getElementById('pwAmount');
+  const bankEl    = document.getElementById('pwBank');
+  const accNumEl  = document.getElementById('pwAccNum');
+  const accNameEl = document.getElementById('pwAccName');
+  const errorEl   = document.getElementById('pwAmountError');
+  const submitBtn = document.getElementById('pwSubmitBtn');
+
+  const amount  = parseFloat(amountEl?.value);
+  const bank    = bankEl?.value.trim();
+  const accNum  = accNumEl?.value.trim();
+  const accName = accNameEl?.value.trim();
+
+  // Clear previous amount error
+  amountEl?.classList.remove('is-error');
+  if (errorEl) errorEl.textContent = '';
+
+  // Validate — same order as the dashboard withdrawal modal
+  if (!amountEl?.value || isNaN(amount) || amount <= 0) {
+    amountEl?.classList.add('is-error');
+    if (errorEl) errorEl.textContent = 'Please enter a valid amount.';
+    return;
+  }
+  if (amount > promoterWalletBalance) {
+    amountEl?.classList.add('is-error');
+    if (errorEl) errorEl.textContent = 'Amount exceeds your available balance.';
+    return;
+  }
+  if (!bank)                { bankEl?.classList.add('is-error');    bankEl?.focus();    return; }
+  if (accNum.length !== 10) { accNumEl?.classList.add('is-error');  accNumEl?.focus();  return; }
+  if (!accName)             { accNameEl?.classList.add('is-error'); accNameEl?.focus(); return; }
+
+  submitBtn.disabled    = true;
+  submitBtn.textContent = 'Submitting...';
+
+  const { data: result, error } = await supabase.rpc('process_promoter_withdrawal', {
+    p_amount:     amount,
+    p_bank:       bank,
+    p_acc_number: accNum,
+    p_acc_name:   accName,
+  });
+
+  if (error || result?.error) {
+    submitBtn.disabled  = false;
+    submitBtn.innerHTML = 'Request Withdrawal <i data-lucide="arrow-up-right"></i>';
+    if (window.lucide) lucide.createIcons({ nodes: [submitBtn] });
+    amountEl?.classList.add('is-error');
+    if (errorEl) errorEl.textContent = result?.error || 'Something went wrong. Try again.';
+    return;
+  }
+
+  // ── Update module state ──
+  promoterWalletBalance = Number(result.remaining_balance);
+
+  if (affiliateBalance) {
+    affiliateBalance.textContent = promoterWalletBalance.toLocaleString('en-NG', {
+      minimumFractionDigits: 2,
+    });
+  }
+
+  if (withdrawBtn) {
+    withdrawBtn.disabled = promoterWalletBalance <= 0;
+  }
+
+  // Force the withdrawals section to re-fetch on next visit
+  loaded.withdrawals = false;
+
+  // ── Swap to receipt ──
+  modalBodyEl.innerHTML = `
+    <div class="modal-receipt">
+      <div class="modal-receipt__icon">
+        <i data-lucide="check"></i>
+      </div>
+      <p class="modal-receipt__heading">Withdrawal Requested</p>
+      <p class="modal-receipt__sub">Your request has been submitted for processing.</p>
+      <div class="modal-receipt__card">
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Amount</span>
+          <span class="modal-receipt__val">₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Bank</span>
+          <span class="modal-receipt__val">${bank}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Account</span>
+          <span class="modal-receipt__val">${accNum} · ${accName}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Remaining Balance</span>
+          <span class="modal-receipt__val">₦${promoterWalletBalance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div class="modal-receipt__divider"></div>
+        <div class="modal-receipt__row">
+          <span class="modal-receipt__key">Reference</span>
+          <span class="modal-receipt__val">${result.reference}</span>
+        </div>
+      </div>
+      <p class="modal-receipt__ref">ref: ${result.reference}</p>
+      <button class="modal-done-btn" id="pwDoneBtn" type="button">Done</button>
+    </div>
+  `;
+
+  if (window.lucide) lucide.createIcons({ nodes: [modalBodyEl] });
+  document.getElementById('pwDoneBtn')
+    ?.addEventListener('click', closePromoterWithdrawModal);
+}
+
+// ── Wire the shell's close button and backdrop ──
+// (modal.js is not imported here so these listeners are unbound)
+modalCloseBtn?.addEventListener('click', closePromoterWithdrawModal);
+modalBackdrop?.addEventListener('click', closePromoterWithdrawModal);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modalShell?.classList.contains('is-open')) {
+    closePromoterWithdrawModal();
+  }
+});
+
+// ── Wire the button ──
+withdrawBtn?.addEventListener('click', openPromoterWithdrawModal);
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -205,7 +423,7 @@ function renderReferralRow(ref) {
 
   row.innerHTML = `
     <div class="aff-ref-inner">
-      <div class="flex items-center gap-3">
+      <div class="flex items-start gap-3">
         <div class="dash-ref-avatar">${getInitials(ref.first_name, ref.last_name)}</div>
         <div class="aff-ref-identity">
           <div class="aff-ref-name-row flex items-center gap-2">
@@ -229,7 +447,7 @@ function renderReferralRow(ref) {
     </div>
   `;
 
-  if (window.lucide) lucide.createIcons({ nodes: [row] });
+  lucide.createIcons();
   return row;
 }
 
@@ -268,6 +486,7 @@ const refCountEl = document.getElementById('refCount');
     : `${allReferrals.length} total`;
 
   allReferrals.forEach(ref => refListEl.appendChild(renderReferralRow(ref)));
+  if (window.lucide) lucide.createIcons({ nodes: [refListEl] });
 })();
 
 
@@ -397,6 +616,7 @@ async function loadNetworkSection() {
 
     emptyEl.classList.add('hidden');
     subset.forEach(ref => listEl.appendChild(renderReferralRow(ref)));
+    if (window.lucide) lucide.createIcons({ nodes: [listEl] });
   }
 
   function updateSummary(subset) {
@@ -514,4 +734,5 @@ async function loadWithdrawalsSection() {
     if (window.lucide) lucide.createIcons({ nodes: [row] });
     listEl.appendChild(row);
   });
+  if (window.lucide) lucide.createIcons({ nodes: [listEl] });
 }

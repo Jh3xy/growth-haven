@@ -193,7 +193,6 @@
   font-size: 0.6875rem;
   font-weight: var(--fw-medium);
   color: var(--status-error);
-  min-height: 1rem;
   display: block;
 }
 

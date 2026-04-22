@@ -3,6 +3,9 @@
 *::before{
   box-sizing: border-box;
 }
+#section-home{
+  padding-bottom: 4rem;
+}
 /* Shell handles layout — dashboard.css sets margin-left and padding-top:0 */
 .dash-main {
   padding-top: 0 !important;
@@ -18,6 +21,11 @@ padding: 3rem 1rem;
 }
 .dash-sidebar__nav{
   padding: 1.5rem 0.5rem;
+}
+.dash-ref-list {
+  min-height: 0;
+  align-self: flex-start;
+  width: 100%;
 }
 
 /* ─── BALANCE (NORTH STAR) CARD ──────────────────────── */
