@@ -340,6 +340,8 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 /* ─── ROW CARD ───────────────────────────────────────────── */

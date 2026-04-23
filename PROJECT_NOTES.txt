@@ -1,0 +1,11 @@
+
+------- TO DOs ---------
+include active investment check in withdrwal validation and reject request when active Investment = true
+deposit bonus - still undecided :
+  Options include, a 10% bonus when user invests all of their first deposit
+
+[ ] PAYSTACK INTEGRATION:
+    - Create Edge Function 'paystack-webhook' to handle incoming payment events.
+    - Implement logic to verify transaction reference and update 'investments' table.
+    - Set up automated referral commission payouts upon successful deposit verification.
+    - Ensure webhook signature validation is active for security.

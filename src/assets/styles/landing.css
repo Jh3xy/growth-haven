@@ -38,7 +38,7 @@ label.required::after{
   padding: 1rem 0;
   /* position: sticky; */
   z-index: 20;
-  background-color: var(--surface-overlay);
+  /* background-color: var(--surface-overlay); */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);

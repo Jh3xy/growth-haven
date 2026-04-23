@@ -265,6 +265,9 @@ padding: 3rem 1rem;
   white-space: nowrap;
   flex-shrink: 0;
   line-height: 1.4;
+  position: absolute;
+  right: 4%;
+  bottom: 15px;
 }
 
 /* ── Last active line ── */
