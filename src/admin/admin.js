@@ -754,12 +754,12 @@ async function promoteMember(memberId, button) {
   button.disabled = true;
   button.textContent = 'Updating...';
 
-  const { error } = await supabase
-    .from('members')
-    .update({ role: 'promoter', promoter: true })
-    .eq('id', memberId);
+  const { error } = await supabase.rpc('admin_promote_member', {
+    p_member_id: memberId
+  });
 
   if (error) {
+    console.error('[promote] Error:', error);
     button.disabled = false;
     button.textContent = 'Make Promoter';
     return;
