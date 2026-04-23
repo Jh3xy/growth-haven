@@ -54,7 +54,7 @@ export async function createMemberProfile(userId, email) {
 export async function getUserStatus(userId) {
   const { data, error } = await supabase
     .from('members')
-    .select('promoter')
+    .select('promoter, role')
     .eq('id', userId)
     .single();
     

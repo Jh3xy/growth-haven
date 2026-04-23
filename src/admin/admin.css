@@ -1,0 +1,440 @@
+
+
+/* admin.css - GrowthHaven Admin Dashboard additions */
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  outline-color: var(--brand-primary-ring);
+}
+button,
+input{
+  font-family: inherit;
+}
+.dash-welcome-card__sub{
+  margin-top: 1rem;
+}
+.admin-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-section-head__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-section-head__title {
+  margin: 0;
+  font-size: clamp(1.375rem, 3vw, 1.75rem);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.admin-section-head__sub {
+  margin: 0;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.admin-section-tools {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* Prevents the button from being squashed */
+}
+
+.admin-input__wrap{
+  position: relative; /* Essential for the absolute icon inside */
+  flex: 1; 
+  display: flex;
+  align-items: center;
+}
+
+.admin-input__wrap [data-lucide="search"] {
+  position: absolute;
+  /* left: 0.95rem; */
+  /* right: 0; */
+  color: var(--text-tertiary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.admin-refresh-btn {
+  width: 40px;
+  height: 40px;
+  min-height: unset;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-low);
+  transition:
+    color var(--transition-global),
+    border-color var(--transition-global),
+    background-color var(--transition-global),
+    transform var(--transition-global),
+    box-shadow var(--transition-global);
+}
+
+.admin-refresh-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--brand-primary-ring);
+  box-shadow: var(--shadow-accent);
+  transform: translateY(-1px);
+}
+
+.admin-refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.admin-stat-card__value {
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+}
+
+.admin-stat-card__meta {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.admin-search {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Space between the search bar and the button */
+  width: 100%;
+}
+
+.admin-search [data-lucide] {
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+.admin-search [data-lucide = "search"] {
+  position: absolute;
+  left: 0.95rem;
+}
+
+.admin-search__input {
+  width: 100%;
+  height: 40px;
+  padding: 0 2px 0 2.2rem;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-low);
+  transition:
+    border-color var(--transition-global),
+    box-shadow var(--transition-global),
+    background-color var(--transition-global);
+}
+
+.admin-search__input:focus {
+  border-color: var(--brand-primary-ring);
+  box-shadow: 0 0 0 3px var(--brand-primary-soft);
+}
+
+.admin-search__input::placeholder {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.admin-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-list-card {
+  background: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-low);
+  overflow: hidden;
+}
+
+.admin-member-item + .admin-member-item,
+.admin-withdrawal-item + .admin-withdrawal-item {
+  border-top: var(--border-width) solid var(--border-subtle);
+}
+
+.admin-member-toggle {
+  width: 100%;
+  min-height: unset;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-global);
+}
+
+.admin-member-toggle:hover {
+  background: var(--surface-card-muted);
+}
+
+.admin-member-main,
+.admin-withdrawal-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-member-name,
+.admin-withdrawal-name {
+  font-size: 0.95rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  line-height: 1.35;
+  margin-bottom: 5px;
+}
+
+.admin-member-email{
+  margin-top: -3px;
+}
+
+.admin-member-email,
+.admin-withdrawal-meta {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+
+.admin-member-side,
+.admin-withdrawal-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.admin-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 0.7rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card-muted);
+  color: var(--text-secondary);
+  font-size: 0.56rem;
+  font-weight: var(--fw-regular);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-pill--role-admin,
+.admin-pill--role-promoter {
+  background: var(--brand-primary-soft);
+  border-color: var(--brand-primary-ring);
+  color: var(--brand-primary);
+}
+
+.admin-pill--role-supervisor {
+  background: var(--status-info-bg);
+  border-color: var(--status-info-border);
+  color: var(--status-info-text);
+}
+
+.admin-pill--deposited {
+  background: var(--status-success-bg);
+  border-color: var(--status-success-border);
+  color: var(--status-success-text);
+}
+
+.admin-pill--not-deposited {
+  background: var(--status-warning-bg);
+  border-color: var(--status-warning-border);
+  color: var(--status-warning-text);
+}
+
+.admin-member-chevron {
+  color: var(--text-tertiary);
+  transition: transform 0.25s var(--spring);
+}
+
+.admin-member-item.is-open .admin-member-chevron {
+  transform: rotate(180deg);
+}
+
+.admin-member-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s var(--spring);
+}
+
+.admin-member-item.is-open .admin-member-panel {
+  grid-template-rows: 1fr;
+}
+
+.admin-member-panel__inner {
+  overflow: hidden;
+}
+
+.admin-member-details {
+  display: grid;
+  gap: 0.875rem;
+  padding: 0 1.25rem 1.25rem;
+}
+
+.admin-member-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.875rem;
+}
+
+.admin-member-detail {
+  padding: .5rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-card-muted);
+  border: var(--border-width) solid var(--border-subtle);
+}
+
+.admin-member-detail__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: var(--fw-regular);
+}
+
+.admin-member-detail__value {
+  display: block;
+  font-size: 0.93rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.admin-withdrawal-item {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-withdrawal-amount {
+  font-size: 1rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.admin-withdrawal-bank {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.admin-withdrawal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.dash-action-btn--danger {
+  background: var(--status-error-bg);
+  color: var(--status-error-text);
+  border: 1px solid var(--status-error-border);
+}
+
+.dash-action-btn--danger:hover:not(:disabled) {
+  background: var(--status-error);
+  color: var(--text-on-brand);
+  border-color: var(--status-error);
+}
+
+.txn-row__status--approved {
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+  border: 1px solid var(--status-info-border);
+  border-radius: 999px;
+}
+
+.txn-row__status--rejected {
+  background: var(--status-error-bg);
+  color: var(--status-error-text);
+  border: 1px solid var(--status-error-border);
+  border-radius: 999px;
+}
+
+.admin-empty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border: var(--border-width) dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+}
+
+@media (max-width: 640px) {
+  .admin-section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-refresh-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .admin-member-toggle,
+  .admin-withdrawal-item {
+    padding: 1rem;
+  }
+
+  .admin-member-toggle,
+  .admin-withdrawal-item {
+    flex-direction: column;
+  }
+
+  .admin-member-side,
+  .admin-withdrawal-side {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .admin-withdrawal-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

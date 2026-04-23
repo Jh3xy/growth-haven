@@ -1,6 +1,13 @@
 
 /* dashboard.css — GrowthHaven Dashboard */
 /* Uses the existing Veridian design system tokens */
+
+*,
+*::before,
+*::after{
+  -webkit-tap-highlight-color: transparent;
+  outline-color: var(--brand-primary-ring);
+}
 #investActiveState.hidden{
   display: none !important;
 }

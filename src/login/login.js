@@ -78,14 +78,16 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   } else {
     loginBtn.innerText = 'Authenticating Profile...';
     
-    // 1. Fetch the user's promoter status
+    // 1. Fetch the user's portal status
     const { data: profile, error: profileError } = await getUserStatus(data.user.id);
 
     loginBtn.innerText = 'Success! Redirecting...';
 
     // 2. Perform the Stratified Redirect
     setTimeout(() => {
-      if (profile && profile.promoter) {
+      if (profile?.role === 'admin') {
+        window.location.href = '/src/admin/';
+      } else if (profile?.promoter) {
         window.location.href = '/src/affiliate/';
       } else {
         window.location.href = '/src/dashboard/';

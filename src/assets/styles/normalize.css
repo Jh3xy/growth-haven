@@ -12,6 +12,8 @@
 *,
 *::before,
 *::after {
+  -webkit-tap-highlight-color: transparent;
+  outline-color: var(--brand-primary-ring);
   box-sizing: border-box;
   margin: 0;
   padding: 0;

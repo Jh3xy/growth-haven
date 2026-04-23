@@ -2,6 +2,8 @@
 *::after,
 *::before{
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  outline-color: var(--brand-primary-ring);
 }
 #section-home{
   padding-bottom: 4rem;
