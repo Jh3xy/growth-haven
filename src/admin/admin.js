@@ -27,15 +27,22 @@ const hamburger = document.getElementById('sidebarToggle');
 const sidebarSignoutBtn = document.getElementById('sidebarSignoutBtn');
 const overviewSectionInner = document.querySelector('#section-home .dash-section__inner');
 const membersSectionInner = document.querySelector('#section-members .dash-section__inner');
+const withdrawalsSectionInner = document.querySelector('#section-withdrawals .dash-section__inner');
 
 const VALID_SECTIONS = new Set(['home', 'members', 'withdrawals']);
 const SECTION_STORAGE_KEY = 'gh_admin_current_tab';
-const loadedSections = { members: false };
+const loadedSections = { members: false, withdrawals: false };
 
 let membersState = {
   items: [],
   query: '',
   expandedId: null,
+  loading: false,
+};
+
+let withdrawalsState = {
+  items: [],
+  filter: 'all',
   loading: false,
 };
 
@@ -104,6 +111,48 @@ function formatMaybeDate(value) {
   return value ? formatDate(value) : 'Unavailable';
 }
 
+function getStatusClass(status) {
+  const normalizedStatus = (status || '').toLowerCase();
+
+  if (normalizedStatus === 'completed') return 'txn-row__status--completed';
+  if (normalizedStatus === 'pending') return 'txn-row__status--pending';
+  if (normalizedStatus === 'approved') return 'txn-row__status--approved';
+  if (normalizedStatus === 'rejected') return 'txn-row__status--rejected';
+  return 'txn-row__status--failed';
+}
+
+function getWithdrawalSortWeight(status) {
+  if (status === 'pending') return 0;
+  if (status === 'approved') return 1;
+  return 2;
+}
+
+function getFilteredWithdrawals() {
+  const nextItems = [...withdrawalsState.items];
+
+  const filteredItems = withdrawalsState.filter === 'all'
+    ? nextItems
+    : nextItems.filter((item) => item.role === withdrawalsState.filter.slice(0, -1));
+
+  return filteredItems.sort((left, right) => {
+    const weightDiff = getWithdrawalSortWeight(left.status) - getWithdrawalSortWeight(right.status);
+    if (weightDiff !== 0) return weightDiff;
+
+    const leftDate = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightDate = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return rightDate - leftDate;
+  });
+}
+
+function debounce(callback, delay = 200) {
+  let timeoutId;
+
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => callback(...args), delay);
+  };
+}
+
 function setOverviewValue(elementId, value, formatter = (nextValue) => nextValue) {
   const element = document.getElementById(elementId);
   if (!element) return;
@@ -118,18 +167,6 @@ function setOverviewMeta(elementId, text) {
 
   element.classList.remove('skeleton');
   element.textContent = text;
-}
-
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 }
 
 function renderOverviewShell() {
@@ -295,6 +332,181 @@ async function loadOverviewSection() {
   ]);
 }
 
+function renderWithdrawalsSection() {
+  if (!withdrawalsSectionInner) return;
+
+  if (!document.getElementById('withdrawalsListStack')) {
+    withdrawalsSectionInner.innerHTML = `
+      <div class="admin-section-head">
+        <div class="admin-section-head__content">
+          <h2 class="admin-section-head__title">Withdrawals</h2>
+          <p class="admin-section-head__sub">Review payout requests, separate user and promoter queues, and move requests through the approval flow.</p>
+        </div>
+
+        <div class="admin-section-tools">
+          <button class="admin-refresh-btn" id="withdrawalsRefreshBtn" type="button" aria-label="Refresh withdrawals">
+            <i data-lucide="refresh-cw" style="width:16px;height:16px"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="txn-filters" role="tablist" aria-label="Filter withdrawals">
+        <button class="txn-filter-tab is-active" data-withdrawal-filter="all" type="button">All</button>
+        <button class="txn-filter-tab" data-withdrawal-filter="users" type="button">Users</button>
+        <button class="txn-filter-tab" data-withdrawal-filter="promoters" type="button">Promoters</button>
+      </div>
+
+      <div class="admin-stack" id="withdrawalsListStack"></div>
+    `;
+
+    document.getElementById('withdrawalsRefreshBtn')?.addEventListener('click', async () => {
+      await loadWithdrawalsSection({ force: true });
+    });
+
+    withdrawalsSectionInner.querySelector('.txn-filters')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-withdrawal-filter]');
+      if (!button) return;
+
+      withdrawalsState.filter = button.dataset.withdrawalFilter;
+      withdrawalsSectionInner
+        .querySelectorAll('[data-withdrawal-filter]')
+        .forEach((tab) => tab.classList.toggle('is-active', tab === button));
+
+      renderWithdrawalsList();
+    });
+
+    document.getElementById('withdrawalsListStack')?.addEventListener('click', async (event) => {
+      const actionButton = event.target.closest('[data-withdrawal-action]');
+      if (!actionButton) return;
+
+      const withdrawalId = actionButton.dataset.withdrawalId;
+      const nextStatus = actionButton.dataset.withdrawalAction;
+      await updateWithdrawalStatus(withdrawalId, nextStatus, actionButton);
+    });
+  }
+
+  renderWithdrawalsList();
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function renderWithdrawalsList() {
+  const withdrawalsListStack = document.getElementById('withdrawalsListStack');
+  if (!withdrawalsListStack) return;
+
+  const filteredWithdrawals = getFilteredWithdrawals();
+  const listMarkup = withdrawalsState.loading
+    ? `
+      <div class="admin-list-card">
+        <div class="admin-withdrawal-item">
+          <div class="admin-withdrawal-main">
+            <span class="admin-withdrawal-name skeleton">Loading request</span>
+            <span class="admin-withdrawal-meta skeleton">Loading bank details</span>
+            <span class="admin-withdrawal-bank skeleton">Loading date</span>
+          </div>
+          <div class="admin-withdrawal-side">
+            <span class="admin-withdrawal-amount skeleton">₦0.00</span>
+            <div class="admin-pill-row">
+              <span class="admin-pill skeleton">Role</span>
+              <span class="txn-row__status skeleton">Status</span>
+            </div>
+          </div>
+        </div>
+        <div class="admin-withdrawal-item">
+          <div class="admin-withdrawal-main">
+            <span class="admin-withdrawal-name skeleton">Loading request</span>
+            <span class="admin-withdrawal-meta skeleton">Loading bank details</span>
+            <span class="admin-withdrawal-bank skeleton">Loading date</span>
+          </div>
+          <div class="admin-withdrawal-side">
+            <span class="admin-withdrawal-amount skeleton">₦0.00</span>
+            <div class="admin-pill-row">
+              <span class="admin-pill skeleton">Role</span>
+              <span class="txn-row__status skeleton">Status</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+    : filteredWithdrawals.length
+      ? `
+        <div class="admin-list-card">
+          ${filteredWithdrawals.map((withdrawal) => {
+            const roleLabel = withdrawal.role === 'promoter' ? 'promoter' : 'user';
+            const status = withdrawal.status || 'pending';
+            const canApprove = status === 'pending';
+            const canComplete = status === 'approved';
+            const canReject = status === 'pending' || status === 'approved';
+
+            return `
+              <div class="admin-withdrawal-item">
+                <div class="admin-withdrawal-main">
+                  <span class="admin-withdrawal-name">${escapeHtml(withdrawal.requester_name)}</span>
+                  <span class="admin-withdrawal-meta">${escapeHtml(withdrawal.bank)} · ${escapeHtml(withdrawal.account_name)} · ${escapeHtml(withdrawal.account_number)}</span>
+                  <span class="admin-withdrawal-bank">${escapeHtml(formatMaybeDate(withdrawal.created_at))}</span>
+                </div>
+
+                <div class="admin-withdrawal-side">
+                  <span class="admin-withdrawal-amount">${escapeHtml(formatNaira(withdrawal.amount))}</span>
+                  <div class="admin-pill-row">
+                    <span class="admin-pill ${getRoleClass(roleLabel)}">${escapeHtml(roleLabel)}</span>
+                    <span class="txn-row__status ${getStatusClass(status)}">${escapeHtml(status)}</span>
+                  </div>
+                  ${(canApprove || canComplete || canReject) ? `
+                    <div class="admin-withdrawal-actions">
+                      ${canApprove ? `
+                        <button
+                          class="dash-action-btn dash-action-btn--primary"
+                          type="button"
+                          data-withdrawal-id="${escapeHtml(withdrawal.id)}"
+                          data-withdrawal-action="approved"
+                        >
+                          Approve
+                        </button>
+                      ` : ''}
+                      ${canComplete ? `
+                        <button
+                          class="dash-action-btn dash-action-btn--primary"
+                          type="button"
+                          data-withdrawal-id="${escapeHtml(withdrawal.id)}"
+                          data-withdrawal-action="completed"
+                        >
+                          Mark Complete
+                        </button>
+                      ` : ''}
+                      ${canReject ? `
+                        <button
+                          class="dash-action-btn dash-action-btn--danger"
+                          type="button"
+                          data-withdrawal-id="${escapeHtml(withdrawal.id)}"
+                          data-withdrawal-action="rejected"
+                        >
+                          Reject
+                        </button>
+                      ` : ''}
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `
+      : `
+        <div class="admin-empty">
+          No withdrawal requests found for this filter.
+        </div>
+      `;
+
+  withdrawalsListStack.innerHTML = listMarkup;
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
 function getFilteredMembers() {
   const query = membersState.query.trim().toLowerCase();
   if (!query) return membersState.items;
@@ -308,6 +520,78 @@ function getFilteredMembers() {
 
 function renderMembersSection() {
   if (!membersSectionInner) return;
+
+  if (!document.getElementById('membersListStack')) {
+    membersSectionInner.innerHTML = `
+      <div class="admin-section-head">
+        <div class="admin-section-head__content">
+          <h2 class="admin-section-head__title">Members</h2>
+          <p class="admin-section-head__sub">Search the member base, inspect balances and referral lineage, and assign promoter access.</p>
+        </div>
+      </div>
+      
+      <div class="admin-search">
+        <div class="admin-input__wrap">
+          <i data-lucide="search" style="width:16px;height:16px"></i>
+          <input
+            class="admin-search__input"
+            id="membersSearchInput"
+            type="search"
+            placeholder="Search by member name or email"
+            value="${escapeHtml(membersState.query)}"
+          />
+        </div>
+        <div class="admin-section-tools">
+          <button class="admin-refresh-btn" id="membersRefreshBtn" type="button" aria-label="Refresh members">
+            <i data-lucide="refresh-cw" style="width:16px;height:16px"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-stack" id="membersListStack"></div>
+    `;
+
+    const searchInput = document.getElementById('membersSearchInput');
+    const debouncedSearch = debounce((nextQuery) => {
+      membersState.query = nextQuery;
+      renderMembersList();
+    }, 200);
+
+    searchInput?.addEventListener('input', (event) => {
+      debouncedSearch(event.target.value);
+    });
+
+    document.getElementById('membersRefreshBtn')?.addEventListener('click', async () => {
+      await loadMembersSection({ force: true });
+    });
+
+    document.getElementById('membersListStack')?.addEventListener('click', async (event) => {
+      const toggleButton = event.target.closest('[data-member-toggle]');
+      if (toggleButton) {
+        const memberId = toggleButton.dataset.memberToggle;
+        membersState.expandedId = membersState.expandedId === memberId ? null : memberId;
+        renderMembersList();
+        return;
+      }
+
+      const promoteButton = event.target.closest('[data-promote-member]');
+      if (promoteButton) {
+        const memberId = promoteButton.dataset.promoteMember;
+        await promoteMember(memberId, promoteButton);
+      }
+    });
+  }
+
+  renderMembersList();
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function renderMembersList() {
+  const membersListStack = document.getElementById('membersListStack');
+  if (!membersListStack) return;
 
   const filteredMembers = getFilteredMembers();
   const listMarkup = membersState.loading
@@ -423,63 +707,7 @@ function renderMembersSection() {
         </div>
       `;
 
-  membersSectionInner.innerHTML = `
-    <div class="admin-section-head">
-      <div class="admin-section-head__content">
-        <h2 class="admin-section-head__title">Members</h2>
-        <p class="admin-section-head__sub">Search the member base, inspect balances and referral lineage, and assign promoter access.</p>
-      </div>
-      </div>
-      
-      <div class="admin-search">
-        <div class="admin-input__wrap">
-          <i data-lucide="search" style="width:16px;height:16px"></i>
-          <input
-          class="admin-search__input"
-          id="membersSearchInput"
-          type="search"
-          placeholder="Search by member name or email"
-          value="${escapeHtml(membersState.query)}"
-          />
-        </div>
-        <div class="admin-section-tools">
-          <button class="admin-refresh-btn" id="membersRefreshBtn" type="button" aria-label="Refresh members">
-            <i data-lucide="refresh-cw" style="width:16px;height:16px"></i>
-          </button>
-        </div>
-      </div>
-
-    <div class="admin-stack">
-      ${listMarkup}
-    </div>
-  `;
-
-  const searchInput = document.getElementById('membersSearchInput');
-  searchInput?.addEventListener('input', (event) => {
-    membersState.query = event.target.value;
-    renderMembersSection();
-    searchInput.focus();
-  });
-
-  document.getElementById('membersRefreshBtn')?.addEventListener('click', async () => {
-    await loadMembersSection({ force: true });
-  });
-
-  document.getElementById('membersList')?.addEventListener('click', async (event) => {
-    const toggleButton = event.target.closest('[data-member-toggle]');
-    if (toggleButton) {
-      const memberId = toggleButton.dataset.memberToggle;
-      membersState.expandedId = membersState.expandedId === memberId ? null : memberId;
-      renderMembersSection();
-      return;
-    }
-
-    const promoteButton = event.target.closest('[data-promote-member]');
-    if (promoteButton) {
-      const memberId = promoteButton.dataset.promoteMember;
-      await promoteMember(memberId, promoteButton);
-    }
-  });
+  membersListStack.innerHTML = listMarkup;
 
   if (window.lucide) {
     window.lucide.createIcons();
@@ -503,17 +731,15 @@ async function loadMembersSection({ force = false } = {}) {
 
   if (error) {
     membersState.items = [];
-    membersSectionInner.innerHTML = `
-      <div class="admin-section-head">
-        <div class="admin-section-head__content">
-          <h2 class="admin-section-head__title">Members</h2>
-          <p class="admin-section-head__sub">Search the member base, inspect balances and referral lineage, and assign promoter access.</p>
+    renderMembersSection();
+    const membersListStack = document.getElementById('membersListStack');
+    if (membersListStack) {
+      membersListStack.innerHTML = `
+        <div class="admin-empty">
+          Could not load members right now. Try refreshing this section.
         </div>
-      </div>
-      <div class="admin-empty">
-        Could not load members right now. Try refreshing this section.
-      </div>
-    `;
+      `;
+    }
     return;
   }
 
@@ -547,6 +773,86 @@ async function promoteMember(memberId, button) {
 
   renderMembersSection();
   await loadTotalPromotersStat();
+}
+
+async function loadWithdrawalsSection({ force = false } = {}) {
+  if (!withdrawalsSectionInner) return;
+  if (withdrawalsState.loading) return;
+  if (loadedSections.withdrawals && !force) return;
+
+  withdrawalsState.loading = true;
+  renderWithdrawalsSection();
+
+  const { data: requests, error: requestsError } = await supabase
+    .from('withdrawal_requests')
+    .select('id, user_id, role, amount, bank, account_number, account_name, status, reference, created_at, updated_at')
+    .order('created_at', { ascending: false });
+
+  if (requestsError) {
+    withdrawalsState.loading = false;
+    withdrawalsState.items = [];
+    renderWithdrawalsSection();
+    const withdrawalsListStack = document.getElementById('withdrawalsListStack');
+    if (withdrawalsListStack) {
+      withdrawalsListStack.innerHTML = `
+        <div class="admin-empty">
+          Could not load withdrawal requests right now. Try refreshing this section.
+        </div>
+      `;
+    }
+    return;
+  }
+
+  const userIds = [...new Set((requests || []).map((item) => item.user_id).filter(Boolean))];
+
+  let membersById = new Map();
+  if (userIds.length) {
+    const { data: memberRecords } = await supabase
+      .from('members')
+      .select('id, first_name, last_name')
+      .in('id', userIds);
+
+    membersById = new Map(
+      (memberRecords || []).map((memberRecord) => [memberRecord.id, getMemberFullName(memberRecord)])
+    );
+  }
+
+  withdrawalsState.items = (requests || []).map((item) => ({
+    ...item,
+    requester_name: membersById.get(item.user_id) || 'Unknown member',
+  }));
+
+  withdrawalsState.loading = false;
+  loadedSections.withdrawals = true;
+  renderWithdrawalsSection();
+}
+
+async function updateWithdrawalStatus(withdrawalId, nextStatus, button) {
+  if (!withdrawalId || !nextStatus) return;
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Updating...';
+
+  const { data, error } = await supabase.rpc('admin_update_withdrawal_status', {
+    p_withdrawal_id: withdrawalId,
+    p_new_status: nextStatus,
+  });
+
+  if (error) {
+    button.disabled = false;
+    button.textContent = originalText;
+    return;
+  }
+
+  withdrawalsState.items = withdrawalsState.items.map((item) => (
+    item.id === withdrawalId
+      ? { ...item, ...data }
+      : item
+  ));
+
+  renderWithdrawalsSection();
+  await loadPendingWithdrawalsStat();
 }
 
 function closeSidebar() {
@@ -592,6 +898,10 @@ export function switchSection(name) {
 
   if (activeSection === 'members') {
     loadMembersSection();
+  }
+
+  if (activeSection === 'withdrawals') {
+    loadWithdrawalsSection();
   }
 
   closeSidebar();

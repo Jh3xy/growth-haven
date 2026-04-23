@@ -238,9 +238,10 @@ input{
 
 .admin-pill-row {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 0.45rem;
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
 }
 
 .admin-pill {
@@ -346,10 +347,17 @@ input{
 .admin-withdrawal-item {
   padding: 1rem 1.25rem;
   display: flex;
+  position: relative;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
 }
+
+.admin-pill-row .txn-row__status{
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+} 
 
 .admin-withdrawal-amount {
   font-size: 1rem;
@@ -406,6 +414,7 @@ input{
   background: var(--surface-card);
 }
 
+
 @media (max-width: 640px) {
   .admin-section-head {
     flex-direction: column;
@@ -436,5 +445,12 @@ input{
   .admin-withdrawal-actions {
     width: 100%;
     justify-content: flex-start;
+  }
+}
+@media (max-width: 350px) {
+  .admin-pill-row .txn-row__status{
+    position: relative;
+    top: unset;
+    right: unset;
   }
 }
