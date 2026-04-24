@@ -594,7 +594,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
  
 .dash-shell {
   display: flex;
-  min-height: 100dvh;
+  /* min-height: 100dvh; */
   padding-top: 0;
   background-color: var(--surface-background);
   position: relative;
