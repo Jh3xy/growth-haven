@@ -16,6 +16,7 @@
   /* Surface & Backgrounds */
   --surface-background: #F9FBF9;
   --surface-card: #FFFFFF;
+  --surface-card-rgb: 255, 255, 255;
   --surface-card-muted: #F4F8F4;
   --surface-elevated: rgba(255, 255, 255, 0.85);
   --surface-overlay: rgba(249, 251, 249, 0.85);
@@ -113,6 +114,7 @@ html[data-theme='dark'] {
   /* Surface & Backgrounds */
   --surface-background: #07110b;
   --surface-card: #0d1813;
+  --surface-card-rgb: 13, 24, 19;
   --surface-card-muted: #122019;
   --surface-elevated: rgba(13, 24, 19, 0.84);
   --surface-overlay: rgba(7, 17, 11, 0.78);

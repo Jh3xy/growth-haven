@@ -30,6 +30,40 @@
 
 /* ─── HEADER ADDITIONS ───────────────────────────────────── */
 
+.site-header--dashboard {
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--dash-header-h);
+  padding: 0;
+  z-index: 120;
+  isolation: isolate;
+  background-color: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 10px 30px hsla(var(--h-obsidian), var(--s-obsidian), var(--l-obsidian), 0.08);
+}
+
+.site-header--dashboard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(var(--surface-card-rgb), 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.site-header--dashboard .site-header__inner {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+@supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  .site-header--dashboard::before {
+    background-color: var(--surface-card);
+  }
+}
+
 .dash-avatar {
   width: 30px;
   height: 30px;
@@ -542,7 +576,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   .dash-card__value { font-size: 1.1rem; }
   .dash-signout span { display: none; }
   .dash-user__name { display: none; }
-  .site-header__inner { padding: 0 1rem; }
+  .site-header--dashboard .site-header__inner { padding: 0 1rem; }
   .dash-theme-toggle__label { display: none; }
   .dash-theme-toggle { padding-inline: 0.7rem; }
 }
@@ -562,6 +596,8 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   min-height: 100dvh;
   padding-top: var(--dash-header-h);
   background-color: var(--surface-background);
+  position: relative;
+  z-index: 0;
 }
  
  
@@ -578,7 +614,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   border-right: var(--border-width) solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  z-index: 99;
+  z-index: 110;
   overflow-y: auto;
   transition: transform 0.3s var(--spring);
 }
@@ -718,9 +754,9 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
 .dash-overlay {
   display: none;
   position: fixed;
-  inset: 0;
+  inset: var(--dash-header-h) 0 0;
   background: rgba(0, 0, 0, 0.48);
-  z-index: 90;
+  z-index: 100;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -1188,9 +1224,8 @@ html[data-theme='dark'] .dash-activity-row:not(.skeleton-row):hover {
  
   /* Sidebar: off-canvas */
   .dash-sidebar {
-    top: 0;
-    height: 100dvh;
-    z-index: 100;
+    top: var(--dash-header-h);
+    height: calc(100dvh - var(--dash-header-h));
     transform: translateX(-100%);
     box-shadow: none;
   }
