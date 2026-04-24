@@ -71,9 +71,19 @@ Deno.serve(async (req) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id:    chatId,
-          text:       message,
+          chat_id: chatId,
+          text: message,
           parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: "Open Admin Dashboard",
+                  url: "https://growth-havenmvp.vercel.app/src/admin/" 
+                }
+              ]
+            ]
+          }
         }),
       })
     )
