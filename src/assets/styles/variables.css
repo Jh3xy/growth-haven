@@ -65,6 +65,8 @@
   --ff-primary: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --dash-header-h: 64px;
+  --dash-safe-top: env(safe-area-inset-top, 0px);
+  --dash-header-offset: calc(var(--dash-header-h) + var(--dash-safe-top));
   --dash-sidebar-w: 240px;
 
   /* Weights */

@@ -31,35 +31,36 @@
 /* ─── HEADER ADDITIONS ───────────────────────────────────── */
 
 .site-header--dashboard {
-  position: fixed;
-  inset: 0 0 auto;
-  height: var(--dash-header-h);
-  padding: 0;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  min-height: var(--dash-header-offset);
+  padding: var(--dash-safe-top) 0 0;
   z-index: 120;
   isolation: isolate;
-  background-color: var(--surface-card);
+  overflow: hidden;
+  background-color: rgba(var(--surface-card-rgb), 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
   border-bottom: 1px solid var(--border-subtle);
   box-shadow: 0 10px 30px hsla(var(--h-obsidian), var(--s-obsidian), var(--l-obsidian), 0.08);
 }
 
 .site-header--dashboard::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: rgba(var(--surface-card-rgb), 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  pointer-events: none;
+  display: none;
 }
 
 .site-header--dashboard .site-header__inner {
   position: relative;
   z-index: 1;
-  height: 100%;
+  min-height: var(--dash-header-h);
 }
 
 @supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
-  .site-header--dashboard::before {
+  .site-header--dashboard {
     background-color: var(--surface-card);
   }
 }
@@ -594,7 +595,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
 .dash-shell {
   display: flex;
   min-height: 100dvh;
-  padding-top: var(--dash-header-h);
+  padding-top: 0;
   background-color: var(--surface-background);
   position: relative;
   z-index: 0;
@@ -607,9 +608,9 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   width: var(--dash-sidebar-w);
   flex-shrink: 0;
   position: fixed;
-  top: var(--dash-header-h);
+  top: var(--dash-header-offset);
   left: 0;
-  height: calc(100dvh - var(--dash-header-h));
+  height: calc(100dvh - var(--dash-header-offset));
   background-color: var(--surface-card);
   border-right: var(--border-width) solid var(--border-subtle);
   display: flex;
@@ -754,7 +755,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
 .dash-overlay {
   display: none;
   position: fixed;
-  inset: var(--dash-header-h) 0 0;
+  inset: var(--dash-header-offset) 0 0;
   background: rgba(0, 0, 0, 0.48);
   z-index: 100;
   opacity: 0;
@@ -799,7 +800,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   flex: 1;
   min-width: 0;
   margin-left: var(--dash-sidebar-w);
-  padding-top: 0;
+  padding-top: 0.75rem;
   padding-bottom: 0;
   min-height: unset;
 }
@@ -1224,8 +1225,8 @@ html[data-theme='dark'] .dash-activity-row:not(.skeleton-row):hover {
  
   /* Sidebar: off-canvas */
   .dash-sidebar {
-    top: var(--dash-header-h);
-    height: calc(100dvh - var(--dash-header-h));
+    top: var(--dash-header-offset);
+    height: calc(100dvh - var(--dash-header-offset));
     transform: translateX(-100%);
     box-shadow: none;
   }
@@ -1238,11 +1239,12 @@ html[data-theme='dark'] .dash-activity-row:not(.skeleton-row):hover {
   /* Main: full width */
   .dash-main {
     margin-left: 0;
+    padding-top: 0.5rem;
   }
  
   /* Section padding */
   .dash-section {
-    padding: 1.75rem 1.25rem 4rem;
+    padding: 2rem 1.25rem 4rem;
   }
  
   /* Cards */
