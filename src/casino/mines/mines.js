@@ -74,10 +74,41 @@ function setBetError(msg) {
   betInput.classList.toggle('is-error', !!msg)
 }
 
+function resetCashoutButton() {
+  cashoutBtn.innerHTML = `<i data-lucide="hand-coins" style="width:16px;height:16px"></i> Cash Out`
+  cashoutBtn.disabled = true
+
+  if (window.lucide) lucide.createIcons({ nodes: [cashoutBtn] })
+}
+
 function showPhase(phase) {
   controlsIdle.classList.toggle('hidden', phase !== 'idle')
   controlsActive.classList.toggle('hidden', phase !== 'active')
   controlsResult.classList.toggle('hidden', phase !== 'result')
+
+  const isIdle = phase === 'idle'
+  const isActive = phase === 'active'
+
+  betInput.disabled = !isIdle
+  startBtn.disabled = !isIdle
+
+  betChips.querySelectorAll('.mines-chip').forEach((chip) => {
+    chip.disabled = !isIdle
+  })
+
+  minesCountRow.querySelectorAll('.mines-count-btn').forEach((btn) => {
+    btn.disabled = !isIdle
+  })
+
+  if (isActive) {
+    cashoutBtn.disabled = state.revealedTiles.length === 0 || state.isRevealing
+  } else {
+    resetCashoutButton()
+    minesGrid.querySelectorAll('.mines-tile').forEach((tile) => {
+      tile.disabled = true
+    })
+  }
+
   state.phase = phase
 }
 
@@ -195,9 +226,6 @@ async function checkActiveSession() {
   updateGrid()
   syncActiveControls()
   showPhase('active')
-
-  // Unlock cashout if at least one tile revealed
-  cashoutBtn.disabled = state.revealedTiles.length === 0
 }
 
 
@@ -240,8 +268,6 @@ async function startGame() {
   buildGrid()
   syncActiveControls()
   showPhase('active')
-
-  cashoutBtn.disabled = true; // New games start with 0 gems, so no cashing out yet
   if (window.lucide) lucide.createIcons();
 }
 
@@ -273,6 +299,7 @@ async function onTileClick(index) {
     if (data.hit) {
       state.mineTiles = data.mine_positions
       state.phase = 'result'
+      cashoutBtn.disabled = true
       updateGrid()
       showResult('lost', data.bet_amount)
       await loadWallet()
@@ -377,6 +404,7 @@ function resetToIdle() {
 
   startBtn.disabled = false
   startBtn.innerHTML = `<i data-lucide="play" style="width:16px;height:16px"></i> Start Game`
+  resetCashoutButton()
 
   buildGrid()
   // Disable all tiles in idle
