@@ -9,10 +9,23 @@ import '../assets/styles/landing.css'
 import '../assets/styles/queries.css'
 import '../assets/styles/login.css'    // and add login-specific ones
 
-
+import posthog from 'posthog-js';
 import { signInUser, getUserStatus } from '../assets/js/auth.js';
 
 console.log('[auth]: loaded auth-login')
+
+// Initialize PostHog for Error tracking and Feature Flags
+posthog.init('phc_yTajNg3srP52CjfjDBAWnCNBLthdgHXcGzaV4x35CD8n', {
+  api_host: 'https://us.i.posthog.com',
+  defaults: '2026-01-30',
+  autocapture: true,           // Tracks clicks/inputs automatically
+  capture_pageview: true,      // Essential for seeing where users go
+  capture_exceptions: true,    // Your "Paranoia" line — logs JS crashes to PostHog
+  persistence: 'localStorage', // Better than cookies for keeping users "identified"
+  loaded: function(ph) {       // Useful for debugging
+    console.log("PostHog Loaded Successfully");
+  }
+})
 
 // ---- Password toggle ----
 document.querySelectorAll('.pw-toggle').forEach(btn => {
@@ -69,6 +82,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   loginBtn.innerText = 'Signing In...';
 
   const { data, error } = await signInUser(emailEl.value.trim(), pwEl.value);
+
+  // PostHog Identify & Set Person Properties
+  if (data?.user) {
+    posthog.identify(data.user.id); 
+    posthog.setPersonProperties({
+      email: data.user.email,
+      last_login: new Date().toISOString()
+    });
+  }
 
   if (error) {
     setError(pwEl, 'err-pw', 'Invalid email or password.');

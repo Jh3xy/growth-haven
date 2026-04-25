@@ -16,12 +16,27 @@ import '../assets/styles/transactions.css'
 import '../assets/styles/affiliate.css'
 import '../dashboard/modal.css'
 
+
+import posthog from 'posthog-js';
 import { supabase } from '../assets/js/supabase.js';
 import { getInitials, formatDate } from '../assets/js/utils.js';
 
 
 // ─── CONFIG ──────────────────────────────────────────────────
 const REGISTER_URL = `${window.location.origin}/src/register/`;
+
+// Initialize PostHog for Error tracking and Feature Flags
+posthog.init('phc_yTajNg3srP52CjfjDBAWnCNBLthdgHXcGzaV4x35CD8n', {
+  api_host: 'https://us.i.posthog.com',
+  defaults: '2026-01-30',
+  autocapture: true,           // Tracks clicks/inputs automatically
+  capture_pageview: true,      // Essential for seeing where users go
+  capture_exceptions: true,    // Your "Paranoia" line — logs JS crashes to PostHog
+  persistence: 'localStorage', // Better than cookies for keeping users "identified"
+  loaded: function(ph) {       // Useful for debugging
+    console.log("PostHog Loaded Successfully");
+  }
+})
 
 
 // ─── DOM REFS ────────────────────────────────────────────────

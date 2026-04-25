@@ -19,6 +19,7 @@ import '../assets/styles/support.css';
 import './modal.css';
 import '../assets/styles/profile.css';
 
+import posthog from 'posthog-js';
 import { initProfile } from './profile.js';
 import { initTransactions, resetTransactions } from './transactions.js';
 import { openModal } from './modal.js';
@@ -29,6 +30,19 @@ import { supabase } from '../assets/js/supabase.js';
 // This is the full URL of your register page.
 // In prod, change this to your actual domain.
 const REGISTER_URL = `${window.location.origin}/src/register/`;
+
+// Initialize PostHog for Error tracking and Feature Flags
+posthog.init('phc_yTajNg3srP52CjfjDBAWnCNBLthdgHXcGzaV4x35CD8n', {
+  api_host: 'https://us.i.posthog.com',
+  defaults: '2026-01-30',
+  autocapture: true,           // Tracks clicks/inputs automatically
+  capture_pageview: true,      // Essential for seeing where users go
+  capture_exceptions: true,    // Your "Paranoia" line — logs JS crashes to PostHog
+  persistence: 'localStorage', // Better than cookies for keeping users "identified"
+  loaded: function(ph) {       // Useful for debugging
+    console.log("PostHog Loaded Successfully");
+  }
+})
 
 
 // ─── GLOBALS ──────────────────────────────────────────────────
@@ -63,6 +77,20 @@ if (!session) {
 }
 
 const user = session.user;
+
+if (user) {
+  // 1. Tell PostHog who this is so it can match the UUID
+  posthog.identify(user.id);
+
+  // 2. Wait for flags to be ready, then check
+  posthog.onFeatureFlags(() => {
+      if (posthog.isFeatureEnabled('casino-beta-flag')) {
+          console.log('🎰 Casino access granted');
+          // Show your casino UI element here
+          document.getElementById('nav-games-casino').classList.remove('hidden');
+      }
+  });
+}
 
 // ─── PERSONALISE ─────────────────────────────────────────────
 const firstName = user.user_metadata?.first_name || '';

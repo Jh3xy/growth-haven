@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
       ? `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
       : 'Unknown User'
 
-    const roleLabel  = record.role === 'promoter' ? '🏆 Promoter Partner' : '👤 Standard User'
+    const roleLabel  = record.role === 'promoter' ? 'Promoter ' : 'Standard User'
     const amount     = Number(record.amount).toLocaleString('en-NG', {
       minimumFractionDigits: 2,
     })

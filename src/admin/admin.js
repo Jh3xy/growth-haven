@@ -14,8 +14,22 @@ import '../assets/styles/transactions.css'
 import '../dashboard/modal.css'
 import './admin.css'
 
+import posthog from 'posthog-js';
 import { supabase } from '../assets/js/supabase.js';
 import { formatDate, getInitials } from '../assets/js/utils.js';
+
+// Initialize PostHog for Error tracking and Feature Flags
+posthog.init('phc_yTajNg3srP52CjfjDBAWnCNBLthdgHXcGzaV4x35CD8n', {
+  api_host: 'https://us.i.posthog.com',
+  defaults: '2026-01-30',
+  autocapture: true,           // Tracks clicks/inputs automatically
+  capture_pageview: true,      // Essential for seeing where users go
+  capture_exceptions: true,    // Your "Paranoia" line — logs JS crashes to PostHog
+  persistence: 'localStorage', // Better than cookies for keeping users "identified"
+  loaded: function(ph) {       // Useful for debugging
+    console.log("PostHog Loaded Successfully");
+  }
+})
 
 const headerNameEl = document.getElementById('headerName');
 const avatarEl = document.getElementById('avatarInitials');
