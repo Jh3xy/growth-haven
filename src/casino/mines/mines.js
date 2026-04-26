@@ -112,6 +112,13 @@ function showPhase(phase) {
   state.phase = phase
 }
 
+// Get bet input value on load
+function getSavedAmount() {
+  const savedAmount = localStorage.getItem('savedBetAmount')
+  return savedAmount ? parseFloat(savedAmount) : 0
+}
+
+getSavedAmount() && (betInput.value = getSavedAmount());
 
 // ─── WALLET ──────────────────────────────────────────────────
 async function loadWallet() {
@@ -409,6 +416,10 @@ function resetToIdle() {
   buildGrid()
   // Disable all tiles in idle
   minesGrid.querySelectorAll('.mines-tile').forEach(t => t.disabled = true)
+  activeMinesDisplay.textContent = '-';
+  winningsDisplay.textContent = '₦0.00';
+  multiplierDisplay.textContent = '1.00x';
+  activeBetDisplay.textContent = '₦0.00';
 
   showPhase('idle')
   if (window.lucide) lucide.createIcons()
@@ -416,14 +427,24 @@ function resetToIdle() {
 
 
 // ─── EVENT LISTENERS ─────────────────────────────────────────
-startBtn.addEventListener('click', startGame)
-playAgainBtn.addEventListener('click', resetToIdle)
+startBtn.addEventListener('click', ()=> {
+  // Grab Input value and save amount to localStorage
+  let betAmount = betInput.value;
+  localStorage.setItem('savedBetAmount', betAmount);
+  startGame()
+})
+playAgainBtn.addEventListener('click', ()=> {
+  resetToIdle()
+  getSavedAmount() && (betInput.value = getSavedAmount());
+})
 cashoutBtn.addEventListener('click', cashout)
 
 betChips.addEventListener('click', (e) => {
   const chip = e.target.closest('[data-bet]')
   if (!chip) return
   betInput.value = chip.dataset.bet
+  // Save the input amount to localStorage
+  localStorage.setItem('savedBetAmount', chip.dataset.bet);
   setBetError('')
   betChips.querySelectorAll('.mines-chip').forEach(c => {
     c.classList.toggle('is-active', c === chip)

@@ -40,6 +40,18 @@
           <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
           <span>Casino</span>
         </a>
+        <div class="mines-audio-controls flex gap-1">
+          <div class="flex gap-1">
+            <!-- TODO: to be toggled on and off(muted) for audio on each mine click -->
+            <i data-lucide="volume-2"></i>
+            <i data-lucide="volume-off"></i>
+          </div>
+          <!-- TODO: Background music to be toggled on and off but for a constant casino game sound -->
+          <div class="flex gap-1">
+            <i data-lucide="volume-x"></i>
+            <i data-lucide="volume-off"></i>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -75,11 +87,11 @@
 
           <!-- Quick bet chips -->
           <div class="mines-chips" id="betChips">
-            <button class="mines-chip" type="button" data-bet="500">₦500</button>
-            <button class="mines-chip" type="button" data-bet="1000">₦1K</button>
             <button class="mines-chip" type="button" data-bet="5000">₦5K</button>
-            <button class="mines-chip" type="button" data-bet="10000">₦10K</button>
-            <button class="mines-chip" type="button" data-bet="50000">₦50K</button>
+            <button class="mines-chip" type="button" data-bet="100000">₦100K</button>
+            <button class="mines-chip" type="button" data-bet="150000">₦150K</button>
+            <button class="mines-chip" type="button" data-bet="5000000">₦5M</button>
+            <button class="mines-chip" type="button" data-bet="10000000">₦10M</button>
           </div>
 
           <div class="mines-field">
@@ -128,7 +140,7 @@
           <div class="mines-result-icon" id="resultIcon">
             <!-- injected by JS: check or bomb -->
           </div>
-          <p class="mines-result-label" id="resultLabel">—</p>
+          <p class="mines-result-label" id="resultLabel"></p>
           <p class="mines-result-amount" id="resultAmount">₦0.00</p>
 
           <button class="mines-start-btn" id="playAgainBtn" type="button">
