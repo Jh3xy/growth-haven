@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowthHaven | Mines</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 160 160'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z'/%3E%3C/g%3E%3C/svg%3E">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="../../assets/js/script.js"></script>
+  <script type="module" src="./mines.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="mines-header">
+    <div class="mines-header__inner">
+      <div class="mines-header-wrap">
+        <div class="site-header__logo flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+               class="site-header__wordmark" aria-hidden="true" focusable="false">
+            <g fill="currentColor">
+              <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+            </g>
+          </svg>
+          <span class="site-header__wordmark">GrowthHaven</span>
+        </div>
+        <div class="mines-header__right">
+          <button class="dash-theme-toggle flex items-center gap-2" type="button" data-theme-toggle>
+            <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
+            <span class="dash-theme-toggle__label" data-theme-label>Dark mode</span>
+          </button>
+          <div class="mines-wallet-chip flex items-center gap-2">
+            <i data-lucide="wallet" style="width:12px;height:12px"></i>
+            <span id="walletDisplay">₦0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="mines-header__inner-flex">
+        <a href="/src/casino/" class="mines-back-btn" aria-label="Back to casino">
+          <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+          <span>Casino</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- MAIN -->
+  <main class="mines-main">
+    <div class="mines-layout">
+
+
+      <!-- ═══ LEFT — Controls Panel ═══ -->
+      <aside class="mines-controls">
+
+        <!-- Controls: idle state -->
+        <div id="controlsIdle">
+          <h1 class="mines-controls__title">Mines</h1>
+
+          <div class="mines-field">
+            <label class="mines-label" for="betAmount">Bet Amount (₦)</label>
+            <div class="mines-input-wrap">
+              <input
+                class="mines-input"
+                id="betAmount"
+                type="number"
+                min="500"
+                placeholder="500"
+                inputmode="numeric"
+              />
+            </div>
+            <span class="mines-field-error" id="betError"></span>
+          </div>
+
+          <!-- Quick bet chips -->
+          <div class="mines-chips" id="betChips">
+            <button class="mines-chip" type="button" data-bet="500">₦500</button>
+            <button class="mines-chip" type="button" data-bet="1000">₦1K</button>
+            <button class="mines-chip" type="button" data-bet="5000">₦5K</button>
+            <button class="mines-chip" type="button" data-bet="10000">₦10K</button>
+            <button class="mines-chip" type="button" data-bet="50000">₦50K</button>
+          </div>
+
+          <div class="mines-field">
+            <label class="mines-label" for="minesCount">Mines</label>
+            <div class="mines-count-row" id="minesCountRow">
+              <!-- 1–24 rendered by JS -->
+            </div>
+            <span class="mines-selected-mines" id="minesSelectedLabel">3 mines selected</span>
+          </div>
+
+          <button class="mines-start-btn" id="startBtn" type="button">
+            <i data-lucide="play" style="width:16px;height:16px"></i>
+            Start Game
+          </button>
+        </div>
+
+
+        <!-- Controls: active state -->
+        <div id="controlsActive" class="hidden">
+          <div class="mines-stat-block">
+            <span class="mines-stat-label">Bet</span>
+            <span class="mines-stat-value" id="activeBetDisplay">₦0.00</span>
+          </div>
+          <div class="mines-stat-block">
+            <span class="mines-stat-label">Multiplier</span>
+            <span class="mines-stat-value mines-stat-value--accent" id="multiplierDisplay">1.00×</span>
+          </div>
+          <div class="mines-stat-block">
+            <span class="mines-stat-label">Cash Out</span>
+            <span class="mines-stat-value mines-stat-value--green" id="winningsDisplay">₦0.00</span>
+          </div>
+          <div class="mines-stat-block">
+            <span class="mines-stat-label">Mines</span>
+            <span class="mines-stat-value" id="activeMinesDisplay">—</span>
+          </div>
+
+          <button class="mines-cashout-btn" id="cashoutBtn" type="button" disabled>
+            <i data-lucide="hand-coins" style="width:16px;height:16px"></i>
+            Cash Out
+          </button>
+        </div>
+
+
+        <!-- Controls: result state -->
+        <div id="controlsResult" class="hidden">
+          <div class="mines-result-icon" id="resultIcon">
+            <!-- injected by JS: check or bomb -->
+          </div>
+          <p class="mines-result-label" id="resultLabel">—</p>
+          <p class="mines-result-amount" id="resultAmount">₦0.00</p>
+
+          <button class="mines-start-btn" id="playAgainBtn" type="button">
+            <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>
+            Play Again
+          </button>
+        </div>
+
+      </aside><!-- /mines-controls -->
+
+
+      <!-- ═══ RIGHT — Grid ═══ -->
+      <div class="mines-grid-wrap">
+        <div class="mines-grid" id="minesGrid" role="grid" aria-label="Mines game grid">
+          <!-- 25 tiles rendered by JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
