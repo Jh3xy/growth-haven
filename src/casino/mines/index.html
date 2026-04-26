@@ -41,16 +41,9 @@
           <span>Casino</span>
         </a>
         <div class="mines-audio-controls flex gap-1">
-          <div class="flex gap-1">
-            <!-- TODO: to be toggled on and off(muted) for audio on each mine click -->
-            <i data-lucide="volume-2"></i>
-            <i data-lucide="volume-off"></i>
-          </div>
-          <!-- TODO: Background music to be toggled on and off but for a constant casino game sound -->
-          <div class="flex gap-1">
-            <i data-lucide="volume-x"></i>
-            <i data-lucide="volume-off"></i>
-          </div>
+          <button id="musicToggle" class="mines-music-toggle flex items-center" type="button">
+            <i data-lucide="volume-x" style="width:14px;height:14px"></i>
+          </button>
         </div>
       </div>
 
@@ -162,6 +155,7 @@
     </div>
   </main>
 
+  <audio id="bgMusic" src="/assets/audio/melodigne-lofi.mp3" preload="none"></audio>
   <script>lucide.createIcons();</script>
 </body>
 </html>
