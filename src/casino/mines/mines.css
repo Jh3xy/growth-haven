@@ -67,6 +67,8 @@ a      { color: inherit; text-decoration: none; }
 }
 
 .mines-header__inner-flex{
+  position: relative;
+  top: 6px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -86,8 +88,6 @@ svg.site-header__wordmark{
 }
 
 .mines-back-btn {
-  position: relative;
-  top: 6px;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -103,6 +103,23 @@ svg.site-header__wordmark{
   transition: var(--transition-global);
   text-decoration: none;
 }
+
+/* .mines-audio-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.875rem;
+  background: rgba(var(--surface-card-rgb), 0.92);;
+  cursor: pointer;
+  min-height: unset;
+  transition: var(--transition-global);
+  text-decoration: none;
+} */
 
 .mines-back-btn:hover {
   color: var(--text-primary);
@@ -143,6 +160,31 @@ svg.site-header__wordmark{
   color: var(--brand-primary);
 }
 
+.mines-music-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.875rem;
+  background: rgba(var(--surface-card-rgb), 0.92);
+  cursor: pointer;
+  min-height: unset;
+  transition: var(--transition-global);
+  text-decoration: none;
+}
+
+.mines-music-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+.mines-music-toggle:active {
+  transform: scale(.89);
+}
+
 
 /* ─── MAIN LAYOUT ────────────────────────────────────────── */
 
@@ -159,7 +201,8 @@ svg.site-header__wordmark{
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
-  max-width: 860px;
+  margin: 0 auto;
+  max-width: 980px;
 }
 
 
@@ -258,8 +301,8 @@ label[for="minesCount"]{
 /* ─── BET CHIPS ──────────────────────────────────────────── */
 
 .mines-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
   gap: 0.5rem;
 }
 

@@ -15,6 +15,64 @@ import './mines.css'
 
 import { supabase } from '../../assets/js/supabase'
 
+// ─── AUDIO ───────────────────────────────────────────────────
+const clickAudio = new Audio('/assets/audio/camera-shutter.wav')
+const bgAudio = document.getElementById('bgMusic')
+bgAudio.loop = true
+bgAudio.volume = 0
+
+const musicToggle = document.getElementById('musicToggle')
+let isMusicMuted = localStorage.getItem('gh_casino_music') === 'muted'
+
+function fadeAudio(audio, targetVolume, duration) {
+  const startVolume = audio.volume
+  const startTime = Date.now()
+  const fade = () => {
+    const elapsed = Date.now() - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    audio.volume = startVolume + (targetVolume - startVolume) * progress
+    if (progress < 1) requestAnimationFrame(fade)
+  }
+  fade()
+}
+
+function updateMusicIcon() {
+  if (isMusicMuted) {
+    //Set audio state in Localstorage to 'muted' by default
+    localStorage.setItem('gh_casino_music', 'muted')
+  } else {
+    //Set to unmuted and play audio 
+    localStorage.setItem('gh_casino_music', 'unmuted')
+    // bgAudio.play().then(() => {
+    //   fadeAudio(bgAudio, 1, 800)
+    //   isMusicMuted = false
+    //   updateMusicIcon()
+    // }).catch(err => console.error('Audio play failed:', err))
+  }
+  const icon = musicToggle.querySelector('[data-lucide]')
+  icon.setAttribute('data-lucide', isMusicMuted ? 'volume-x' : 'volume-2')
+  if (window.lucide) lucide.createIcons({ nodes: [musicToggle] })
+}
+
+updateMusicIcon()
+
+musicToggle.addEventListener('click', () => {
+  if (isMusicMuted) {
+    bgAudio.play().then(() => {
+      fadeAudio(bgAudio, 1, 800)
+      isMusicMuted = false
+      localStorage.setItem('gh_casino_music', 'unmuted')
+      updateMusicIcon()
+    }).catch(err => console.error('Audio play failed:', err))
+  } else {
+    fadeAudio(bgAudio, 0, 800)
+    setTimeout(() => bgAudio.pause(), 800)
+    isMusicMuted = true
+    localStorage.setItem('gh_casino_music', 'muted')
+    updateMusicIcon()
+  }
+})
+
 // ─── AUTH GUARD ──────────────────────────────────────────────
 const { data: { session } } = await supabase.auth.getSession()
 if (!session) {
@@ -112,6 +170,13 @@ function showPhase(phase) {
   state.phase = phase
 }
 
+// Get bet input value on load
+function getSavedAmount() {
+  const savedAmount = localStorage.getItem('savedBetAmount')
+  return savedAmount ? parseFloat(savedAmount) : 0
+}
+
+getSavedAmount() && (betInput.value = getSavedAmount());
 
 // ─── WALLET ──────────────────────────────────────────────────
 async function loadWallet() {
@@ -276,6 +341,10 @@ async function startGame() {
 async function onTileClick(index) {
   if (state.phase !== 'active' || state.isRevealing || state.revealedTiles.includes(index)) return
 
+  // Play click sound immediately on tile click
+  clickAudio.currentTime = 0
+  clickAudio.play().catch(err => console.error('Click sound failed:', err))
+
   state.isRevealing = true
 
   const tile = minesGrid.querySelector(`[data-index="${index}"]`)
@@ -409,6 +478,10 @@ function resetToIdle() {
   buildGrid()
   // Disable all tiles in idle
   minesGrid.querySelectorAll('.mines-tile').forEach(t => t.disabled = true)
+  activeMinesDisplay.textContent = '-';
+  winningsDisplay.textContent = '₦0.00';
+  multiplierDisplay.textContent = '1.00x';
+  activeBetDisplay.textContent = '₦0.00';
 
   showPhase('idle')
   if (window.lucide) lucide.createIcons()
@@ -416,14 +489,24 @@ function resetToIdle() {
 
 
 // ─── EVENT LISTENERS ─────────────────────────────────────────
-startBtn.addEventListener('click', startGame)
-playAgainBtn.addEventListener('click', resetToIdle)
+startBtn.addEventListener('click', ()=> {
+  // Grab Input value and save amount to localStorage
+  let betAmount = betInput.value;
+  localStorage.setItem('savedBetAmount', betAmount);
+  startGame()
+})
+playAgainBtn.addEventListener('click', ()=> {
+  resetToIdle()
+  getSavedAmount() && (betInput.value = getSavedAmount());
+})
 cashoutBtn.addEventListener('click', cashout)
 
 betChips.addEventListener('click', (e) => {
   const chip = e.target.closest('[data-bet]')
   if (!chip) return
   betInput.value = chip.dataset.bet
+  // Save the input amount to localStorage
+  localStorage.setItem('savedBetAmount', chip.dataset.bet);
   setBetError('')
   betChips.querySelectorAll('.mines-chip').forEach(c => {
     c.classList.toggle('is-active', c === chip)
