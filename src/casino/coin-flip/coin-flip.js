@@ -12,6 +12,8 @@ import '../../assets/styles/queries.css'
 import '../../assets/styles/dashboard.css'
 import '../mines/mines.css'
 import './coin-flip.css'
+import '../casino-modal.css'
+import '../casino-utils.css'
 
 import { supabase } from '../../assets/js/supabase.js'
 

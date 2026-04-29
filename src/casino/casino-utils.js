@@ -1,14 +1,14 @@
+
+
 /**
  * casino-utils.js — GrowthHaven Casino Shared Utilities
- * Import from any casino game file.
+ * Styles live in casino-utils.css — import that in your game JS.
  *
  * Usage:
- *   import { formatNaira, initRecentBets, prependBet } from '../casino-utils.js'
+ *   import { formatNaira, initRecentBets } from '../casino-utils.js'
  *
- *   // On boot — pass game type + the element to mount into
  *   const recentBets = initRecentBets('coin_flip', document.getElementById('recentBetsMount'))
- *
- *   // After a round resolves — add to top of list without re-fetching
+ *   // After a round:
  *   recentBets.prepend({ outcome_won, bet_amount, profit, multiplier })
  */
 
@@ -21,8 +21,8 @@ export function formatNaira(amount) {
 }
 
 export function timeAgo(isoString) {
-  const diff = Date.now() - new Date(isoString).getTime()
-  const mins = Math.floor(diff / 60_000)
+  const diff  = Date.now() - new Date(isoString).getTime()
+  const mins  = Math.floor(diff / 60_000)
   if (mins < 1)  return 'just now'
   if (mins < 60) return `${mins}m ago`
   const hours = Math.floor(mins / 60)
@@ -32,22 +32,14 @@ export function timeAgo(isoString) {
 
 
 // ─── RECENT BETS ACCORDION ───────────────────────────────────
-//
-// Renders a collapsible "Recent Bets" section into `mountEl`.
-// The mount element should be an empty div placed at the top of
-// the controls panel, before the title.
-//
-// Returns { prepend } so the caller can optimistically add new
-// rows without re-fetching after each round.
 
 export function initRecentBets(gameType, mountEl) {
   if (!mountEl) return { prepend: () => {} }
 
-  let isOpen    = false
-  let isLoaded  = false
-  let listEl    = null   // the <div> holding rows — populated lazily
+  let isOpen   = false
+  let isLoaded = false
+  let listEl   = null
 
-  // ── Build shell ───────────────────────────────────────────
   mountEl.innerHTML = `
     <div class="casino-rb">
       <button class="casino-rb__toggle" type="button" id="rbToggle">
@@ -73,18 +65,13 @@ export function initRecentBets(gameType, mountEl) {
   const countEl   = mountEl.querySelector('#rbCount')
   listEl          = mountEl.querySelector('#rbList')
 
-  // ── Toggle ────────────────────────────────────────────────
   toggleBtn.addEventListener('click', async () => {
     isOpen = !isOpen
     panel.classList.toggle('hidden', !isOpen)
     toggleBtn.classList.toggle('is-open', isOpen)
-
-    if (isOpen && !isLoaded) {
-      await fetchAndRender()
-    }
+    if (isOpen && !isLoaded) await fetchAndRender()
   })
 
-  // ── Fetch ─────────────────────────────────────────────────
   async function fetchAndRender() {
     const { data, error } = await supabase.rpc('get_game_history', {
       p_game_type: gameType,
@@ -100,19 +87,14 @@ export function initRecentBets(gameType, mountEl) {
     }
 
     data.forEach(round => listEl.appendChild(buildRow(round)))
-
-    // Update count badge
     countEl.textContent = data.length
     countEl.classList.remove('hidden')
-
     isLoaded = true
   }
 
-  // ── Build a single row ────────────────────────────────────
   function buildRow(round) {
-    const row = document.createElement('div')
+    const row    = document.createElement('div')
     row.className = 'casino-rb__row'
-
     const sign   = round.outcome_won ? '+' : '-'
     const amount = Math.abs(round.profit)
     const mult   = round.multiplier > 0 ? `${Number(round.multiplier).toFixed(2)}×` : '—'
@@ -129,26 +111,20 @@ export function initRecentBets(gameType, mountEl) {
     return row
   }
 
-  // ── Prepend — called after each round without re-fetching ─
   function prepend(round) {
-    // Add to count badge
     const current = parseInt(countEl.textContent) || 0
     countEl.textContent = Math.min(current + 1, 20)
     countEl.classList.remove('hidden')
 
-    // If panel is open, insert at top
     if (isLoaded && listEl) {
       const empty = listEl.querySelector('.casino-rb__empty')
       if (empty) empty.remove()
 
-      const row = buildRow({
-        ...round,
-        created_at: new Date().toISOString(),
-      })
+      const row = buildRow({ ...round, created_at: new Date().toISOString() })
       row.classList.add('casino-rb__row--new')
       listEl.insertBefore(row, listEl.firstChild)
 
-      // Keep max 20 rows in the DOM
+      // Keep max 20 in DOM
       const rows = listEl.querySelectorAll('.casino-rb__row')
       if (rows.length > 20) rows[rows.length - 1].remove()
     }
@@ -156,3 +132,4 @@ export function initRecentBets(gameType, mountEl) {
 
   return { prepend }
 }
+

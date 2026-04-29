@@ -1,0 +1,155 @@
+
+
+/* ============================================================
+   casino-utils.css — GrowthHaven Casino Shared UI
+   src/casino/casino-utils.css
+   Import in any game JS: import '../casino-utils.css'
+============================================================ */
+
+/* ── RECENT BETS ACCORDION ───────────────────────────────────── */
+
+.casino-rb {
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 1rem;
+}
+
+.casino-rb__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--ff-primary);
+  min-height: unset;
+  text-align: left;
+  transition: color var(--transition-global);
+}
+
+.casino-rb__toggle:hover { color: var(--text-primary); }
+
+.casino-rb__label {
+  font-size: 0.6875rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.casino-rb__count {
+  font-size: 0.6rem;
+  font-weight: var(--fw-semibold);
+  color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+  border: 1px solid var(--brand-primary-ring);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  line-height: 1.6;
+}
+
+.casino-rb__chevron {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: transform 0.25s var(--spring);
+}
+
+.casino-rb__toggle.is-open .casino-rb__chevron {
+  transform: rotate(180deg);
+}
+
+/* ── PANEL ───────────────────────────────────────────────────── */
+
+.casino-rb__panel {
+  padding-bottom: 0.75rem;
+}
+
+.casino-rb__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.casino-rb__list::-webkit-scrollbar { display: none; }
+
+.casino-rb__loading,
+.casino-rb__empty {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+/* ── ROW ─────────────────────────────────────────────────────── */
+
+.casino-rb__row {
+  display: grid;
+  /* dot | bet | mult | profit | time */
+  grid-template-columns: 8px 1fr auto auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.75rem;
+}
+
+.casino-rb__row:last-child { border-bottom: none; }
+
+/* Flash animation for newly prepended rows */
+.casino-rb__row--new {
+  animation: rb-flash 0.6s ease both;
+}
+
+@keyframes rb-flash {
+  0%   { background: var(--brand-primary-soft); }
+  100% { background: transparent; }
+}
+
+/* ── DOT ─────────────────────────────────────────────────────── */
+
+.casino-rb__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.casino-rb__dot--win  { background: var(--status-success); }
+.casino-rb__dot--loss { background: var(--status-error); }
+
+/* ── COLUMNS ─────────────────────────────────────────────────── */
+
+.casino-rb__bet {
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.casino-rb__mult {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.casino-rb__profit {
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+
+.casino-rb__profit--win  { color: var(--status-success-text); }
+.casino-rb__profit--loss { color: var(--status-error-text); }
+
+html[data-theme='dark'] .casino-rb__profit--win  { color: var(--status-success); }
+html[data-theme='dark'] .casino-rb__profit--loss { color: var(--status-error); }
+
+.casino-rb__time {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+

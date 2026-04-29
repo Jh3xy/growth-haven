@@ -12,6 +12,8 @@ import '../../assets/styles/landing.css'
 import '../../assets/styles/queries.css'
 import '../../assets/styles/dashboard.css'
 import './mines.css'
+import '../casino-modal.css';
+import '../casio-utils.css';
 
 import { supabase } from '../../assets/js/supabase'
 

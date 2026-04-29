@@ -55,7 +55,6 @@ const backBtn      = document.getElementById('backBtn');
 const SIMULATED_OTP = '123456';
 
 
-console.log({ firstNameEl, lastNameEl, emailEl, pwEl, pwConfirmEl });
 (function prefillReferralFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const ref    = params.get('ref');
