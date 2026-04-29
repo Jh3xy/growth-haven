@@ -59,6 +59,8 @@
       <!-- ═══ LEFT — Controls Panel ═══ -->
       <aside class="mines-controls">
 
+        <div id="recentBetsMount"></div>
+        
         <!-- Controls: idle state -->
         <div id="controlsIdle">
           <h1 class="mines-controls__title">Mines</h1>
@@ -126,22 +128,6 @@
             Cash Out
           </button>
         </div>
-
-
-        <!-- Controls: result state -->
-        <div id="controlsResult" class="hidden">
-          <div class="mines-result-icon" id="resultIcon">
-            <!-- injected by JS: check or bomb -->
-          </div>
-          <p class="mines-result-label" id="resultLabel"></p>
-          <p class="mines-result-amount" id="resultAmount">₦0.00</p>
-
-          <button class="mines-start-btn" id="playAgainBtn" type="button">
-            <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>
-            Play Again
-          </button>
-        </div>
-
       </aside><!-- /mines-controls -->
 
 

@@ -13,9 +13,12 @@ import '../../assets/styles/queries.css'
 import '../../assets/styles/dashboard.css'
 import './mines.css'
 import '../casino-modal.css';
-import '../casio-utils.css';
+import '../casino-utils.css';
 
 import { supabase } from '../../assets/js/supabase'
+import { showCasinoResult } from "../casino-modal.js";
+import { initRecentBets } from "../casino-utils.js";
+
 
 // ─── AUDIO ───────────────────────────────────────────────────
 const clickAudio = new Audio('/assets/audio/camera-shutter.wav')
@@ -107,21 +110,21 @@ const betChips          = document.getElementById('betChips')
 const minesCountRow     = document.getElementById('minesCountRow')
 const minesSelectedLabel= document.getElementById('minesSelectedLabel')
 const startBtn          = document.getElementById('startBtn')
-const playAgainBtn      = document.getElementById('playAgainBtn')
 const cashoutBtn        = document.getElementById('cashoutBtn')
 const minesGrid         = document.getElementById('minesGrid')
 
 const controlsIdle      = document.getElementById('controlsIdle')
 const controlsActive    = document.getElementById('controlsActive')
-const controlsResult    = document.getElementById('controlsResult')
 
 const activeBetDisplay  = document.getElementById('activeBetDisplay')
 const multiplierDisplay = document.getElementById('multiplierDisplay')
 const winningsDisplay   = document.getElementById('winningsDisplay')
 const activeMinesDisplay= document.getElementById('activeMinesDisplay')
-const resultIcon        = document.getElementById('resultIcon')
-const resultLabel       = document.getElementById('resultLabel')
-const resultAmount      = document.getElementById('resultAmount')
+// const playAgainBtn      = document.getElementById('playAgainBtn')
+// const controlsResult    = document.getElementById('controlsResult')
+// const resultIcon        = document.getElementById('resultIcon')
+// const resultLabel       = document.getElementById('resultLabel')
+// const resultAmount      = document.getElementById('resultAmount')
 
 
 // ─── HELPERS ─────────────────────────────────────────────────
@@ -142,34 +145,33 @@ function resetCashoutButton() {
 }
 
 function showPhase(phase) {
-  controlsIdle.classList.toggle('hidden', phase !== 'idle')
-  controlsActive.classList.toggle('hidden', phase !== 'active')
-  controlsResult.classList.toggle('hidden', phase !== 'result')
+  controlsIdle.classList.toggle("hidden", phase !== "idle");
+  controlsActive.classList.toggle("hidden", phase !== "active");
 
-  const isIdle = phase === 'idle'
-  const isActive = phase === 'active'
+  const isIdle = phase === "idle";
+  const isActive = phase === "active";
 
-  betInput.disabled = !isIdle
-  startBtn.disabled = !isIdle
+  betInput.disabled = !isIdle;
+  startBtn.disabled = !isIdle;
 
-  betChips.querySelectorAll('.mines-chip').forEach((chip) => {
-    chip.disabled = !isIdle
-  })
+  betChips.querySelectorAll(".mines-chip").forEach((chip) => {
+    chip.disabled = !isIdle;
+  });
 
-  minesCountRow.querySelectorAll('.mines-count-btn').forEach((btn) => {
-    btn.disabled = !isIdle
-  })
+  minesCountRow.querySelectorAll(".mines-count-btn").forEach((btn) => {
+    btn.disabled = !isIdle;
+  });
 
   if (isActive) {
-    cashoutBtn.disabled = state.revealedTiles.length === 0 || state.isRevealing
+    cashoutBtn.disabled = state.revealedTiles.length === 0 || state.isRevealing;
   } else {
-    resetCashoutButton()
-    minesGrid.querySelectorAll('.mines-tile').forEach((tile) => {
-      tile.disabled = true
-    })
+    resetCashoutButton();
+    minesGrid.querySelectorAll(".mines-tile").forEach((tile) => {
+      tile.disabled = true;
+    });
   }
 
-  state.phase = phase
+  state.phase = phase;
 }
 
 // Get bet input value on load
@@ -436,27 +438,34 @@ function syncActiveControls() {
 
 // ─── SHOW RESULT ──────────────────────────────────────────────
 function showResult(outcome, amount, multiplier = null) {
-  showPhase('result')
+  // Lock grid tiles — keep active panel visible so multiplier etc. stay on screen
+  minesGrid.querySelectorAll(".mines-tile").forEach((t) => (t.disabled = true));
+  cashoutBtn.disabled = true;
 
-  if (outcome === 'won') {
-    resultIcon.innerHTML = `
-      <div class="mines-result-icon__inner mines-result-icon__inner--win">
-        <i data-lucide="trophy" style="width:28px;height:28px;stroke-width:1.5"></i>
-      </div>`
-    resultLabel.textContent  = multiplier ? `Cashed out at ${Number(multiplier).toFixed(2)}×` : 'You won!'
-    resultAmount.textContent = formatNaira(amount)
-    resultAmount.style.color = 'var(--status-success-text)'
-  } else {
-    resultIcon.innerHTML = `
-      <div class="mines-result-icon__inner mines-result-icon__inner--loss">
-        <i data-lucide="bomb" style="width:28px;height:28px;stroke-width:1.5"></i>
-      </div>`
-    resultLabel.textContent  = 'Mine hit — better luck next time'
-    resultAmount.textContent = `-${formatNaira(amount)}`
-    resultAmount.style.color = 'var(--status-error-text)'
-  }
+  const won = outcome === "won";
+  const profit = won ? amount - state.betAmount : -state.betAmount;
 
-  if (window.lucide) lucide.createIcons({ nodes: [resultIcon] })
+  // Optimistically add to recent bets list
+  recentBets.prepend({
+    outcome_won: won,
+    bet_amount: state.betAmount,
+    profit,
+    multiplier: multiplier ?? 0,
+  });
+
+  showCasinoResult({
+    won,
+    betAmount: state.betAmount,
+    payout: won ? amount : 0,
+    profit,
+    multiplier: multiplier ?? 0,
+    gameLabel: "Mines",
+    onPlayAgain: () => {
+      resetToIdle();
+      const saved = getSavedAmount();
+      if (saved) betInput.value = saved;
+    },
+  });
 }
 
 
@@ -497,10 +506,7 @@ startBtn.addEventListener('click', ()=> {
   localStorage.setItem('savedBetAmount', betAmount);
   startGame()
 })
-playAgainBtn.addEventListener('click', ()=> {
-  resetToIdle()
-  getSavedAmount() && (betInput.value = getSavedAmount());
-})
+
 cashoutBtn.addEventListener('click', cashout)
 
 betChips.addEventListener('click', (e) => {
@@ -525,14 +531,18 @@ betInput.addEventListener('input', () => {
 
 
 // ─── BOOT ────────────────────────────────────────────────────
-buildMinesSelector()
-buildGrid()
-// Tiles are disabled at idle — enable only when a game starts
-minesGrid.querySelectorAll('.mines-tile').forEach(t => t.disabled = true)
+buildMinesSelector();
+buildGrid();
+minesGrid.querySelectorAll(".mines-tile").forEach((t) => (t.disabled = true));
 
-await Promise.all([loadWallet(), checkActiveSession()])
+// Init recent bets accordion
+const recentBets = initRecentBets(
+  "mines",
+  document.getElementById("recentBetsMount"),
+);
 
-// If no active session was found, stay on idle
-if (state.phase === 'idle') {
-  if (window.lucide) lucide.createIcons()
+await Promise.all([loadWallet(), checkActiveSession()]);
+
+if (state.phase === "idle") {
+  if (window.lucide) lucide.createIcons();
 }

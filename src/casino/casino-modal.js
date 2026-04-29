@@ -43,7 +43,9 @@ export function showCasinoResult({
   const overlay = document.createElement('div')
   overlay.className = 'cm-overlay'
 
-  const icon = won ? `<i data-lucide="trophy"></i>` : `<i data-lucide="bomb"></i>`;
+  const icon = won
+    ? `<i data-lucide="trophy"></i>`
+    : `<i data-lucide="bomb"></i>`;
   const outcome  = won ? 'You won!' : 'You lost.'
   const amtClass = won ? 'cm-amount--win' : 'cm-amount--loss'
   const amtText  = won
@@ -84,10 +86,16 @@ export function showCasinoResult({
     onPlayAgain?.()
   })
 
-  overlay.querySelector('#cmClose').addEventListener('click', closeCasinoModal)
+  overlay.querySelector('#cmClose').addEventListener('click', ()=> {
+   closeCasinoModal()
+   closeCasinoModal();
+    onPlayAgain?.();
+  })
 
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeCasinoModal()
+    closeCasinoModal()
+    onPlayAgain?.()
   })
 
   const onKeydown = (e) => {

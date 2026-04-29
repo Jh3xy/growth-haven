@@ -1,5 +1,6 @@
 
 
+
 /* ============================================================
    casino-utils.css — GrowthHaven Casino Shared UI
    src/casino/casino-utils.css
@@ -7,6 +8,11 @@
 ============================================================ */
 
 /* ── RECENT BETS ACCORDION ───────────────────────────────────── */
+#recentBetsMount{
+  margin-top: 1.6rem;
+  width: 100%;
+}
+
 
 .casino-rb {
   border-bottom: 1px solid var(--border-subtle);
@@ -151,5 +157,9 @@ html[data-theme='dark'] .casino-rb__profit--loss { color: var(--status-error); }
   white-space: nowrap;
   opacity: 0.7;
 }
+
+
+
+
 
 

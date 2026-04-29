@@ -191,6 +191,7 @@ svg.site-header__wordmark{
 .mines-main {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   padding: 2rem 1.25rem 4rem;
