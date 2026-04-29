@@ -87,7 +87,6 @@ export function showCasinoResult({
   })
 
   overlay.querySelector('#cmClose').addEventListener('click', ()=> {
-   closeCasinoModal()
    closeCasinoModal();
     onPlayAgain?.();
   })
@@ -95,7 +94,7 @@ export function showCasinoResult({
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeCasinoModal()
     closeCasinoModal()
-    onPlayAgain?.()
+    // onPlayAgain?.()
   })
 
   const onKeydown = (e) => {
