@@ -466,6 +466,7 @@ function showResult(outcome, amount, multiplier = null) {
       if (saved) betInput.value = saved;
     },
   });
+  lucide.createIcons();
 }
 
 

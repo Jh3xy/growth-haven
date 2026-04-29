@@ -140,6 +140,7 @@ flipBtn?.addEventListener('click', async () => {
     gameLabel:   'Coin Flip',
     onPlayAgain: resetCoin,
   })
+  lucide.createIcons();
 })
 
 // ─── CHIPS ───────────────────────────────────────────────────

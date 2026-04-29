@@ -18,6 +18,7 @@ export default defineConfig({
         affiliate: resolve(__dirname, 'src/affiliate/index.html'),
         casino:     resolve(__dirname, 'src/casino/index.html'),
         mines:     resolve(__dirname, 'src/casino/mines/index.html'),
+        'coin-flip':     resolve(__dirname, 'src/casino/coin-flip/index.html'),
       }
     }
   }

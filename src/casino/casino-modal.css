@@ -66,6 +66,12 @@
   justify-content: center;
   margin-bottom: 1rem;
   font-size: 1.75rem;
+
+  & svg.lucide {
+    width: 30px;
+    height: 30px;
+    stroke-width: 3px;
+  }
 }
 
 .cm-icon--win {
