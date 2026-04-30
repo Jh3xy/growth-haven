@@ -11,227 +11,491 @@
 <body>
 
   <!-- =====================
-       HEADER
+       NAVBAR
   ===================== -->
-  <header class="site-header fixed top-0 z-50 w-full">
-    <div class="site-header__inner flex-between px-8">
+  <header class="nav nav--scrolled" id="nav">
+    <div class="nav__inner">
 
-      <!-- Logo -->
-      
-      <div class="site-header__logo flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160" class="site-header__wordmark" aria-hidden="true" focusable="false"><g fill="currentColor"><path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/></g></svg>
-        <span class="site-header__wordmark">GrowthHaven</span>
+      <a href="/" class="nav__logo" aria-label="GrowthHaven home">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 160 160" aria-hidden="true" focusable="false">
+          <g fill="currentColor">
+            <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+          </g>
+        </svg>
+        <span class="nav__wordmark">GrowthHaven</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Main navigation">
+        <a href="#features" class="nav__link">Features</a>
+        <a href="#how-it-works" class="nav__link">How It Works</a>
+        <a href="#community" class="nav__link">Community</a>
+        <a href="#waitlist" class="nav__link">Waitlist</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a href="/src/register/" class="nav__cta">
+          Join The Haven
+          <i data-lucide="arrow-right"></i>
+        </a>
+        <button class="dash-theme-toggle flex items-center gap-2" type="button" data-theme-toggle>
+          <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
+        </button>
+
+        <button class="nav__hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false">
+          <i data-lucide="menu"></i>
+        </button>
       </div>
 
+    </div>
+
+    <!-- Mobile drawer -->
+    <div class="nav__drawer" id="navDrawer" aria-hidden="true">
+      <div class="nav__drawer-inner">
+        <a href="#features"     class="nav__drawer-link">Features</a>
+        <a href="#how-it-works" class="nav__drawer-link">How It Works</a>
+        <a href="#community"    class="nav__drawer-link">Community</a>
+        <a href="#waitlist"     class="nav__drawer-link">Waitlist</a>
+        <a href="/src/register/"     class="cta-btn nav__drawer-cta">Join The Haven — For Free</a>
+      </div>
     </div>
   </header>
 
 
   <!-- =====================
-       MAIN
+       HERO
   ===================== -->
-  <main class="site-main">
-    <div class="site-main__inner">
+  <section class="hero">
+
+    <!-- Decorative blobs -->
+    <div class="deco-blob deco-blob--hero-left"  aria-hidden="true"></div>
+    <div class="deco-blob deco-blob--hero-right" aria-hidden="true"></div>
+
+    <div class="hero__inner">
+
+      <!-- Badge -->
+      <!-- <div class="badge-pill hero__badge flex items-center gap-2">
+        <span class="badge-pill__dot"></span>
+        <span class="badge-pill__label uppercase">Coming Q4 2025</span>
+      </div> -->
+
+      <!-- Headline -->
+      <h1 class="hero__heading">
+        Your Money.<br>
+        Your Environment.<br>
+        <span class="hero__accent italic">Real Growth.</span>
+      </h1>
+
+      <!-- Sub -->
+      <p class="hero__body">
+        GrowthHaven is the first ecosystem that lets you decide exactly how your money works — from disciplined savings to community-powered rewards. You choose the field; we build the soil.
+      </p>
+
+      <!-- CTAs -->
+      <div class="hero__ctas">
+        <a href="/src/register/" class="cta-btn hero__cta-primary flex-center gap-2">
+          Join The Haven — For Free
+        </a>
+        <a href="https://t.me/+UHPnYhMx6aI3NzBk" target="_blank" rel="noopener noreferrer" class="cta-btn hero__tg-link flex items-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Join Us on Telegram
+        </a>
+      </div>
+
+      <!-- Social proof -->
+      <div class="social-proof hero__social flex items-center gap-4">
+        <div class="avatar-stack flex">
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-01.png" alt="Early member 1" />
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="Early member 2" />
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="Early member 3" />
+        </div>
+        <p class="social-proof__text italic">Joining 400+ early members.</p>
+      </div>
+
+    </div>
+  </section>
 
 
-      <!-- =====================
-           LEFT COLUMN — Editorial
-      ===================== -->
-      <div class="hero-col">
+  <!-- =====================
+       STATS BAR
+  ===================== -->
+  <section class="stats" aria-label="Platform stats">
+    <div class="stats__inner">
+      <div class="stats__item">
+        <span class="stats__value">400+</span>
+        <span class="stats__label">Early Members</span>
+      </div>
+      <div class="stats__divider" aria-hidden="true"></div>
+      <div class="stats__item">
+        <span class="stats__value">4</span>
+        <span class="stats__label">Growth Environments</span>
+      </div>
+      <div class="stats__divider" aria-hidden="true"></div>
+      <div class="stats__item">
+        <span class="stats__value">₦0</span>
+        <span class="stats__label">Hidden Fees</span>
+      </div>
+      <div class="stats__divider" aria-hidden="true"></div>
+      <div class="stats__item">
+        <span class="stats__value">CAC</span>
+        <span class="stats__label">Certified</span>
+      </div>
+    </div>
+  </section>
 
-        <!-- Badge Pill -->
-        <div class="badge-pill flex items-center gap-2 self-start">
+  <!-- =====================
+       TESTIMONIALS
+  ===================== -->
+  <section class="testimonials" id="community" aria-label="Community testimonials">
+    <div class="testimonials__header">
+      <div class="section-label">
+        <span class="badge-pill flex items-center gap-2">
           <span class="badge-pill__dot"></span>
-          <span class="badge-pill__label uppercase">Coming Q4 2025</span>
-        </div>
+          <span class="badge-pill__label uppercase">Early Community</span>
+        </span>
+      </div>
+      <h2 class="section-heading">What early members are saying.</h2>
+    </div>
 
-        <!-- Headline -->
-        <h1 class="hero-heading">
-          Your Money. Your Environment
-          <span class="hero-heading__accent italic">Real Growth.</span>
-        </h1>
+    <!-- Marquee track — duplicated for seamless loop -->
+    <div class="testi-track-wrap" aria-hidden="true">
+      <div class="testi-track" id="testiTrack">
 
-        <!-- Body Text -->
-        <p class="hero-body">
-          Stop letting your capital sit idle. GrowthHaven is the first ecosystem that lets you decide exactly how your money works—from the stability of the Global Market Growth to community-driven rewards and social tasks. You choose the field; we provide the soil.
-        </p>
-
-        <!-- Countdown Timer -->
-        <div class="countdown flex gap-8" id="countdown" aria-label="Countdown to launch">
-          <div class="countdown__unit flex-col">
-            <span class="countdown__value" id="cd-days">00</span>
-            <span class="countdown__label uppercase">Days</span>
-          </div>
-          <div class="countdown__unit flex-col">
-            <span class="countdown__value" id="cd-hours">00</span>
-            <span class="countdown__label uppercase">Hours</span>
-          </div>
-          <div class="countdown__unit flex-col">
-            <span class="countdown__value" id="cd-mins">00</span>
-            <span class="countdown__label uppercase">Mins</span>
-          </div>
-          <div class="countdown__unit flex-col">
-            <span class="countdown__value" id="cd-secs">00</span>
-            <span class="countdown__label uppercase">Secs</span>
-          </div>
-        </div>
-
-      </div><!-- /hero-col -->
-
-
-      <!-- =====================
-           RIGHT COLUMN — Waitlist Card
-      ===================== -->
-      <div class="card-col">
-        <div class="waitlist-wrap">
-          <div class="waitlist-card">
-  
-            <!-- Card Header -->
-            <div class="waitlist-card__header">
-              <h2 class="waitlist-card__title">Join the Haven</h2>
-              <p class="waitlist-card__subtitle">
-                Be the first to access the Vault, earn tiered referral bonuses, and start growing your portfolio with the top 500 global companies.
-              </p>
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★</div>
+          <p class="testi-card__quote">"Finally, a platform that doesn't try to tell me what to do with my money and then call it 'flexibility'. With GrowthHaven, I actually control my Vault and my referrals. It feels like real ownership."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="Early member 3" />
+            <div>
+              <div class="testi-card__name">Adeola O.</div>
+              <div class="testi-card__role">Early Member · Lagos</div>
             </div>
-  
-            <!-- Form -->
-            <form class="waitlist-form flex-col gap-6" novalidate>
-  
-              <!-- Name Field -->
-              <div class="form-field flex-col gap-2">
-                <label class="form-field__label uppercase required" for="text">
-                 Full Name
-                </label>
-                <input
-                  class="form-field__input"
-                  id="text"
-                  type="text"
-                  placeholder="John Doe"
-                  autocomplete="text"
-                  required
-                />
-              </div>
-  
-              <!-- Email Field -->
-              <div class="form-field flex-col gap-2">
-                <label class="form-field__label uppercase required" for="email">
-                 Email Address
-                </label>
-                <input
-                  class="form-field__input"
-                  id="email"
-                  type="email"
-                  placeholder="name@institution.com"
-                  autocomplete="email"
-                  required
-                />
-              </div>
-  
-              <!-- Phone Field -->
-              <div class="form-field flex-col gap-2">
-                <label class="form-field__label uppercase" for="phone">
-                  WhatsApp / Phone Number
-                </label>
-                <input
-                  class="form-field__input"
-                  id="phone"
-                  type="tel"
-                  placeholder="+234 (00) 000-000"
-                  autocomplete="tel"
-                />
-              </div>
-  
-              <!-- CTA Buttons -->
-              <div class="cta">
-                <button class="cta-btn flex-center gap-2" type="submit">
-                  Secure My spot
-                  <i data-lucide="calendar-check-2"></i>
-                </button>
-              </div>
-  
-            </form>
-            
           </div>
         </div>
-        <div class="card-col-secondary">
-          <a href="/src/register/" class="cta-btn cta-btn-secondary flex-center gap-2">
-            Join Beta
-            <i data-lucide="move-right"></i>
-          </a>
-          <!-- Social Proof -->
-          <div class="social-proof flex items-center gap-4">
-            <div class="avatar-stack flex">
-              <img
-                class="avatar-stack__img object-cover"
-                src="/assets/other/avatar-01.png"
-                alt="Fund manager 1"
-              />
-              <img
-                class="avatar-stack__img object-cover"
-                src="/assets/other/avatar-02.png"
-                alt="Fund manager 2"
-              />
-              <img
-                class="avatar-stack__img object-cover"
-                src="/assets/other/avatar-03.png"
-                alt="Fund manager 3"
-              />
+
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"The referral system is actually straightforward. I brought in four people and I could clearly see exactly how much I earned from each one. No confusing or vague 'bonuses' — just clear numbers. I like that."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-05.png" alt="Early member 3" />
+            <div>
+              <div class="testi-card__name">Emeka K.</div>
+              <div class="testi-card__role">Early Member · Abuja</div>
             </div>
-            <p class="social-proof__text italic">Joining 400+ leading fund managers.</p>
           </div>
         </div>
-      </div><!-- /card-col -->
 
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"Most fintech apps look pretty but deliver very little. GrowthHaven is different — it actually shows you what's happening with your money and lets you decide where it goes. That level of transparency is honestly rare."</p>
+          <div class="testi-card__author">
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-07.png" alt="Early member 3" />
+          <div>
+            <div class="testi-card__name">Fatima N.</div>
+              <div class="testi-card__role">Promoter Partner · Kano</div>
+            </div>
+          </div>
+        </div>
 
-      <!-- =====================
-           TRUST SIGNALS — Mobile only
-           Hidden on desktop via CSS
-      ===================== -->
-      <section class="trust-signals trust-signals--mobile-only flex-col gap-8" aria-label="Trust signals">
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"I was skeptical at first, but the beta dashboard won me over. Watching my Vault balance update in real time and seeing my referral count ticking up… it’s clean, smooth, and it just works."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="Early member 3" />
+            <div>
+              <div class="testi-card__name">Tunde O.</div>
+              <div class="testi-card__role">Early Member · Port Harcourt</div>
+            </div>
+          </div>
+        </div>
 
-        <div class="trust-item flex items-start gap-4">
-          <div class="trust-item__icon flex-center shrink-0">
-            <!-- Shield icon -->
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★</div>
+          <p class="testi-card__quote">"The community rewards model feels genuinely different. You’re not just another user ID to them. Your activity actually matters, and you can see the returns directly. That’s refreshing."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-04.png" alt="Early member 3" />
+            <div>
+              <div class="testi-card__name">Chioma I.</div>
+              <div class="testi-card__role">Early Member · Enugu</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"Just signed up and got my referral code in seconds. The interface is sharp — not too flashy, not messy. It feels exactly how it should when you’re trusting something with your money."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-09.png" alt="Early member 3" />
+            <div>
+              <div class="testi-card__name">Mohammed B.</div>
+              <div class="testi-card__role">Promoter Partner · Kaduna</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       FEATURES
+  ===================== -->
+  <section class="features" id="features" aria-labelledby="features-heading">
+    <div class="features__inner">
+
+      <div class="section-label">
+        <span class="badge-pill flex items-center gap-2">
+          <span class="badge-pill__dot"></span>
+          <span class="badge-pill__label uppercase">The Ecosystem</span>
+        </span>
+      </div>
+
+      <h2 class="section-heading" id="features-heading">
+        Four ways your money grows.
+      </h2>
+      <p class="section-sub">
+        Most platforms give you one option and call it a strategy. GrowthHaven gives you four distinct environments — pick one, pick all, or let the platform balance them for you.
+      </p>
+
+      <div class="features__grid">
+
+        <article class="feature-card feature-card--vault">
+          <div class="feature-card__icon">
             <i data-lucide="shield"></i>
           </div>
-          <div>
-            <h3 class="trust-item__title">The Vault Architecture</h3>
-            <p class="trust-item__body">High-yield savings and disciplined capital preservation designed to protect and grow your base.</p>
+          <div class="feature-card__tag">Save</div>
+          <h3 class="feature-card__title">The Vault</h3>
+          <p class="feature-card__body">
+            High-yield savings with capital preservation at its core. Your base, protected. Funds sit in the Vault earning competitive returns while the rest of the ecosystem moves around them.
+          </p>
+          <div class="feature-card__status">
+            <span class="feature-status-pill feature-status-pill--live">MVP Ready</span>
           </div>
+        </article>
+
+        <article class="feature-card feature-card--market">
+          <div class="feature-card__icon">
+            <i data-lucide="trending-up"></i>
+          </div>
+          <div class="feature-card__tag">Grow</div>
+          <h3 class="feature-card__title">Market Growth</h3>
+          <p class="feature-card__body">
+            Your portfolio moves with the world's top 500 companies — automatically. No stock-picking, no guesswork. Diversified exposure to global market performance, hands-free.
+          </p>
+          <div class="feature-card__status">
+            <span class="feature-status-pill feature-status-pill--soon">Post-MVP</span>
+          </div>
+        </article>
+
+        <article class="feature-card feature-card--rewards">
+          <div class="feature-card__icon">
+            <i data-lucide="users"></i>
+          </div>
+          <div class="feature-card__tag">Earn</div>
+          <h3 class="feature-card__title">Community Rewards</h3>
+          <p class="feature-card__body">
+            Tiered referral bonuses that turn your network into an asset. Every person you bring into the Haven earns you a cut — and the more they grow, the more you do too.
+          </p>
+          <div class="feature-card__status">
+            <span class="feature-status-pill feature-status-pill--live">MVP Ready</span>
+          </div>
+        </article>
+
+        <article class="feature-card feature-card--social">
+          <div class="feature-card__icon">
+            <i data-lucide="zap"></i>
+          </div>
+          <div class="feature-card__tag">Connect</div>
+          <h3 class="feature-card__title">Social Tasks</h3>
+          <p class="feature-card__body">
+            Earn rewards from your everyday activity. Follow, share, engage — turn the time you'd spend scrolling into something that actually pays. Community-powered, community-funded.
+          </p>
+          <div class="feature-card__status">
+            <span class="feature-status-pill feature-status-pill--soon">Coming Soon</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =====================
+       HOW IT WORKS
+  ===================== -->
+  <section class="how" id="how-it-works" aria-labelledby="how-heading">
+    <div class="how__inner">
+
+      <div class="section-label">
+        <span class="badge-pill flex items-center gap-2">
+          <span class="badge-pill__dot"></span>
+          <span class="badge-pill__label uppercase">Simple by design</span>
+        </span>
+      </div>
+
+      <h2 class="section-heading" id="how-heading">
+        Up and running in three steps.
+      </h2>
+
+      <div class="how__steps">
+
+        <div class="how-step">
+          <div class="how-step__num">01</div>
+          <div class="how-step__icon"><i data-lucide="user-plus"></i></div>
+          <h3 class="how-step__title">Create your Haven</h3>
+          <p class="how-step__body">Sign up free. No gatekeeping, no lengthy verification — just your name, email, and you're in. Your referral code generates automatically.</p>
         </div>
 
-        <div class="trust-item flex items-start gap-4">
-          <div class="trust-item__icon flex-center shrink-0">
-            <!-- Institution / bank icon -->
-            <i data-lucide="landmark"></i>
-          </div>
-          <div>
-            <h3 class="trust-item__title">Global MArket Growth - Portfolio tracking</h3>
-            <p class="trust-item__body">No need to pick just one route to grow your money. Diversify your funds across the world’s most successful companies automatically.</p>
-          </div>
+        <div class="how__connector" aria-hidden="true">
+          <i data-lucide="arrow-right"></i>
         </div>
 
-        <div class="trust-item flex items-start gap-4">
-          <div class="trust-item__icon flex-center shrink-0">
-            <!-- Institution / bank icon -->
-            <i data-lucide="landmark"></i>
-          </div>
-          <div>
-            <h3 class="trust-item__title">Social & Referral Growth</h3>
-            <p class="trust-item__body">Earn while you engage. Our tiered referral system and social tasks turn your activity into assets.</p>
-          </div>
+        <div class="how-step">
+          <div class="how-step__num">02</div>
+          <div class="how-step__icon"><i data-lucide="settings-2"></i></div>
+          <h3 class="how-step__title">Choose your environment</h3>
+          <p class="how-step__body">Pick the growth environment that fits your goals — or spread across all four. The Vault, Market Growth, Community Rewards, Social Tasks. Your call.</p>
         </div>
 
-      </section><!-- /trust-signals -->
+        <div class="how__connector" aria-hidden="true">
+          <i data-lucide="arrow-right"></i>
+        </div>
+
+        <div class="how-step">
+          <div class="how-step__num">03</div>
+          <div class="how-step__icon"><i data-lucide="sprout"></i></div>
+          <h3 class="how-step__title">Watch it grow</h3>
+          <p class="how-step__body">The ecosystem runs. Your balance grows. Track everything from your dashboard — transparent, real-time, always yours.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
 
-    </div><!-- /site-main__inner -->
+  <!-- =====================
+       WAITLIST
+  ===================== -->
+  <section class="waitlist-section" id="waitlist" aria-labelledby="waitlist-heading">
+    <div class="waitlist-section__inner">
 
-    <!-- Decorative blurs -->
-    <div class="deco-blob deco-blob--bottom-left" aria-hidden="true"></div>
-    <div class="deco-blob deco-blob--top-right" aria-hidden="true"></div>
+      <!-- Left: copy -->
+      <div class="waitlist-section__copy">
 
-  </main>
+        <div class="section-label">
+          <span class="badge-pill flex items-center gap-2">
+            <span class="badge-pill__dot"></span>
+            <span class="badge-pill__label uppercase">Priority Access</span>
+          </span>
+        </div>
+
+        <h2 class="waitlist-section__heading" id="waitlist-heading">
+          Secure your spot.<br>Start for free.
+        </h2>
+
+        <p class="waitlist-section__body">
+          The Haven is opening to a limited first wave. Early members get priority onboarding, locked-in referral rates, and first access to the Vault on launch day.
+        </p>
+
+        <ul class="waitlist-perks">
+          <li class="waitlist-perk flex items-start gap-3">
+            <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
+            <span>Priority dashboard access on launch</span>
+          </li>
+          <li class="waitlist-perk flex items-start gap-3">
+            <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
+            <span>Locked-in early referral bonus tier</span>
+          </li>
+          <li class="waitlist-perk flex items-start gap-3">
+            <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
+            <span>No entry fee. No credit card.</span>
+          </li>
+          <li class="waitlist-perk flex items-start gap-3">
+            <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
+            <span>Access to the early member Telegram community</span>
+          </li>
+        </ul>
+
+        <!-- Social proof -->
+        <div class="social-proof flex items-center gap-4">
+          <div class="avatar-stack flex">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-01.png" alt="Early member 1" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="Early member 2" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="Early member 3" />
+          </div>
+          <p class="social-proof__text italic">Joining 400+ early members.</p>
+        </div>
+
+      </div>
+
+      <!-- Right: form card -->
+      <div class="waitlist-section__card-wrap">
+        <div class="waitlist-card">
+
+          <div class="waitlist-card__header">
+            <h3 class="waitlist-card__title">Join the Haven</h3>
+            <p class="waitlist-card__subtitle">
+              Be the first to access the Vault, earn tiered referral bonuses, and start growing your portfolio.
+            </p>
+          </div>
+
+          <form class="waitlist-form flex-col gap-6" novalidate>
+
+            <div class="form-field flex-col gap-2">
+              <label class="form-field__label uppercase required" for="text">Full Name</label>
+              <input class="form-field__input" id="text" type="text" placeholder="John Doe" autocomplete="text" required />
+            </div>
+
+            <div class="form-field flex-col gap-2">
+              <label class="form-field__label uppercase required" for="email">Email Address</label>
+              <input class="form-field__input" id="email" type="email" placeholder="name@institution.com" autocomplete="email" required />
+            </div>
+
+            <div class="form-field flex-col gap-2">
+              <label class="form-field__label uppercase" for="phone">WhatsApp / Phone Number</label>
+              <input class="form-field__input" id="phone" type="tel" placeholder="+234 (00) 000-000" autocomplete="tel" />
+            </div>
+
+            <div class="cta">
+              <button class="cta-btn flex-center gap-2" type="submit">
+                Secure My Spot
+                <i data-lucide="calendar-check-2"></i>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- =====================
+       PRE-FOOTER CTA STRIP
+  ===================== -->
+  <section class="prefooter" aria-label="Final call to action">
+    <div class="prefooter__inner">
+      <h2 class="prefooter__heading">Your money deserves a better environment.</h2>
+      <p class="prefooter__sub">Join the Haven today — free, fast, and built for growth.</p>
+      <div class="prefooter__ctas">
+        <a href="/src/register/" class="cta-btn prefooter__btn flex-center gap-2">
+          Join The Haven — For Free
+          <i data-lucide="arrow-right"></i>
+        </a>
+        <a href="https://t.me/+UHPnYhMx6aI3NzBk" target="_blank" rel="noopener noreferrer" class="hero__tg-link prefooter__tg flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Follow on Telegram
+        </a>
+      </div>
+    </div>
+    <div class="deco-blob deco-blob--prefooter" aria-hidden="true"></div>
+  </section>
 
 
   <!-- =====================
@@ -239,22 +503,23 @@
   ===================== -->
   <footer class="site-footer">
     <div class="site-footer__inner flex-between">
-      
+
       <div class="site-footer__brand flex items-center gap-4">
         <span class="site-footer__name">GrowthHaven</span>
         <span class="site-footer__copy">
-          &copy; 2025 GrowthHaven. Institutional-grade security. All rights reserved.
+          &copy; 2025 GrowthHaven. All rights reserved.
         </span>
       </div>
 
       <nav class="site-footer__links flex gap-8" aria-label="Footer navigation">
-        <a href="#" class="site-footer__link">Security Architecture</a>
-        <a href="#" class="site-footer__link">Privacy Protocol</a>
-        <a href="#" class="site-footer__link">Terms of Service</a>
+        <a href="/src/privacy/" class="site-footer__link">Security</a>
+        <a href="/src/privacy/" class="site-footer__link">Privacy</a>
+        <a href="/src/terms/" class="site-footer__link">Terms</a>
       </nav>
 
     </div>
   </footer>
+
 
   <script>
     lucide.createIcons();

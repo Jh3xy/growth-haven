@@ -401,4 +401,41 @@ function showSuccess(firstName) {
     }
   });
   
- }
+}
+
+
+
+// ---- Navbar scroll glass ----
+const nav = document.getElementById('nav');
+
+// ---- Mobile hamburger ----
+const hamburger = document.getElementById('navHamburger');
+const drawer    = document.getElementById('navDrawer');
+
+hamburger.addEventListener('click', () => {
+  const isOpen = drawer.classList.toggle('nav__drawer--open');
+  hamburger.setAttribute('aria-expanded', String(isOpen));
+  drawer.setAttribute('aria-hidden', String(!isOpen));
+});
+
+// Close drawer on drawer link click
+drawer.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    drawer.classList.remove('nav__drawer--open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    drawer.setAttribute('aria-hidden', 'true');
+  });
+});
+
+// ---- Testimonials marquee clone for seamless loop ----
+const track = document.getElementById('testiTrack');
+if (track) {
+  // Clone all children and append so the marquee loops seamlessly
+  const cards = Array.from(track.children);
+  cards.forEach(card => {
+    const clone = card.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    track.appendChild(clone);
+  });
+}
+
