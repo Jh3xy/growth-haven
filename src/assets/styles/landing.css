@@ -993,7 +993,7 @@ svg.site-header__wordmark {
 }
 
 .hero__inner {
-  max-width: 760px;
+  max-width: 1020px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
