@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrowthHaven | Limbo</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 160 160'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z'/%3E%3C/g%3E%3C/svg%3E">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="../../assets/js/script.js"></script>
+  <script type="module" src="./limbo.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="cf-header">
+    <div class="cf-header__inner">
+      <div class="mines-header-wrap">
+        <div class="site-header__logo flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+               class="site-header__wordmark" aria-hidden="true" focusable="false">
+            <g fill="currentColor">
+              <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+            </g>
+          </svg>
+          <span class="site-header__wordmark">GrowthHaven</span>
+        </div>
+        <div class="mines-header__right">
+          <button class="dash-theme-toggle flex items-center gap-2" type="button" data-theme-toggle>
+            <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
+            <span class="dash-theme-toggle__label" data-theme-label>Dark mode</span>
+          </button>
+          <div class="mines-wallet-chip flex items-center gap-2">
+            <i data-lucide="wallet" style="width:12px;height:12px"></i>
+            <span id="walletDisplay">₦0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="mines-header__inner-flex">
+        <a href="/src/casino/" class="mines-back-btn" aria-label="Back to casino">
+          <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+          <span>Casino</span>
+        </a>
+        <div class="mines-audio-controls flex gap-1">
+          <button id="musicToggle" class="mines-music-toggle flex items-center" type="button">
+            <i data-lucide="volume-x" style="width:14px;height:14px"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- MAIN -->
+  <main class="limbo-main">
+    <div class="limbo-layout">
+
+      <div id="recentBetsMount"></div>
+
+      <!-- ═══ STAGE (right on desktop) ═══ -->
+      <div class="limbo-stage-col">
+        <div class="limbo-stage">
+
+          <div class="limbo-display" id="limboDisplay">
+            <span class="limbo-display__multiplier" id="limboMultiplier">—</span>
+            <span class="limbo-display__unit" id="limboUnit">×</span>
+          </div>
+
+          <p class="limbo-stage__verdict" id="limboVerdict">Set your target and launch</p>
+
+        </div>
+      </div>
+
+      <!-- ═══ CONTROLS (left on desktop) ═══ -->
+      <div class="limbo-controls-col">
+        <div class="dash-card limbo-controls">
+
+
+          <div class="limbo-controls__head">
+            <h1 class="limbo-controls__title">Limbo</h1>
+            <p class="limbo-controls__sub">Set your target. The higher the risk, the bigger the reward.</p>
+          </div>
+
+          <!-- Bet amount -->
+          <div class="limbo-field">
+            <label class="limbo-label" for="betAmount">Bet Amount (₦)</label>
+            <input
+              class="limbo-input"
+              id="betAmount"
+              type="number"
+              min="500"
+              placeholder="Enter amount"
+              inputmode="numeric"
+            />
+            <span class="limbo-field-error" id="betError"></span>
+          </div>
+
+          <!-- Quick chips -->
+          <div class="limbo-chips" id="betChips">
+            <button class="limbo-chip" type="button" data-bet="5000">₦5K</button>
+            <button class="limbo-chip" type="button" data-bet="10000">₦10K</button>
+            <button class="limbo-chip" type="button" data-bet="50000">₦50K</button>
+            <button class="limbo-chip" type="button" data-bet="100000">₦100K</button>
+          </div>
+
+          <!-- Target multiplier -->
+          <div class="limbo-field">
+            <label class="limbo-label" for="targetMultiplier">Target Multiplier (×)</label>
+            <input
+              class="limbo-input"
+              id="targetMultiplier"
+              type="number"
+              min="1"
+              max="999"
+              step="0.01"
+              placeholder="e.g. 2.00"
+              inputmode="decimal"
+            />
+            <span class="limbo-field-error" id="targetError"></span>
+          </div>
+
+          <!-- Stats strip -->
+          <div class="limbo-stats">
+            <div class="limbo-stat">
+              <span class="limbo-stat__label">Potential Win</span>
+              <span class="limbo-stat__value limbo-stat__value--accent" id="potentialWin">₦0.00</span>
+            </div>
+            <div class="limbo-stat">
+              <span class="limbo-stat__label">Win Chance</span>
+              <span class="limbo-stat__value" id="winChanceDisplay">—</span>
+            </div>
+          </div>
+
+          <!-- Roll button -->
+          <button class="limbo-roll-btn" id="rollBtn" type="button">
+            <i data-lucide="rocket" style="width:18px;height:18px"></i>
+            Launch
+          </button>
+
+        </div>
+      </div>
+
+      
+
+    </div>
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
