@@ -19,6 +19,7 @@ export default defineConfig({
         casino:     resolve(__dirname, 'src/casino/index.html'),
         mines:     resolve(__dirname, 'src/casino/mines/index.html'),
         dice:     resolve(__dirname, 'src/casino/dice/index.html'),
+        limbo:     resolve(__dirname, 'src/casino/limbo/index.html'),
         'coin-flip':     resolve(__dirname, 'src/casino/coin-flip/index.html'),
       }
     }
