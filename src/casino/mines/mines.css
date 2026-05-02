@@ -603,17 +603,17 @@ html[data-theme='dark'] .mines-stat-value--green {
   align-items: center;
   justify-content: center;
 
-  background-image:
+  /* background-image:
     linear-gradient(to top,
       rgba(0, 0, 0, 0.55) 0%,
       rgba(0, 0, 0, 0.1) 60%,
       rgba(0, 0, 0, 0.35) 100%
     ),
-    url('/public/assets/others/bg_dark.webp');
+    url('/assets/other/bg_dark.webp'); */
   background-size: cover;
   background-position: center center;
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  padding: .5rem;
 }
 
 .mines-grid {

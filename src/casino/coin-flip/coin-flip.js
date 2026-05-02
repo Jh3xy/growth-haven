@@ -132,7 +132,8 @@ flipBtn?.addEventListener('click', async () => {
     profit:      data.profit,
     multiplier:  data.won ? MULTIPLIER : 0,
     gameLabel:   'Coin Flip',
-    onPlayAgain: resetCoin,
+    onPlayAgain: () => {},
+    // onPlayAgain: resetCoin,
   })
   lucide.createIcons();
 })

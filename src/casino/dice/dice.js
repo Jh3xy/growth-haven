@@ -208,7 +208,7 @@ rollBtn?.addEventListener('click', async () => {
     const dir     = state.direction === 'over' ? 'Over' : 'Under'
     const needed  = `${dir} ${state.target}`
     const check   = data.won ? '✓' : '✗'
-    diceVerdict.textContent = `Rolled ${data.roll} — needed ${needed} ${check}`
+    diceVerdict.textContent = `Rolled ${data.roll} — needed ${needed}`
     diceVerdict.className   =
       `dice-stage__verdict dice-stage__verdict--${data.won ? 'win' : 'loss'}`
   }

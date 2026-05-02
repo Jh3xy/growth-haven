@@ -51,6 +51,7 @@ const limboDisplay    = document.getElementById('limboDisplay')
 const limboMultiplier = document.getElementById('limboMultiplier')
 const limboUnit       = document.getElementById('limboUnit')
 const limboVerdict    = document.getElementById('limboVerdict')
+const rocketScene = document.getElementById("limboRocketScene");
 
 // ─── HELPERS ─────────────────────────────────────────────────
 function setBetError(msg) {
@@ -89,6 +90,8 @@ function setDisplayState(state, value = null) {
   // Clear all state classes first
   limboDisplay?.classList.remove('is-idle', 'is-rolling', 'is-win', 'is-loss')
   limboDisplay?.classList.add(`is-${state}`)
+  rocketScene?.classList.remove("is-idle", "is-rolling", "is-win", "is-loss");
+  rocketScene?.classList.add(`is-${state}`) 
 
   if (state === 'idle') {
     if (limboMultiplier) limboMultiplier.textContent = '—'
@@ -160,6 +163,15 @@ rollBtn?.addEventListener('click', async () => {
   }
   if (hasError) return
 
+  // Client-side balance guard — prevents animation on obvious failures.
+  // Server still validates authoritatively; this just avoids the visual glitch.
+  const rawBalance = walletDisplay?.textContent?.replace(/[₦,\s]/g, '') || '0'
+  const currentBalance = parseFloat(rawBalance)
+  if (!isNaN(currentBalance) && currentBalance < bet) {
+    setBetError('Insufficient balance.')
+    return
+  }
+
   setRolling(true)
 
   // RPC + animation run in parallel; we wait for both before rendering result
@@ -188,7 +200,7 @@ rollBtn?.addEventListener('click', async () => {
 
   if (won) {
     setVerdict(
-      `Reached ${Number(result).toFixed(2)}× — target was ${Number(target).toFixed(2)}× ✓`,
+      `Reached ${Number(result).toFixed(2)}× — target was ${Number(target).toFixed(2)}×`,
       'win'
     )
   } else {
@@ -209,13 +221,13 @@ rollBtn?.addEventListener('click', async () => {
 
   showCasinoResult({
     won,
-    betAmount:   bet,
-    payout:      data.payout,
-    profit:      data.profit,
-    multiplier:  won ? target : 0,
-    gameLabel:   'Limbo',
-    onPlayAgain: resetStage,
-  })
+    betAmount: bet,
+    payout: data.payout,
+    profit: data.profit,
+    multiplier: won ? target : 0,
+    gameLabel: "Limbo",
+    onPlayAgain: () => {},
+  });
   lucide.createIcons()
 })
 

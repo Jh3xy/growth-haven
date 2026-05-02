@@ -461,9 +461,28 @@ function showResult(outcome, amount, multiplier = null) {
     multiplier: multiplier ?? 0,
     gameLabel: "Mines",
     onPlayAgain: () => {
-      resetToIdle();
+      // Soft reset — controls only, grid stays showing mine positions
+      state.sessionId = null;
+      state.betAmount = 0;
+      state.revealedTiles = [];
+      state.mineTiles = [];
+      state.multiplier = 1;
+      state.winnings = 0;
+      state.isRevealing = false;
+
+      setBetError("");
+      startBtn.disabled = false;
+      startBtn.innerHTML = `<i data-lucide="play" style="width:16px;height:16px"></i> Start Game`;
+      resetCashoutButton();
+      activeMinesDisplay.textContent = "-";
+      winningsDisplay.textContent = "₦0.00";
+      multiplierDisplay.textContent = "1.00×";
+      activeBetDisplay.textContent = "₦0.00";
+
+      showPhase("idle"); // shows idle controls, disables tiles — no grid rebuild
       const saved = getSavedAmount();
       if (saved) betInput.value = saved;
+      if (window.lucide) lucide.createIcons();
     },
   });
   lucide.createIcons();
