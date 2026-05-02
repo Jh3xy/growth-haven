@@ -15,7 +15,7 @@ import '../casino-modal.css'
 import '../casino-utils.css'
 import './limbo.css'
 
-import { supabase }         from '../../assets/js/supabase.js'
+import { supabase }  from '../../assets/js/supabase.js'
 import { showCasinoResult } from '../casino-modal.js'
 import { formatNaira, initRecentBets } from '../casino-utils.js'
 

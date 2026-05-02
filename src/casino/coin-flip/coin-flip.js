@@ -42,7 +42,6 @@ const chooseHeads    = document.getElementById('chooseHeads')
 const chooseTails    = document.getElementById('chooseTails')
 const flipBtn        = document.getElementById('flipBtn')
 const coinEl         = document.getElementById('coin')
-const coinFaceLabel  = document.getElementById('coinFaceLabel')
 const potentialWinEl = document.getElementById('potentialWin')
 const multiplierEl   = document.getElementById('multiplierDisplay')
 
@@ -65,7 +64,7 @@ function setFlipping(isFlipping) {
   if (chooseHeads) chooseHeads.disabled = isFlipping
   if (chooseTails) chooseTails.disabled = isFlipping
   betChips?.querySelectorAll('.cf-chip').forEach(b => { b.disabled = isFlipping })
-  coinEl?.classList.toggle('coin--spinning', isFlipping)
+  coinEl?.classList.toggle("is-spinning", isFlipping);
 }
 
 async function loadWallet() {
@@ -79,16 +78,13 @@ function selectChoice(c) {
   state.choice = c
   chooseHeads?.classList.toggle('is-selected', c === 'heads')
   chooseTails?.classList.toggle('is-selected', c === 'tails')
-  coinEl?.classList.remove('coin--win', 'coin--lose')
-  if (coinFaceLabel) coinFaceLabel.textContent = c === 'heads' ? 'H' : 'T'
-  coinEl?.classList.toggle('coin--tails', c === 'tails')
+  coinEl?.classList.remove('is-win', 'is-lose')
+  coinEl?.classList.toggle("is-tails", c === "tails");
   setBetError('')
 }
 
 function resetCoin() {
-  coinEl?.classList.remove('coin--win', 'coin--lose', 'coin--tails', 'coin--spinning')
-  if (coinFaceLabel)
-    coinFaceLabel.textContent = state.choice === 'heads' ? 'H' : state.choice === 'tails' ? 'T' : '?'
+  coinEl?.classList.remove("is-win", "is-lose", "is-tails", "is-spinning");
 }
 
 // ─── CHOICE BUTTONS ──────────────────────────────────────────
@@ -116,11 +112,9 @@ flipBtn?.addEventListener('click', async () => {
     return
   }
 
-  // Update coin to show actual outcome
-  if (coinFaceLabel) coinFaceLabel.textContent = data.outcome === 'heads' ? 'H' : 'T'
-  coinEl?.classList.remove('coin--tails')
-  coinEl?.classList.toggle('coin--tails', data.outcome === 'tails')
-  coinEl?.classList.add(data.won ? 'coin--win' : 'coin--lose')
+  coinEl?.classList.remove('is-tails')
+  coinEl?.classList.toggle('is-tails', data.outcome === 'tails')
+  coinEl?.classList.add(data.won ? "is-win" : "is-lose");
 
   if (walletDisplay) walletDisplay.textContent = formatNaira(data.new_balance)
 

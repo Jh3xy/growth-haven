@@ -60,54 +60,59 @@
       <div class="cf-stage">
 
         <div class="cf-coin-wrap">
-          <div class="cf-coin" id="coin">
-            <span class="cf-coin__label" id="coinFaceLabel">?</span>
+          <div class="cf-coin__inner" id="coin">
+            <div class="cf-coin__face cf-coin__face--heads">
+              <img src="/assets/other/heads.png" alt="Heads" draggable="false" style="user-select: none;"/>
+            </div>
+            <div class="cf-coin__face cf-coin__face--tails">
+              <img src="/assets/other/tails.png" alt="Tails" draggable="false" style="user-select: none;"/>
+            </div>
           </div>
         </div>
-
       </div>
+
       <!-- ═══ CONTROLS ═══ -->
       <div class="cf-controls-wrap">
         <div class="dash-card cf-controls">
 
-          <div>
-            <h1 class="cf-controls__title">Coin Flip</h1>
-            <p class="cf-controls__sub">Pick a side. Double or nothing.</p>
-          </div>
-
           <!-- Bet amount -->
           <div class="cf-field">
             <label class="cf-label" for="betAmount">Bet Amount (₦)</label>
-            <input
-              class="cf-input"
-              id="betAmount"
-              type="number"
-              min="500"
-              placeholder="Enter amount"
-              inputmode="numeric"
-            />
+            <div class="cf-input-wrap">
+              <input
+                class="cf-input"
+                id="betAmount"
+                type="number"
+                min="500"
+                placeholder="Enter amount"
+                inputmode="numeric"
+              />
+              <div class="cf-chips" id="betChips">
+                <button class="cf-chip" type="button" data-bet="10000">₦10K</button>
+                <button class="cf-chip" type="button" data-bet="50000">₦50K</button>
+              </div>
+            </div>
             <span class="cf-field-error" id="betError"></span>
           </div>
 
-          <!-- Quick chips -->
-          <div class="cf-chips" id="betChips">
-            <button class="cf-chip" type="button" data-bet="5000">₦5K</button>
-            <button class="cf-chip" type="button" data-bet="10000">₦10K</button>
-            <button class="cf-chip" type="button" data-bet="50000">₦50K</button>
-            <button class="cf-chip" type="button" data-bet="100000">₦100K</button>
-          </div>
-
           <!-- Choose side -->
+           <!-- TODO: Add coin flip image in each button head and tail /assets/others.... -->
           <div class="cf-field">
-            <label class="cf-label">Pick Your Side</label>
+            <label class="cf-label">Pick A Side</label>
             <div class="cf-choice-row">
               <button class="cf-choice-btn" id="chooseHeads" type="button">
+                <div class="cf-choice-img">
+                  <img src="/assets/other/heads.png" alt="heads">
+                </div>
                 Heads
-                <span class="cf-choice-btn__sub">Green</span>
+                <!-- <span class="cf-choice-btn__sub">Green</span> -->
               </button>
               <button class="cf-choice-btn" id="chooseTails" type="button">
+                 <div class="cf-choice-img">
+                  <img src="/assets/other/tails.png" alt="tails">
+                </div>
                 Tails
-                <span class="cf-choice-btn__sub">Amber</span>
+                <!-- <span class="cf-choice-btn__sub">Amber</span> -->
               </button>
             </div>
           </div>

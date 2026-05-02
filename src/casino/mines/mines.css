@@ -602,6 +602,18 @@ html[data-theme='dark'] .mines-stat-value--green {
   margin-top: 1.4rem;
   align-items: center;
   justify-content: center;
+
+  background-image:
+    linear-gradient(to top,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.1) 60%,
+      rgba(0, 0, 0, 0.35) 100%
+    ),
+    url('/public/assets/others/bg_dark.webp');
+  background-size: cover;
+  background-position: center center;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
 }
 
 .mines-grid {
@@ -610,6 +622,9 @@ html[data-theme='dark'] .mines-stat-value--green {
   gap: 0.5rem;
   width: 100%;
   max-width: 500px;
+
+  position: relative;
+  z-index: 1;
 }
 
 

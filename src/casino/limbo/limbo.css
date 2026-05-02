@@ -167,8 +167,31 @@
   gap: 0.5rem;
 }
 
+.limbo-input-wrap{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  /* padding: 0.75rem 1rem; */
+  background: var(--surface-input, var(--surface-card));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--ff-primary);
+  font-size: 0.9375rem;
+  font-weight: var(--fw-medium);
+  outline: none;
+  transition:
+    border-color var(--transition-global),
+    box-shadow var(--transition-global);
+  box-sizing: border-box;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
 .limbo-label {
-  font-size: 0.75rem;
+  font-size: 0.56rem;
   font-weight: var(--fw-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -194,12 +217,24 @@
   -moz-appearance: textfield;
 }
 
+
+.limbo-input::placeholder{
+  font-size: .8rem;
+}
+.limbo-input-wrap .limbo-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  outline: none;
+  background: transparent !important;
+}
+
 .limbo-input::-webkit-outer-spin-button,
 .limbo-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
-
-.limbo-input:focus {
+.limbo-input:not(.input-alt):focus,
+.limbo-input-wrap:has(.limbo-input:focus) {
   border-color: var(--brand-primary);
   box-shadow: 0 0 0 3px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.15);
 }
@@ -220,13 +255,13 @@
 .limbo-chips {
   display: flex;
   gap: 0.4rem;
-  flex-wrap: wrap;
+  margin-right: 4px;
 }
 
 .limbo-chip {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 0.45rem 0.5rem;
+  padding: 0.5rem;
   background: var(--surface-subtle, var(--surface-card));
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -332,6 +367,7 @@
 
 .limbo-stage-col {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
@@ -344,6 +380,17 @@
   gap: 1.5rem;
   padding: 3rem 1rem;
   width: 100%;
+
+  background-image: linear-gradient(
+    to top, rgba(0, 0, 0, 0.65) 0%, 
+    rgba(0, 0, 0, 0.25) 10%,
+    rgba(0, 0, 0, 0.45) 100% ), 
+    url('/assets/other/limbo-bg.png');
+  background-size: cover;
+  background-position: center bottom;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 340px;
 }
 
 /* ── DISPLAY — the big number ────────────────────────────────── */

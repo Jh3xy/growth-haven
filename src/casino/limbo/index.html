@@ -54,10 +54,10 @@
   <main class="limbo-main">
     <div class="limbo-layout">
 
-      <div id="recentBetsMount"></div>
-
+      
       <!-- ═══ STAGE (right on desktop) ═══ -->
       <div class="limbo-stage-col">
+        <div id="recentBetsMount"></div>
         <div class="limbo-stage">
 
           <div class="limbo-display" id="limboDisplay">
@@ -74,33 +74,33 @@
       <div class="limbo-controls-col">
         <div class="dash-card limbo-controls">
 
-
-          <div class="limbo-controls__head">
-            <h1 class="limbo-controls__title">Limbo</h1>
-            <p class="limbo-controls__sub">Set your target. The higher the risk, the bigger the reward.</p>
-          </div>
-
           <!-- Bet amount -->
           <div class="limbo-field">
             <label class="limbo-label" for="betAmount">Bet Amount (₦)</label>
-            <input
-              class="limbo-input"
-              id="betAmount"
-              type="number"
-              min="500"
-              placeholder="Enter amount"
-              inputmode="numeric"
-            />
+            <div class="limbo-input-wrap">
+              <input
+                class="limbo-input input-alt"
+                id="betAmount"
+                type="number"
+                min="500"
+                placeholder="Enter amount"
+                inputmode="numeric"
+              />
+              <div class="limbo-chips" id="betChips">
+                <button class="limbo-chip" type="button" data-bet="10000">₦10K</button>
+                <button class="limbo-chip" type="button" data-bet="50000">₦50K</button>
+              </div>
+            </div>
             <span class="limbo-field-error" id="betError"></span>
           </div>
 
           <!-- Quick chips -->
-          <div class="limbo-chips" id="betChips">
+          <!-- <div class="limbo-chips" id="betChips">
             <button class="limbo-chip" type="button" data-bet="5000">₦5K</button>
             <button class="limbo-chip" type="button" data-bet="10000">₦10K</button>
             <button class="limbo-chip" type="button" data-bet="50000">₦50K</button>
             <button class="limbo-chip" type="button" data-bet="100000">₦100K</button>
-          </div>
+          </div> -->
 
           <!-- Target multiplier -->
           <div class="limbo-field">

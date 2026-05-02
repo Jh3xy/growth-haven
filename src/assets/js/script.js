@@ -412,14 +412,14 @@ const nav = document.getElementById('nav');
 const hamburger = document.getElementById('navHamburger');
 const drawer    = document.getElementById('navDrawer');
 
-hamburger.addEventListener('click', () => {
+hamburger?.addEventListener('click', () => {
   const isOpen = drawer.classList.toggle('nav__drawer--open');
   hamburger.setAttribute('aria-expanded', String(isOpen));
   drawer.setAttribute('aria-hidden', String(!isOpen));
 });
 
 // Close drawer on drawer link click
-drawer.querySelectorAll('a').forEach(link => {
+drawer?.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     drawer.classList.remove('nav__drawer--open');
     hamburger.setAttribute('aria-expanded', 'false');

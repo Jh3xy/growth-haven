@@ -52,11 +52,11 @@
   <!-- MAIN -->
   <main class="dice-main">
     <div class="dice-layout">
-      <!-- Recent bets accordion: first child of card -->
-      <div id="recentBetsMount"></div>
-
+      
       <!-- ═══ STAGE (right on desktop) ═══ -->
       <div class="dice-stage-col">
+        <!-- Recent bets accordion: first child of card -->
+        <div id="recentBetsMount"></div>
         <div class="dice-stage">
           <div class="dice-face" id="diceFace">
             <div class="dice-face__pip-grid" id="dicePips" aria-hidden="true">
@@ -72,31 +72,29 @@
       <div class="dice-controls-col">
         <div class="dash-card dice-controls">
 
-          <div class="dice-controls__head">
+          <!-- <div class="dice-controls__head">
             <h1 class="dice-controls__title">Dice</h1>
             <p class="dice-controls__sub">Predict the roll. Set your risk.</p>
-          </div>
+          </div> -->
 
           <!-- Bet amount -->
           <div class="dice-field">
             <label class="dice-label" for="betAmount">Bet Amount (₦)</label>
-            <input
-              class="dice-input"
-              id="betAmount"
-              type="number"
-              min="500"
-              placeholder="Enter amount"
-              inputmode="numeric"
-            />
+            <div class="dice-input-wrap">
+              <input
+                class="dice-input"
+                id="betAmount"
+                type="number"
+                min="500"
+                placeholder="Enter amount"
+                inputmode="numeric"
+              />
+              <div class="dice-chips" id="betChips">
+                <button class="dice-chip" type="button" data-bet="10000">₦10K</button>
+                <button class="dice-chip" type="button" data-bet="50000">₦50K</button>
+              </div>
+            </div>
             <span class="dice-field-error" id="betError"></span>
-          </div>
-
-          <!-- Quick chips -->
-          <div class="dice-chips" id="betChips">
-            <button class="dice-chip" type="button" data-bet="5000">₦5K</button>
-            <button class="dice-chip" type="button" data-bet="10000">₦10K</button>
-            <button class="dice-chip" type="button" data-bet="50000">₦50K</button>
-            <button class="dice-chip" type="button" data-bet="100000">₦100K</button>
           </div>
 
           <!-- Direction toggle -->
