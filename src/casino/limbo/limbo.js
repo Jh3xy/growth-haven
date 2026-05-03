@@ -174,7 +174,7 @@ rollBtn?.addEventListener('click', async () => {
 
   setRolling(true)
 
-  // RPC + animation run in parallel; we wait for both before rendering result
+  // RPC + animation run in parallel; wait for both before rendering result
   const [{ data, error }] = await Promise.all([
     supabase.rpc('play_limbo', {
       p_bet_amount:        bet,

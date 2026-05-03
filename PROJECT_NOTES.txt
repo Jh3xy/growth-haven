@@ -9,3 +9,169 @@ deposit bonus - still undecided :
     - Implement logic to verify transaction reference and update 'investments' table.
     - Set up automated referral commission payouts upon successful deposit verification.
     - Ensure webhook signature validation is active for security.
+
+
+
+
+I am building GrowthHaven, a FinTech/casino web platform. Stack: Vite MPA, vanilla HTML/CSS/JS, Supabase (auth + Postgres + RLS). No frameworks, no Tailwind.
+
+I am adding a Plinko game.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROJECT CONVENTIONS — MUST FOLLOW EXACTLY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tech stack & constraints:
+- Build tool: Vite (MPA). All HTML entry points registered in vite.config.js build.rollupOptions.input
+- Backend/auth: Supabase
+- Frontend: Pure HTML, CSS, vanilla JS — no frameworks
+- Icons: Lucide via CDN, initialized with lucide.createIcons()
+- CSS: Modular files, CSS imported through the JS entry file (NOT via <link> tags in HTML)
+- Font: General Sans
+
+File structure:
+- All casino games live at src/casino/<game>/index.html + <game>.js + <game>.css
+- Shared casino modules: src/casino/casino-modal.js + casino-modal.css
+- Shared casino utilities: src/casino/casino-utils.js + casino-utils.css
+- Supabase client: src/assets/js/supabase.js
+- Plinko will live at: src/casino/plinko/index.html, plinko.js, plinko.css
+- Background image already downloaded and will be placed at /assets/other/plinko-bg.png (I adjust paths myself)
+
+CSS import order in JS (MUST match exactly — copy from dice.js which is attached):
+  import '../../assets/styles/fonts.css'
+  import '../../assets/styles/variables.css'
+  import '../../assets/styles/utils.css'
+  import '../../assets/styles/style.css'
+  import '../../assets/styles/animations.css'
+  import '../../assets/styles/landing.css'
+  import '../../assets/styles/queries.css'
+  import '../../assets/styles/dashboard.css'
+  import '../mines/mines.css'       ← always imported for shared header/global styles
+  import '../casino-modal.css'
+  import '../casino-utils.css'
+  import './plinko.css'
+
+Auth pattern (top-level await, always):
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { window.location.href = '/src/login/'; throw new Error('[plinko] No session') }
+
+Header markup: copy EXACTLY from the attached dice/index.html (same logo, wallet chip id="walletDisplay", back-to-casino link, theme toggle, music toggle with id="musicToggle").
+
+Shared result modal: showCasinoResult({ won, betAmount, payout, profit, multiplier, gameLabel, onPlayAgain }) — attached casino-modal.js. No HTML needed.
+
+Shared recent bets: initRecentBets('plinko', mountEl) returns { prepend } — attached casino-utils.js. Mount div id="recentBetsMount" goes as first child of the controls card.
+
+Database:
+- casino_rounds table — columns: user_id, game_type, bet_amount, outcome_won, payout_amount, profit, multiplier, metadata, created_at
+- get_game_history(p_game_type, p_limit) RPC already exists — used by recent bets accordion
+- members table has wallet_balance (numeric)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PLINKO GAME DESIGN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+How it works:
+- Player sets bet amount and picks a Risk level: Low / Medium / High
+- Player also picks row count: 8, 12, or 16 rows of pegs
+- Server generates a random binary path (Left or Right at each peg row)
+- Final bucket index = number of Right turns (0 = leftmost, rows = rightmost)
+- Each bucket has a multiplier — symmetric, higher risk = wider spread
+- Win condition: always resolves (no loss state per se — every bucket pays something, some < 1× = net loss)
+
+Multiplier tables (these go in the RPC as a 2D lookup):
+  Low risk:
+    8 rows:  [5.6, 2.1, 1.1, 1.0, 0.5, 1.0, 1.1, 2.1, 5.6]
+    12 rows: [8.9, 3.0, 1.4, 1.1, 1.0, 0.5, 1.0, 1.1, 1.4, 3.0, 8.9] -- 13 buckets
+    16 rows: [15.0, 4.0, 2.0, 1.4, 1.1, 1.0, 0.7, 0.5, 0.7, 1.0, 1.1, 1.4, 2.0, 4.0, 15.0] -- wait, 17 buckets
+  Medium risk:
+    8 rows:  [13.0, 3.0, 1.3, 0.7, 0.4, 0.7, 1.3, 3.0, 13.0]
+    12 rows: [24.0, 5.0, 2.0, 0.9, 0.5, 0.3, 0.5, 0.9, 2.0, 5.0, 24.0] -- wait
+  High risk:
+    8 rows:  [29.0, 4.0, 1.5, 0.3, 0.2, 0.3, 1.5, 4.0, 29.0]
+    12 rows: [46.0, 6.0, 2.0, 0.5, 0.2, 0.2, 0.5, 2.0, 6.0, 46.0] -- wait
+
+NOTE on bucket count: for N rows there are N+1 buckets. You define the exact multiplier arrays in the RPC — design them so they are always symmetric and always house-edge-correct. Use a v_house_edge numeric := 0.01 variable at the top of the RPC (same pattern as all other games — one place to change, flows through all math).
+
+RPC spec — play_plinko:
+  Parameters: p_bet_amount numeric, p_rows int (8|12|16), p_risk text ('low'|'medium'|'high')
+  SECURITY DEFINER, VOLATILE, search_path = public
+  - Declare v_house_edge numeric := 0.01 as first variable
+  - Validate: p_bet_amount > 0, p_rows IN (8, 12, 16), p_risk IN ('low','medium','high')
+  - Use FOR UPDATE on wallet read
+  - Generate path: array of p_rows booleans (true=right, false=left) using random() < 0.5
+  - bucket_index = count of true values in path (0 to p_rows)
+  - Look up multiplier from hardcoded 2D array by (p_risk, p_rows, bucket_index)
+  - won = multiplier >= 1.0
+  - payout = p_bet_amount * multiplier
+  - profit = payout - p_bet_amount
+  - Insert into casino_rounds: game_type='plinko', multiplier=looked_up_multiplier, metadata={path, bucket_index, rows: p_rows, risk: p_risk}
+  - Return jsonb: { path (bool[]), bucket_index, multiplier, won, payout, profit, new_balance } or { error } on failure
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VISUAL / LAYOUT DESIGN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Layout: controls left (fixed ~320px) / stage right on desktop (min-width: 768px), stacked on mobile. Same grid pattern as dice (attached dice.css + dice/index.html for reference).
+
+Stage:
+- Background image: url('/assets/other/plinko-bg.png') with a dark gradient overlay (same pattern as limbo/dice stages)
+- The peg board is rendered as DOM elements inside the stage — no canvas
+- Peg board structure: N rows of pegs, each row has (row_index + 1) pegs, offset so they sit between the pegs above (triangular Galton board layout)
+- Pegs: small circles, e.g. 8px diameter, rendered via JS into a container div
+- Ball: a single div absolutely positioned, animated step-by-step through the path using CSS transitions + JS timeouts
+- Buckets: a row of divs at the bottom, each showing its multiplier. Color coded: green (>= 2×), yellow (1–2×), red (< 1×). The landing bucket gets a highlight/pulse animation.
+- Ball drop animation: each step takes ~120ms, ball moves from current peg to next row's peg (left or right based on path[i]), so total animation = rows * 120ms ≈ 1–2s
+
+Controls card (inside dash-card, same pattern as dice):
+- recentBetsMount div first
+- Bet amount input + inline chips (₦10K, ₦50K) in the same .input-wrap pattern as limbo/dice
+- Risk selector: 3 toggle buttons (Low / Medium / High) — same pattern as dice direction buttons
+- Row selector: 3 toggle buttons (8 / 12 / 16)
+- Stats strip: Potential Win (updates live), Multiplier range (shows "0.2× – 29×" based on current risk/rows)
+- Drop button (primary CTA, full width, pill shape)
+
+CSS class prefix: plinko- (e.g. .plinko-main, .plinko-stage, .plinko-board, .plinko-peg, .plinko-ball, .plinko-bucket)
+Use GH CSS custom properties only — no hardcoded colors.
+
+JS behavior:
+- On Drop: validate bet > 0, disable controls, call play_plinko RPC
+- While waiting for RPC: show ball at top of board with a "waiting" state (don't animate yet)
+- When RPC responds: animate ball through the returned path array step by step
+- After animation completes: highlight bucket, update wallet, call recentBets.prepend(), call showCasinoResult()
+- onPlayAgain: reset ball to top, clear bucket highlight, re-enable controls (keep previous result visible until next drop)
+- Stats update live on risk/row/bet input changes
+- HOUSE_EDGE = 0.01 constant at top of JS file (mirrors RPC)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT TO GENERATE — IN ORDER, ONE AT A TIME
+Wait for my confirmation before moving to the next step.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. play_plinko Postgres RPC (SQL)
+2. plinko/index.html — wait for confirmation
+3. plinko.css — wait for confirmation  
+4. plinko.js — wait for confirmation
+5. vite.config.js addition: add plinko: resolve(__dirname, 'src/casino/plinko/index.html') to build.rollupOptions.input
+
+Output format: artifacts or inline code only — never plain prose code blocks — to preserve context tokens.
+Do not rewrite files entirely when giving instructions; give surgical diffs (find X, replace with Y).
+When you do write a full file (SQL, new CSS, new JS), write it as an artifact.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ATTACHED FILES FOR CONTEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Attach these files to this message:
+1. src/casino/casino-modal.js
+2. src/casino/casino-modal.css
+3. src/casino/casino-utils.js
+4. src/casino/casino-utils.css
+5. src/casino/mines/mines.css         (shared header + global styles)
+6. src/casino/dice/dice.css           (layout/stage pattern reference)
+7. src/casino/dice/index.html         (header markup to copy exactly)
+8. src/casino/dice/dice.js            (CSS import order + JS pattern reference)
+9. vite.config.js                     (so new entry point gets added correctly)
+
+
+
+

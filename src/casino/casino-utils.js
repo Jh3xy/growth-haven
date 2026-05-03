@@ -101,12 +101,7 @@ export function initRecentBets(gameType, mountEl) {
 
     row.innerHTML = `
       <span class="casino-rb__dot casino-rb__dot--${round.outcome_won ? 'win' : 'loss'}"></span>
-      <span class="casino-rb__bet">${formatNaira(round.bet_amount)}</span>
       <span class="casino-rb__mult">${mult}</span>
-      <span class="casino-rb__profit casino-rb__profit--${round.outcome_won ? 'win' : 'loss'}">
-        ${sign}${formatNaira(amount)}
-      </span>
-      <span class="casino-rb__time">${timeAgo(round.created_at)}</span>
     `
     return row
   }
