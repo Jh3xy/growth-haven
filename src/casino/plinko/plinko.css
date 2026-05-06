@@ -1,5 +1,3 @@
-
-
 /* ============================================================
    plinko.css — GrowthHaven Plinko Game
    src/casino/plinko/plinko.css
@@ -11,7 +9,7 @@
 ─────────────────────────────────────────────────────────────── */
 
 .plinko-tri-row {
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
 }
 
 /* ── STAGE ───────────────────────────────────────────────────
@@ -23,15 +21,14 @@
   padding: 1.5rem 1rem 1rem;
   min-height: 480px;
   gap: 0;
-
   background-image:
     linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.55) 0%,
-      rgba(0, 0, 0, 0.30) 50%,
-      rgba(0, 0, 0, 0.65) 100%
+      to top,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.3) 4%,
+      rgba(0, 0, 0, 0.5) 100%
     ),
-    url('/assets/other/plinko-bg.png');  /* adjust path if needed */
+    url("/assets/other/plinko-bg.png");
   background-size: cover;
   background-position: center center;
 }
@@ -45,9 +42,14 @@
   position: relative;
   flex: 1;
   width: 100%;
-  max-width: 480px;
+  max-width: min(95vw, 480px);
+  min-width: 220px;
   min-height: 300px;
   margin: 0 auto;
+}
+
+.plinko-board-wrap.plinko-rows-16 {
+  max-width: min(95vw, 560px);
 }
 
 /* ── PEG BOARD ───────────────────────────────────────────────
@@ -58,6 +60,7 @@
 .plinko-board {
   position: absolute;
   inset: 0;
+  overflow: hidden;
 }
 
 /* ── PEGS ────────────────────────────────────────────────────
@@ -66,13 +69,24 @@
 
 .plinko-peg {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: var(--plinko-peg-size, 8px);
+  height: var(--plinko-peg-size, 8px);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.4);
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.7) 45%,
+    rgba(255, 255, 255, 0.18)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 10px rgba(255, 255, 255, 0.16);
   transform: translate(-50%, -50%);
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 /* Highlight peg that ball is passing through */
@@ -90,14 +104,14 @@
 
 .plinko-ball {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: var(--plinko-ball-size, 16px);
+  height: var(--plinko-ball-size, 16px);
   border-radius: 50%;
   background: radial-gradient(
     circle at 35% 35%,
-    rgba(255, 255, 255, 0.9),
-    var(--brand-primary) 60%,
-    hsla(var(--h-primary), var(--s-primary), calc(var(--l-primary) - 15%), 1)
+    rgba(255, 255, 255, 0.95),
+    var(--brand-primary) 52%,
+    hsla(var(--h-primary), var(--s-primary), calc(var(--l-primary) - 12%), 1)
   );
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.5),
@@ -105,8 +119,9 @@
   transform: translate(-50%, -50%);
   z-index: 10;
   /* Motion transition set per-step by JS (120ms) */
-  transition: top 0.12s cubic-bezier(0.45, 0.05, 0.55, 0.95),
-              left 0.12s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  transition:
+    top 0.12s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+    left 0.12s cubic-bezier(0.45, 0.05, 0.55, 0.95);
   pointer-events: none;
 }
 
@@ -116,8 +131,17 @@
 }
 
 @keyframes ball-pulse {
-  0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 2px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.5); }
-  50%       { box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 0 6px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.2); }
+  0%,
+  100% {
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.5),
+      0 0 0 2px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.5);
+  }
+  50% {
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.5),
+      0 0 0 6px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.2);
+  }
 }
 
 /* Hidden when no round is active */
@@ -135,24 +159,34 @@
 .plinko-buckets {
   display: flex;
   width: 100%;
-  max-width: 480px;
+  max-width: min(95vw, 480px);
   margin: 0 auto;
-  gap: 2px;
+  gap: 3px;
   padding-top: 6px;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.plinko-buckets.plinko-rows-16 {
+  max-width: min(95vw, 560px);
+  gap: 1px;
 }
 
 /* Individual bucket */
 .plinko-bucket {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 2px;
+  padding: 6px 4px;
   border-radius: var(--radius-sm);
-  font-size: 0.5rem;
+  font-size: 0.58rem;
   font-weight: var(--fw-bold);
   letter-spacing: 0.01em;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: 1px solid transparent;
   transition:
     background var(--transition-global),
@@ -160,6 +194,11 @@
     transform 0.15s var(--spring),
     box-shadow 0.15s ease;
   cursor: default;
+}
+
+.plinko-buckets.plinko-rows-16 .plinko-bucket {
+  padding: 4px 2px;
+  font-size: 0.5rem;
 }
 
 /* ── BUCKET COLOUR TIERS ─────────────────────────────────────
@@ -174,18 +213,18 @@
   color: var(--status-success-text);
 }
 
-html[data-theme='dark'] .plinko-bucket--green {
+html[data-theme="dark"] .plinko-bucket--green {
   color: var(--status-success);
 }
 
 .plinko-bucket--yellow {
   background: hsla(45, 90%, 50%, 0.12);
-  border-color: hsla(45, 90%, 50%, 0.30);
+  border-color: hsla(45, 90%, 50%, 0.3);
   color: hsl(40, 85%, 45%);
 }
 
-html[data-theme='dark'] .plinko-bucket--yellow {
-  background: hsla(45, 90%, 50%, 0.10);
+html[data-theme="dark"] .plinko-bucket--yellow {
+  background: hsla(45, 90%, 50%, 0.1);
   border-color: hsla(45, 90%, 50%, 0.25);
   color: hsl(45, 90%, 60%);
 }
@@ -196,7 +235,7 @@ html[data-theme='dark'] .plinko-bucket--yellow {
   color: var(--status-error-text);
 }
 
-html[data-theme='dark'] .plinko-bucket--red {
+html[data-theme="dark"] .plinko-bucket--red {
   color: var(--status-error);
 }
 
@@ -211,25 +250,36 @@ html[data-theme='dark'] .plinko-bucket--red {
 }
 
 .plinko-bucket--green.is-landed {
-  box-shadow: 0 0 0 2px var(--status-success),
-              0 4px 16px rgba(34, 197, 94, 0.35);
+  box-shadow:
+    0 0 0 2px var(--status-success),
+    0 4px 16px rgba(34, 197, 94, 0.35);
 }
 
 .plinko-bucket--yellow.is-landed {
-  box-shadow: 0 0 0 2px hsl(45, 90%, 50%),
-              0 4px 16px hsla(45, 90%, 50%, 0.35);
+  box-shadow:
+    0 0 0 2px hsl(45, 90%, 50%),
+    0 4px 16px hsla(45, 90%, 50%, 0.35);
 }
 
 .plinko-bucket--red.is-landed {
-  box-shadow: 0 0 0 2px var(--status-error),
-              0 4px 16px rgba(239, 68, 68, 0.35);
+  box-shadow:
+    0 0 0 2px var(--status-error),
+    0 4px 16px rgba(239, 68, 68, 0.35);
 }
 
 @keyframes bucket-land {
-  0%   { transform: scaleY(1);    }
-  40%  { transform: scaleY(1.18); }
-  70%  { transform: scaleY(0.96); }
-  100% { transform: scaleY(1.12); }
+  0% {
+    transform: scaleY(1);
+  }
+  40% {
+    transform: scaleY(1.18);
+  }
+  70% {
+    transform: scaleY(0.96);
+  }
+  100% {
+    transform: scaleY(1.12);
+  }
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────────
@@ -241,9 +291,16 @@ html[data-theme='dark'] .plinko-bucket--red {
     min-height: 400px;
   }
 
+  .plinko-board-wrap {
+    max-width: min(95vw, 380px);
+  }
+
   .plinko-bucket {
-    font-size: 0.45rem;
-    padding: 4px 1px;
+    font-size: 0.52rem;
+    padding: 4px 0.75rem;
+  }
+  #rows16 {
+    display: none;
   }
 }
 
