@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plinko — GrowthHaven</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="../../assets/js/script.js"></script>
+  <script type="module" src="./plinko.js"></script>
+</head>
+<body>
+
+  <!-- ── HEADER ──────────────────────────────────────────────── -->
+  <header class="cf-header">
+    <div class="cf-header__inner">
+      <div class="mines-header-wrap">
+        <div class="site-header__logo flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+               class="site-header__wordmark" aria-hidden="true" focusable="false">
+            <g fill="currentColor">
+              <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+            </g>
+          </svg>
+          <span class="site-header__wordmark">GrowthHaven</span>
+        </div>
+        <div class="mines-header__right">
+          <button class="dash-theme-toggle flex items-center gap-2" type="button" data-theme-toggle>
+            <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
+            <span class="dash-theme-toggle__label" data-theme-label>Dark mode</span>
+          </button>
+          <div class="mines-wallet-chip flex items-center gap-2">
+            <i data-lucide="wallet" style="width:12px;height:12px"></i>
+            <span id="walletDisplay">₦0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="mines-header__inner-flex">
+        <a href="/src/casino/" class="mines-back-btn" aria-label="Back to casino">
+          <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+          <span>Casino</span>
+        </a>
+        <div class="mines-audio-controls flex gap-1">
+          <button id="musicToggle" class="mines-music-toggle flex items-center" type="button">
+            <i data-lucide="volume-x" style="width:14px;height:14px"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── MAIN ────────────────────────────────────────────────── -->
+  <main class="dice-main">
+    <div class="dice-layout">
+      <!-- Recent bets accordion (always first child) -->
+      <div id="recentBetsMount"></div>
+
+      <!-- ── STAGE ──────────────────────────────────────────── -->
+      <div class="dice-stage-col">
+        <div class="plinko-stage dice-stage">
+
+          <!-- Peg board — JS builds pegs and ball into this -->
+          <div class="plinko-board-wrap">
+            <div class="plinko-ball" id="plinkoBall"></div>
+            <div class="plinko-board" id="plinkoBoard"></div>
+          </div>
+
+          <!-- Bucket row — JS builds buckets into this -->
+          <div class="plinko-buckets" id="plinkoBuckets"></div>
+
+        </div>
+      </div>
+
+
+      <!-- ── CONTROLS ──────────────────────────────────────── -->
+      <aside class="dash-card dice-controls">
+
+        <!-- Bet Amount -->
+        <div class="dice-field">
+          <label class="dice-label" for="betAmount">Bet Amount</label>
+          <div class="dice-input-wrap">
+            <input
+              id="betAmount"
+              class="dice-input"
+              type="number"
+              min="0"
+              step="100"
+              placeholder="Enter Bet Amount"
+              autocomplete="off"
+            />
+            <div class="dice-chips" id="betChips">
+              <button class="dice-chip" type="button" data-bet="10000">₦10K</button>
+              <button class="dice-chip" type="button" data-bet="50000">₦50K</button>
+            </div>
+          </div>
+          <span class="dice-field-error" id="betError"></span>
+        </div>
+
+        <!-- Risk Selector -->
+        <div class="dice-field">
+          <span class="dice-label">Risk</span>
+          <div class="dice-dir-row plinko-tri-row">
+            <button class="dice-dir-btn is-selected" id="riskLow"  type="button" data-risk="low">
+              Low
+              <span class="dice-dir-btn__sub">Safe</span>
+            </button>
+            <button class="dice-dir-btn" id="riskMed"  type="button" data-risk="medium">
+              Medium
+              <span class="dice-dir-btn__sub">Balanced</span>
+            </button>
+            <button class="dice-dir-btn" id="riskHigh" type="button" data-risk="high">
+              High
+              <span class="dice-dir-btn__sub">Volatile</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row Selector -->
+        <div class="dice-field">
+          <span class="dice-label">Rows</span>
+          <div class="dice-dir-row plinko-tri-row">
+            <button class="dice-dir-btn is-selected" id="rows8"  type="button" data-rows="8">
+              8
+              <span class="dice-dir-btn__sub">Rows</span>
+            </button>
+            <button class="dice-dir-btn" id="rows12" type="button" data-rows="12">
+              12
+              <span class="dice-dir-btn__sub">Rows</span>
+            </button>
+            <button class="dice-dir-btn" id="rows16" type="button" data-rows="16">
+              16
+              <span class="dice-dir-btn__sub">Rows</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Strip -->
+        <div class="dice-stats">
+          <div class="dice-stat">
+            <span class="dice-stat__label">Potential Win</span>
+            <span class="dice-stat__value dice-stat__value--accent" id="potentialWin">₦0.00</span>
+          </div>
+          <div class="dice-stat">
+            <span class="dice-stat__label">Max Multi</span>
+            <span class="dice-stat__value" id="maxMult">5.6×</span>
+          </div>
+          <div class="dice-stat">
+            <span class="dice-stat__label">Min Multi</span>
+            <span class="dice-stat__value" id="minMult">0.5×</span>
+          </div>
+        </div>
+
+        <!-- Drop button -->
+        <button class="dice-roll-btn" id="dropBtn" type="button">
+          <i data-lucide="circle-dot"></i>
+          Drop Ball
+        </button>
+
+      </aside>
+    </div><!-- /.dice-layout -->
+  </main>
+
+  <script>
+    lucide.createIcons()
+  </script>
+</body>
+</html>
