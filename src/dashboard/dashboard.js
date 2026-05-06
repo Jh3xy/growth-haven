@@ -84,11 +84,15 @@ if (user) {
 
   // 2. Wait for flags to be ready, then check
   posthog.onFeatureFlags(() => {
-      if (posthog.isFeatureEnabled('casino-beta-flag')) {
-          console.log('🎰 Casino access granted');
-          // Show your casino UI element here
-          document.getElementById('nav-games-casino').classList.remove('hidden');
-      }
+    if (posthog.isFeatureEnabled('casino-beta-flag')) {
+      console.log('🎰 Casino access granted');
+      // Show your casino UI element here
+      document.getElementById('nav-games-casino').classList.remove('hidden');
+    }
+    if (posthog.isFeatureEnabled("blog-access")) {
+      document.getElementById('nav-blog-btn').classList.remove('hidden');
+      console.log("📰 Blog access granted");
+    }
   });
 }
 
@@ -400,7 +404,7 @@ function openSidebar() {
 
 
 // Define valid sections outside the function for better performance
-const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'support', 'transact', 'sports', 'invest']);
+const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'support', 'blog', 'transact', 'sports', 'invest']);
 
 export function switchSection(name) {
   //Validate the input. If it's trash, default to 'home'.

@@ -1,0 +1,782 @@
+
+
+GROWTH-HAVEN PROJECT TODOS - Project additions, features, bug fixes, updates and general planning (Post and Pre MVP)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+BLOG FEATURE (Twitter/X Style Feed + Likes + Wallet Rewards)
+═══════════════════════════════════════════════════════════════════════════════
+
+OVERVIEW:
+  Self-contained blog/feed section where users can post content, like others' posts, and earn wallet credits.
+  - Liker earns ₦100 per like
+  - Post owner earns ₦200 when someone likes their post
+  - Gated for users who haven't deposited yet (glass overlay with CTA)
+  - Comments postponed to Phase 2
+
+IMPLEMENTATION ORDER:
+  1. Database Setup & Add Blog section gated with postHog feature flag too dashboard.js line 91 - 96
+  2. Post Creation Page
+  3. Feed Section (gated + ungated states)
+  4. Like functionality + wallet integration
+  5. Dummy data seeding
+  6. Real-time subscriptions
+  7. Polish & testing
+
+
+─────────────────────────────────────────────────────────────────────────────
+① DATABASE SETUP (Supabase) - confirm from /src/types/supabase.ts file
+─────────────────────────────────────────────────────────────────────────────
+
+□ Create posts table:
+  CREATE TABLE posts (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id uuid REFERENCES members(id) ON DELETE CASCADE,
+    content text NOT NULL,
+    created_at timestamp DEFAULT NOW(),
+    is_dummy boolean DEFAULT false
+  );
+
+□ Create likes table:
+  CREATE TABLE likes (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    post_id uuid REFERENCES posts(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES members(id) ON DELETE CASCADE,
+    created_at timestamp DEFAULT NOW(),
+    UNIQUE(post_id, user_id) -- prevent double likes
+  );
+
+□ Create indexes for performance:
+  CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
+  CREATE INDEX idx_likes_post_user ON likes(post_id, user_id);
+  CREATE INDEX idx_posts_user_id ON posts(user_id);
+
+□ Create Postgres function for wallet credits on like:
+  CREATE OR REPLACE FUNCTION process_post_like(
+      p_post_id uuid,
+      p_liker_id uuid
+  ) RETURNS json AS $$
+  DECLARE
+      v_post_owner_id uuid;
+      v_already_liked boolean;
+  BEGIN
+      -- Check if already liked
+      SELECT EXISTS(
+          SELECT 1 FROM likes 
+          WHERE post_id = p_post_id AND user_id = p_liker_id
+      ) INTO v_already_liked;
+
+      IF v_already_liked THEN
+          RAISE EXCEPTION 'You have already liked this post';
+      END IF;
+
+      -- Get post owner
+      SELECT user_id INTO v_post_owner_id
+      FROM posts 
+      WHERE id = p_post_id;
+
+      IF v_post_owner_id IS NULL THEN
+          RAISE EXCEPTION 'Post not found';
+      END IF;
+
+      -- Prevent self-liking
+      IF v_post_owner_id = p_liker_id THEN
+          RAISE EXCEPTION 'You cannot like your own post';
+      END IF;
+
+      -- Everything in one transaction
+      BEGIN
+          -- Insert like
+          INSERT INTO likes (post_id, user_id)
+          VALUES (p_post_id, p_liker_id);
+
+          -- Credit liker ₦100
+          UPDATE members
+          SET wallet_balance = wallet_balance + 100
+          WHERE id = p_liker_id;
+
+          -- Credit post owner ₦200
+          UPDATE members
+          SET wallet_balance = wallet_balance + 200
+          WHERE id = v_post_owner_id;
+
+          -- Log transactions
+          INSERT INTO transactions (user_id, type, label, amount) VALUES
+              (p_liker_id, 'blog_like_reward', 'Liked a post', 100),
+              (v_post_owner_id, 'blog_post_reward', 'Post was liked', 200);
+
+          RETURN json_build_object(
+              'success', true, 
+              'liker_earned', 100, 
+              'owner_earned', 200
+          );
+
+      EXCEPTION WHEN OTHERS THEN
+          RAISE EXCEPTION 'Transaction failed: %', SQLERRM;
+      END;
+  END;
+  $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+□ Set up RLS policies:
+  -- Anyone can read posts
+  CREATE POLICY "Posts are viewable by everyone" 
+  ON posts FOR SELECT 
+  USING (true);
+  
+  -- Users can only create posts for themselves
+  CREATE POLICY "Users can create their own posts" 
+  ON posts FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+  
+  -- Users can only delete their own posts
+  CREATE POLICY "Users can delete their own posts" 
+  ON posts FOR DELETE 
+  USING (auth.uid() = user_id);
+  
+  -- Anyone can read likes
+  CREATE POLICY "Likes are viewable by everyone" 
+  ON likes FOR SELECT 
+  USING (true);
+  
+  -- Users can only like as themselves (function handles uniqueness)
+  CREATE POLICY "Users can create likes" 
+  ON likes FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+  
+  -- Users can only unlike their own likes
+  CREATE POLICY "Users can delete their own likes" 
+  ON likes FOR DELETE 
+  USING (auth.uid() = user_id);
+
+□ Add has_deposited flag to members table (if not already present):
+  ALTER TABLE members ADD COLUMN IF NOT EXISTS has_deposited boolean DEFAULT false;
+  
+  -- Create trigger to set has_deposited = true on first successful deposit
+  CREATE OR REPLACE FUNCTION mark_first_deposit() RETURNS TRIGGER AS $$
+  BEGIN
+    IF NEW.type = 'deposit' AND NEW.status = 'completed' THEN
+      UPDATE members 
+      SET has_deposited = true 
+      WHERE id = NEW.user_id AND has_deposited = false;
+    END IF;
+    RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;
+  
+  CREATE TRIGGER on_deposit_completion
+  AFTER INSERT ON transactions
+  FOR EACH ROW
+  EXECUTE FUNCTION mark_first_deposit();
+
+
+─────────────────────────────────────────────────────────────────────────────
+② POST CREATION PAGE (/src/post/)
+─────────────────────────────────────────────────────────────────────────────
+
+□ Create /src/post/index.html (separate from SPA, like casino):
+  - Minimal layout: user avatar, name, textarea, submit button
+  - Auth guard on page load (redirect to login if no session)
+  - Form validation: content required, max 500 characters
+  - On submit: insert into posts table, redirect to dashboard feed section
+
+□ Update vite.config.js to include /src/post/ as entry point:
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        dashboard: resolve(__dirname, 'src/dashboard/index.html'),
+        post: resolve(__dirname, 'src/post/index.html'),
+        // ... other entries
+      }
+    }
+  }
+
+□ Create /src/post/post.js:
+  - Auth check with supabase.auth.getSession()
+  - Fetch user data (name, avatar)
+  - Handle form submit
+  - Character counter for textarea
+  - Loading state on submit button
+  - Toast notification on success/error
+
+□ Style /src/post/post.css:
+  - Clean, Twitter-like compose UI - but follow the current design system
+  - Mobile-first responsive
+  - Focus on the textarea
+  - Floating action buttons (Cancel, Post)
+
+
+─────────────────────────────────────────────────────────────────────────────
+③ SPA DASHBOARD - FEED SECTION
+─────────────────────────────────────────────────────────────────────────────
+
+□ I added "Blog" navigation button in sidebar and the section which works with the current spa navigation system
+
+□ edit #section-blog in dashboard/index.html:
+  - Section header ("Blog Feed", subtitle)
+  - Floating "Post" button (bottom-left, similar to TG button)
+  - Feed container (#blogFeed)
+  - "Load More" button at bottom
+  - Empty state (shown when no posts exist yet)
+
+□ Gating overlay (shown when user hasn't deposited):
+  <div class="blog-gate-overlay flex-col-center" id="blogGateOverlay">
+    <div class="blog-gate-card flex-col-center">
+      <div class="blog-gate-icon flex-center">
+        <i data-lucide="lock" style="width:28px;height:28px"></i>
+      </div>
+      <h3 class="blog-gate-title">Start Earning from Posts</h3>
+      <p class="blog-gate-text">
+        Deposit to unlock the feed and earn ₦100 for every post you like.
+        Post owners earn ₦200 when you like their content.
+      </p>
+      <button class="blog-gate-cta" id="blogGateDepositBtn">
+        <i data-lucide="arrow-down-to-line" style="width:16px;height:16px"></i>
+        Make Your First Deposit
+      </button>
+    </div>
+  </div>
+
+□ CSS for gating overlay:
+  .blog-gate-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6); /* dark mode */
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    display: none; /* shown via JS when needed */
+  }
+  
+  .is-gated .blog-gate-overlay {
+    display: flex;
+  }
+  
+  .blog-gate-card {
+    max-width: 400px;
+    padding: 2rem;
+    background: var(--surface-primary);
+    border-radius: var(--radius-lg);
+    gap: 1rem;
+    text-align: center;
+  }
+
+□ Main feed query (with joins):
+  const { data: posts, error } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      author:members!user_id(first_name, last_name),
+      likes(count),
+      user_liked:likes!inner(user_id)
+    `)
+    .eq('user_liked.user_id', currentUserId)
+    .order('created_at', { ascending: false })
+    .range(0, 19); // first 20 posts
+
+□ Feed rendering (blog.js):
+  - Create renderPost(post) function
+  - Shows: author name + initials avatar, post content, like count, like button, timestamp
+  - Like button state: filled heart if user already liked, outline if not
+  - Timestamp: relative ("2h ago", "3d ago") using formatRelativeTime() helper
+  - Truncate long posts with "Read more" expansion
+
+□ Like button functionality:
+  - Optimistic UI: immediately increment count, fill heart
+  - Call process_post_like RPC function
+  - On success: update wallet balance in UI, prepend transaction to Home activity list
+  - On error (already liked, etc.): revert UI, show toast
+  - Prevent spam clicks with disabled state during request
+
+□ Floating "Post" button:
+  - Position: bottom-left, similar to current TG button
+  - On click: window.location.href = '/src/post/'
+  - Icon: plus or edit icon
+  - Badge: "Post" text shown on desktop, icon-only on mobile
+
+□ Load More implementation:
+  let currentPage = 0;
+  const POSTS_PER_PAGE = 20;
+  
+  async function loadMorePosts() {
+    const start = currentPage * POSTS_PER_PAGE;
+    const end = start + POSTS_PER_PAGE - 1;
+    
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*, members(*), likes(count)')
+      .order('created_at', { ascending: false })
+      .range(start, end);
+    
+    if (!data || data.length < POSTS_PER_PAGE) {
+      loadMoreBtn.classList.add('hidden'); // no more posts
+    }
+    
+    data.forEach(post => {
+      feedContainer.appendChild(renderPost(post));
+    });
+    
+    currentPage++;
+  }
+
+□ Real-time subscription (new posts appear live):
+  supabase
+    .channel('posts_channel')
+    .on('postgres_changes', 
+      { event: 'INSERT', schema: 'public', table: 'posts' },
+      (payload) => {
+        const newPost = payload.new;
+        // Fetch full post with author data
+        // Prepend to feed with animation
+      }
+    )
+    .subscribe();
+
+□ Check gating on section load:
+  async function loadBlogSection() {
+    const { data: member } = await supabase
+      .from('members')
+      .select('has_deposited')
+      .eq('id', user.id)
+      .single();
+    
+    const section = document.getElementById('section-blog');
+    
+    if (!member.has_deposited) {
+      section.classList.add('is-gated');
+      document.body.style.overflow = 'hidden'; // lock scroll
+      
+      // Wire gate CTA
+      document.getElementById('blogGateDepositBtn').addEventListener('click', () => {
+        document.getElementById('depositBtn').click(); // open existing deposit modal
+      });
+    } else {
+      section.classList.remove('is-gated');
+      document.body.style.overflow = ''; // restore scroll
+      await loadPosts(); // load feed
+    }
+  }
+
+
+─────────────────────────────────────────────────────────────────────────────
+④ DUMMY DATA SEEDING
+─────────────────────────────────────────────────────────────────────────────
+
+□ Create System/Bot account for dummy posts:
+  - Email: system@growthhaven.com
+  - Name: "GrowthHaven Team"
+  - Mark as is_dummy: true in members table
+
+□ Seed ~80-200 educational/informational/NIgerian meme funny dummy posts:
+  Examples:
+  - "The average person spends 6 months of their lifetime waiting for red lights to turn green."
+  - "Honey never spoils. Archaeologists found 3000-year-old honey in Egyptian tombs that was still edible."
+  - "A single cloud can weigh over 1 million pounds despite appearing to float."
+  - "The human brain uses 20% of the body's energy despite being only 2% of body weight."
+  - "Investing just ₦1,000 daily for a year totals ₦365,000 — small habits compound."
+  
+  Mark all dummy posts with is_dummy: true
+
+□ I will Create 5-10 dummy member accounts:
+  - Realistic Nigerian names (mix of common first/last names)
+  - Varied avatars (initials)
+  - Mark all as is_dummy: true
+
+□ Seed realistic likes from dummy members on dummy posts:
+  - Each dummy post gets 3-15 likes
+  - Random distribution to look organic
+  - Mix of dummy members liking each post
+
+□ Seeding strategy:
+  - Run seed script once on deployment
+  - Real posts appear mixed with dummy posts naturally
+  - Feed query doesn't filter out is_dummy (so they appear together)
+  - Can add filter later if needed: .eq('is_dummy', false)
+
+
+─────────────────────────────────────────────────────────────────────────────
+⑤ POLISH & UX
+─────────────────────────────────────────────────────────────────────────────
+
+□ Like button animation:
+  - Heart scale + color transition on click
+  - Subtle bounce effect
+  - CSS: @keyframes heart-like { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.2) } }
+
+□ Relative timestamps ("2h ago"):
+  function formatRelativeTime(isoString) {
+    const now = Date.now();
+    const then = new Date(isoString).getTime();
+    const diff = now - then;
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (mins < 60) return `${mins}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return formatDate(isoString); // fallback to "24 Apr 2026"
+  }
+
+□ Toast notifications:
+  - "Post liked! ₦100 earned" (success)
+  - "You've already liked this post" (warning)
+  - "Failed to like post. Try again." (error)
+
+□ Loading states:
+  - Skeleton rows while fetching posts (similar to transaction skeletons)
+  - Spinner on "Load More" button while fetching
+  - Disabled like button during request
+
+□ Truncate long posts with "Read more":
+  - Max 3 lines visible initially
+  - "Read more" link expands to full text
+  - CSS: line-clamp: 3; text-overflow: ellipsis;
+
+□ Mobile responsiveness:
+  - Stack post content vertically on narrow screens
+  - Larger tap targets for like button
+  - Floating post button positioned for thumb reach
+
+□ Empty state (when no posts exist):
+  <div class="blog-empty flex-col-center">
+    <div class="blog-empty__icon flex-center">
+      <i data-lucide="message-square" style="width:24px;height:24px"></i>
+    </div>
+    <p class="blog-empty__title">No posts yet</p>
+    <p class="blog-empty__sub">Be the first to share something!</p>
+  </div>
+
+
+═══════════════════════════════════════════════════════════════════════════════
+LEADERBOARD FEATURE
+═══════════════════════════════════════════════════════════════════════════════
+
+OVERVIEW:
+  Competitive rankings across multiple categories to drive engagement.
+  Mix of real users + dummy data to avoid empty leaderboards early on.
+
+CATEGORIES (TABS):
+  1. All-Time Champions - Highest wallet balance
+  2. Weekly Leaders - Most earned this week (resets Monday)
+  3. Investment Pros - Most completed vault plans
+  4. Blog Stars - Most likes received on posts
+  5. Referral Kings - Most referrals brought in
+
+VISUAL DESIGN:
+  - Top 3 get podium badges (🥇 🥈 🥉)
+  - Each row: Rank, Avatar/Initials, Name, Stat Value
+  - Current user's row highlighted if in top 50
+  - "Your rank: #127" shown even if outside top 50
+
+─────────────────────────────────────────────────────────────────────────────
+① DATABASE SETUP - YOU CAN CONFIRM FROM THE FILE /src/types/supabase.ts
+─────────────────────────────────────────────────────────────────────────────
+
+□ Create Supabase views for each category:
+
+  -- All-Time Champions
+  CREATE VIEW leaderboard_all_time AS
+  SELECT 
+    m.id,
+    m.first_name || ' ' || m.last_name as name,
+    m.first_name,
+    m.last_name,
+    m.wallet_balance as stat,
+    m.is_dummy,
+    RANK() OVER (ORDER BY m.wallet_balance DESC) as rank
+  FROM members m
+  ORDER BY rank
+  LIMIT 50;
+  
+  -- Weekly Leaders (earned this week)
+  CREATE VIEW leaderboard_weekly AS
+  SELECT 
+    m.id,
+    m.first_name || ' ' || m.last_name as name,
+    m.first_name,
+    m.last_name,
+    COALESCE(SUM(t.amount), 0) as stat,
+    m.is_dummy,
+    RANK() OVER (ORDER BY COALESCE(SUM(t.amount), 0) DESC) as rank
+  FROM members m
+  LEFT JOIN transactions t ON t.user_id = m.id 
+    AND t.created_at >= date_trunc('week', NOW())
+    AND t.type IN ('daily_claim', 'referral_bonus', 'vault_maturity', 'blog_like_reward', 'blog_post_reward')
+  GROUP BY m.id
+  ORDER BY rank
+  LIMIT 50;
+  
+  -- Investment Pros (completed vault plans)
+  CREATE VIEW leaderboard_investments AS
+  SELECT 
+    m.id,
+    m.first_name || ' ' || m.last_name as name,
+    m.first_name,
+    m.last_name,
+    COUNT(i.id) as stat,
+    m.is_dummy,
+    RANK() OVER (ORDER BY COUNT(i.id) DESC) as rank
+  FROM members m
+  LEFT JOIN investments i ON i.user_id = m.id AND i.status = 'completed'
+  GROUP BY m.id
+  ORDER BY rank
+  LIMIT 50;
+  
+  -- Blog Stars (most likes received)
+  CREATE VIEW leaderboard_blog_stars AS
+  SELECT 
+    m.id,
+    m.first_name || ' ' || m.last_name as name,
+    m.first_name,
+    m.last_name,
+    COUNT(l.id) as stat,
+    m.is_dummy,
+    RANK() OVER (ORDER BY COUNT(l.id) DESC) as rank
+  FROM members m
+  LEFT JOIN posts p ON p.user_id = m.id
+  LEFT JOIN likes l ON l.post_id = p.id
+  GROUP BY m.id
+  ORDER BY rank
+  LIMIT 50;
+  
+  -- Referral Kings
+  CREATE VIEW leaderboard_referrals AS
+  SELECT 
+    m.id,
+    m.first_name || ' ' || m.last_name as name,
+    m.first_name,
+    m.last_name,
+    COUNT(r.id) as stat,
+    m.is_dummy,
+    RANK() OVER (ORDER BY COUNT(r.id) DESC) as rank
+  FROM members m
+  LEFT JOIN members r ON r.referrer_code = m.referral_code
+  GROUP BY m.id
+  ORDER BY rank
+  LIMIT 50;
+
+□ Create RPC function to get user's rank in a category:
+  CREATE OR REPLACE FUNCTION get_user_rank(
+    p_category text,
+    p_user_id uuid
+  ) RETURNS integer AS $$
+  DECLARE
+    v_rank integer;
+  BEGIN
+    CASE p_category
+      WHEN 'all_time' THEN
+        SELECT rank INTO v_rank FROM leaderboard_all_time WHERE id = p_user_id;
+      WHEN 'weekly' THEN
+        SELECT rank INTO v_rank FROM leaderboard_weekly WHERE id = p_user_id;
+      WHEN 'investments' THEN
+        SELECT rank INTO v_rank FROM leaderboard_investments WHERE id = p_user_id;
+      WHEN 'blog_stars' THEN
+        SELECT rank INTO v_rank FROM leaderboard_blog_stars WHERE id = p_user_id;
+      WHEN 'referrals' THEN
+        SELECT rank INTO v_rank FROM leaderboard_referrals WHERE id = p_user_id;
+      ELSE
+        RETURN NULL;
+    END CASE;
+    
+    RETURN v_rank;
+  END;
+  $$ LANGUAGE plpgsql;
+
+
+─────────────────────────────────────────────────────────────────────────────
+② SPA DASHBOARD - LEADERBOARD SECTION
+─────────────────────────────────────────────────────────────────────────────
+
+□ Add "Leaderboard" navigation button in sidebar:
+  <button class="dash-nav-link flex items-center gap-3" data-nav="leaderboard" type="button">
+    <i data-lucide="trophy" style="width:16px;height:16px"></i>
+    <span>Leaderboard</span>
+  </button>
+
+□ Create #section-leaderboard in dashboard/index.html:
+  - Section header
+  - Filter tabs (like transactions)
+  - Leaderboard list container
+  - User's own rank display (if outside top 50)
+
+□ Tab system:
+  <div class="leaderboard-filters" role="tablist">
+    <button class="leaderboard-tab is-active" data-category="all_time">All-Time</button>
+    <button class="leaderboard-tab" data-category="weekly">This Week</button>
+    <button class="leaderboard-tab" data-category="investments">Investments</button>
+    <button class="leaderboard-tab" data-category="blog_stars">Blog Stars</button>
+    <button class="leaderboard-tab" data-category="referrals">Referrals</button>
+  </div>
+
+□ Leaderboard row structure:
+  <div class="leaderboard-row">
+    <div class="leaderboard-rank">#1</div> <!-- or badge for top 3 -->
+    <div class="leaderboard-avatar">AB</div>
+    <div class="leaderboard-info">
+      <span class="leaderboard-name">Abubakar Bello</span>
+    </div>
+    <span class="leaderboard-stat">₦450,000</span>
+  </div>
+  
+  <!-- Current user's row gets .is-current-user class -->
+
+□ Top 3 podium styling:
+  - Rank 1: Gold badge icon, accent color
+  - Rank 2: Silver badge icon
+  - Rank 3: Bronze badge icon
+  - Slightly larger/emphasized compared to ranks 4-50
+
+□ Load leaderboard data:
+  async function loadLeaderboard(category) {
+    const { data, error } = await supabase
+      .from(`leaderboard_${category}`)
+      .select('*')
+      .limit(50);
+    
+    // Get current user's rank if not in top 50
+    const { data: userRank } = await supabase.rpc('get_user_rank', {
+      p_category: category,
+      p_user_id: user.id
+    });
+    
+    renderLeaderboard(data, userRank);
+  }
+
+□ Show user's rank even if outside top 50:
+  <div class="leaderboard-user-rank">
+    <i data-lucide="map-pin" style="width:14px;height:14px"></i>
+    Your rank: <strong>#127</strong>
+  </div>
+
+
+─────────────────────────────────────────────────────────────────────────────
+③ DUMMY DATA SEEDING
+─────────────────────────────────────────────────────────────────────────────
+
+□ Create 25-30 dummy member accounts with realistic stats:
+  Names examples (mix Nigerian + common names):
+  - Chidi Okafor
+  - Amina Yusuf
+  - Tunde Adeyemi
+  - Ngozi Eze
+  - Ibrahim Musa
+  - Blessing Ojo
+  - Emeka Nwosu
+  - Fatima Hassan
+  - Adeola Williams
+  - Uche Okeke
+  
+  Stats distribution (make it organic, not all perfect):
+  - Wallet balances: ₦50k to ₦2M (varied)
+  - Completed investments: 0-12 plans
+  - Blog likes: 5-200 likes
+  - Referrals: 0-30 referrals
+  
+  Mark all with is_dummy: true
+
+□ Populate dummy stats in members table:
+  - wallet_balance: random between 50000-2000000
+  - Mix of high performers and average users
+  - Some with 0 in certain categories (makes it realistic)
+
+□ Seed dummy investment records, posts, likes, referrals:
+  - Link dummy investments to dummy members
+  - Create dummy posts from dummy members
+  - Seed likes between dummy members
+  - Create referral relationships
+
+□ Real users appear naturally:
+  - Feed query doesn't filter is_dummy
+  - Real users compete with dummy users
+  - Can add .eq('is_dummy', false) filter later if needed
+
+
+─────────────────────────────────────────────────────────────────────────────
+④ POLISH & UX
+─────────────────────────────────────────────────────────────────────────────
+
+□ Auto-refresh leaderboard:
+  - Weekly category refreshes every hour (optional)
+  - All-time refreshes on tab switch
+  - Add "Last updated X mins ago" timestamp
+
+□ Skeleton loading states:
+  - Show 10 skeleton rows while fetching
+
+□ Empty state (shouldn't happen with dummy data):
+  <div class="leaderboard-empty flex-col-center">
+    <i data-lucide="trophy"></i>
+    <p>No data yet. Be the first!</p>
+  </div>
+
+□ Smooth transitions:
+  - Fade in leaderboard rows
+  - Highlight current user's row with pulse animation
+
+□ Mobile responsive:
+  - Horizontal scroll for tabs if needed
+  - Stack avatar + name vertically on small screens
+
+
+═══════════════════════════════════════════════════════════════════════════════
+PHASE 2 - FUTURE ENHANCEMENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+Blog:
+  □ Comments system (nested replies?)
+  □ Post images/attachments
+  □ Post editing/deletion (own posts only)
+  □ Advanced feed filters (Following, Trending, etc.)
+  □ Notifications for likes/comments
+  □ Search posts
+
+Leaderboard:
+  □ Monthly/Yearly views
+  □ Filter by location/region
+  □ Prize pool for top performers
+  □ Badges/achievements system
+
+General:
+  □ Referral system improvements
+  □ Daily check-in streak
+  □ Challenges/Missions
+  □ Withdrawal flow (Paystack integration)
+  □ Investment bundles/packages
+
+
+═══════════════════════════════════════════════════════════════════════════════
+NOTES & DECISIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+SCROLL PATTERN:
+  ✓ Using "Load More" button (simplest, most reliable)
+  - Loads 20 posts at a time
+  - Hide button when no more posts
+  - Optional: "Back to top" floating button after scrolling 2 viewports
+
+BLOG GATING:
+  ✓ Glass overlay when user hasn't deposited
+  - Backdrop blur + semi-transparent background
+  - Feed visible but locked
+  - CTA button opens existing deposit modal
+  - Unlocks immediately after first deposit (via trigger)
+
+DUMMY DATA STRATEGY:
+  ✓ Mix real + dummy users in all features
+  - Use is_dummy flag for future filtering if needed
+  - Makes platform feel active from day 1
+  - Dummy users have realistic, varied stats
+
+REAL-TIME:
+  - Blog feed subscribes to new posts
+  - Leaderboard could subscribe to member updates (optional)
+  - Use Supabase Realtime channels
+
+TECH STACK CONFIRMATION:
+  ✓ Vanilla HTML/CSS/JS
+  ✓ Supabase (Postgres + RLS + Realtime)
+  ✓ Vite for build
+  ✓ No frontend framework
+  ✓ Modal system already exists
+  ✓ PostHog for analytics
+
