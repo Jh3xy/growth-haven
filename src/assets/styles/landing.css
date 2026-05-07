@@ -1449,6 +1449,16 @@ a.cta-btn.hero__tg-link {
   animation-play-state: paused;
 }
 
+.testi-track.is-paused {
+  animation-play-state: paused;
+}
+
+.testi-track-wrap:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
 @keyframes testi-scroll {
   from {
     transform: translateX(0);

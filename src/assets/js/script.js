@@ -448,3 +448,175 @@ if (track) {
     track.appendChild(clone);
   });
 }
+
+// ---- Marquee keyboard accessibility (left/right + pause) ----
+const trackWrap = document.querySelector(".testi-track-wrap");
+if (track && trackWrap) {
+  let manualPaused = false;
+
+  function parseTranslateX(matrix) {
+    if (!matrix || matrix === "none") return 0;
+    const m = matrix.match(/matrix(3d)?\((.+)\)/);
+    if (!m) return 0;
+    const values = m[2].split(",").map((s) => s.trim());
+    if (m[1]) {
+      // matrix3d
+      return parseFloat(values[12]) || 0;
+    }
+    return parseFloat(values[4]) || 0;
+  }
+
+  function pauseTrack(freezeTransform = true) {
+    const cs = window.getComputedStyle(track);
+    const matrix = cs.transform || cs.webkitTransform || "none";
+    if (freezeTransform && matrix && matrix !== "none") {
+      const tx = parseTranslateX(matrix);
+      track.style.transform = `translateX(${tx}px)`;
+    }
+    track.classList.add("is-paused");
+  }
+
+  function resumeTrack() {
+    track.classList.remove("is-paused");
+    track.style.transform = "";
+  }
+
+  function nudge(direction) {
+    // direction: -1 (left) | 1 (right)
+    pauseTrack(true);
+    const cs = window.getComputedStyle(track);
+    const matrix = cs.transform || "none";
+    let tx = parseTranslateX(matrix);
+    const card = track.querySelector(".testi-card");
+    const gapStr = window.getComputedStyle(track).gap || "20px";
+    const gap = parseFloat(gapStr) || 20;
+    const cardWidth = card ? card.offsetWidth : 320;
+    const delta = (cardWidth + gap) * direction;
+    const newTx = tx - delta; // more negative moves left
+    track.style.transform = `translateX(${newTx}px)`;
+    manualPaused = true;
+  }
+
+  trackWrap.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      nudge(-1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      nudge(1);
+    } else if (e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      if (track.classList.contains("is-paused")) {
+        resumeTrack();
+        manualPaused = false;
+      } else {
+        pauseTrack();
+        manualPaused = true;
+      }
+    }
+  });
+
+  trackWrap.addEventListener("focus", () => {
+    pauseTrack();
+  });
+  trackWrap.addEventListener("blur", () => {
+    if (!manualPaused) resumeTrack();
+  });
+  trackWrap.addEventListener("click", () => {
+    if (track.classList.contains("is-paused")) {
+      resumeTrack();
+      manualPaused = false;
+    } else {
+      pauseTrack();
+      manualPaused = true;
+    }
+  });
+
+  // Make sure keyboard-focusable visual state is clear
+  trackWrap.setAttribute("tabindex", trackWrap.getAttribute("tabindex") || "0");
+}
+
+// ---- Stats count-up on intersection ----
+(function initStatsCountUp() {
+  const prefersReducedMotion =
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const stats = Array.from(document.querySelectorAll(".stats__value"));
+  if (!stats.length) return;
+
+  const parseStat = (text) => {
+    const str = (text || "").trim();
+    // capture optional non-digit prefix, numeric part, optional non-digit suffix
+    const m = str.match(/^(\D*)([\d][\d,\.]*)(\D*)$/);
+    if (!m) return null;
+    const prefix = m[1] || "";
+    const numStr = m[2] || "";
+    const suffix = m[3] || "";
+    const value = parseFloat(numStr.replace(/,/g, ""));
+    if (isNaN(value)) return null;
+    return { prefix, value, suffix };
+  };
+
+  const formatNumber = (n) =>
+    new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
+
+  const durationDefault = 1200; // ms
+
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        if (el.dataset.countAnimated) {
+          obs.unobserve(el);
+          return;
+        }
+
+        const parsed = parseStat(el.textContent);
+        if (!parsed) {
+          obs.unobserve(el);
+          return;
+        }
+
+        const { prefix, value: targetValue, suffix } = parsed;
+        el.dataset.countAnimated = "true";
+
+        if (prefersReducedMotion) {
+          el.textContent = prefix + formatNumber(targetValue) + suffix;
+          obs.unobserve(el);
+          return;
+        }
+
+        const duration = parseInt(el.dataset.duration, 10) || durationDefault;
+        const start = 0;
+
+        el.setAttribute("aria-live", "polite");
+
+        let startTime = null;
+        function step(ts) {
+          if (startTime === null) startTime = ts;
+          const elapsed = ts - startTime;
+          const t = Math.min(1, elapsed / duration);
+          const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+          const current = Math.round(start + (targetValue - start) * eased);
+          el.textContent = prefix + formatNumber(current) + suffix;
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            el.textContent = prefix + formatNumber(targetValue) + suffix;
+            el.removeAttribute("aria-live");
+            obs.unobserve(el);
+          }
+        }
+
+        requestAnimationFrame(step);
+      });
+    },
+    { threshold: 0.5 },
+  );
+
+  stats.forEach((el) => {
+    if (parseStat(el.textContent)) observer.observe(el);
+  });
+})();
