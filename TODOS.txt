@@ -173,18 +173,17 @@ IMPLEMENTATION ORDER:
 ② POST CREATION PAGE (/src/post/)
 ─────────────────────────────────────────────────────────────────────────────
 
-□ Create /src/post/index.html (separate from SPA, like casino):
+□ I have created /src/post/index.html (separate from SPA, like casino) whats left is to add:
   - Minimal layout: user avatar, name, textarea, submit button
   - Auth guard on page load (redirect to login if no session)
   - Form validation: content required, max 500 characters
-  - On submit: insert into posts table, redirect to dashboard feed section
+  - On submit: insert into posts table, redirect to dashboard feed section -  i am condiering writng an IFEE function to look for a param in the redirect url like - ?page=blog (or something similar) so it reads it and automatically clicks the nav button that will open the blog section or something more production worthy.
 
-□ Update vite.config.js to include /src/post/ as entry point:
+□ I have also updated the vite.config.js to include /src/post/ as entry point:
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        dashboard: resolve(__dirname, 'src/dashboard/index.html'),
+        // ... other entries
         post: resolve(__dirname, 'src/post/index.html'),
         // ... other entries
       }
@@ -214,7 +213,7 @@ IMPLEMENTATION ORDER:
 
 □ edit #section-blog in dashboard/index.html:
   - Section header ("Blog Feed", subtitle)
-  - Floating "Post" button (bottom-left, similar to TG button)
+  - Floating "Post" button (bottom-left, similar to TG button or oppsoite to the text in section header "Blog Feed"??)
   - Feed container (#blogFeed)
   - "Load More" button at bottom
   - Empty state (shown when no posts exist yet)
@@ -595,7 +594,7 @@ VISUAL DESIGN:
 
 □ Create #section-leaderboard in dashboard/index.html:
   - Section header
-  - Filter tabs (like transactions)
+  - Filter tabs (copy the ones in transactions)
   - Leaderboard list container
   - User's own rank display (if outside top 50)
 
@@ -703,7 +702,7 @@ VISUAL DESIGN:
 □ Skeleton loading states:
   - Show 10 skeleton rows while fetching
 
-□ Empty state (shouldn't happen with dummy data):
+□ Empty state (shouldn't happen with dummy data!):
   <div class="leaderboard-empty flex-col-center">
     <i data-lucide="trophy"></i>
     <p>No data yet. Be the first!</p>
@@ -723,9 +722,9 @@ PHASE 2 - FUTURE ENHANCEMENTS
 ═══════════════════════════════════════════════════════════════════════════════
 
 Blog:
-  □ Comments system (nested replies?)
   □ Post images/attachments
   □ Post editing/deletion (own posts only)
+  □ Comments system (nested replies?)
   □ Advanced feed filters (Following, Trending, etc.)
   □ Notifications for likes/comments
   □ Search posts
@@ -750,7 +749,7 @@ NOTES & DECISIONS
 
 SCROLL PATTERN:
   ✓ Using "Load More" button (simplest, most reliable)
-  - Loads 20 posts at a time
+  - Loads 40 posts at a time
   - Hide button when no more posts
   - Optional: "Back to top" floating button after scrolling 2 viewports
 
