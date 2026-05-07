@@ -1,9 +1,7 @@
-
 /* ============================================
    LANDING PAGE — Component Styles
    GrowthHaven / Veridian v1.0
    ============================================ */
-
 
 /* ---- LAYOUT TOKENS ---- */
 :root {
@@ -23,12 +21,11 @@ html {
   scroll-behavior: smooth;
 }
 
-
 /* label.required{
   position: relative;
 } */
-label.required::after{
-  content: '*';
+label.required::after {
+  content: "*";
   margin-left: 4px;
   position: absolute;
   color: var(--status-error);
@@ -101,7 +98,6 @@ svg.site-header__wordmark {
   display: none;
 }
 
-
 /* ============================================
    MAIN — MOBILE FIRST (single column)
    ============================================ */
@@ -124,7 +120,6 @@ svg.site-header__wordmark {
   gap: 2.5rem;
 }
 
-
 /* ============================================
    HERO COLUMN
    ============================================ */
@@ -133,7 +128,6 @@ svg.site-header__wordmark {
   display: flex;
   flex-direction: column;
 }
-
 
 /* ---- Badge Pill ---- */
 
@@ -158,8 +152,13 @@ svg.site-header__wordmark {
 }
 
 @keyframes gh-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 .badge-pill__label {
@@ -168,7 +167,6 @@ svg.site-header__wordmark {
   letter-spacing: 0.1em;
   color: var(--brand-primary);
 }
-
 
 /* ---- Headline ---- */
 
@@ -187,7 +185,6 @@ svg.site-header__wordmark {
   display: block; /* forces "Secured." onto its own line at any size */
 }
 
-
 /* ---- Body ---- */
 
 .hero-body {
@@ -197,7 +194,6 @@ svg.site-header__wordmark {
   font-weight: var(--fw-regular);
   max-width: 48ch;
 }
-
 
 /* ============================================
    COUNTDOWN
@@ -230,12 +226,11 @@ svg.site-header__wordmark {
   margin-top: 0.3rem;
 }
 
-
 /* ============================================
    CARD COLUMN + WAITLIST CARD
    ============================================ */
 
-.card-col{
+.card-col {
   background-color: var(--surface-card);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
@@ -253,10 +248,14 @@ svg.site-header__wordmark {
   right: -60px;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(34, 197, 94, 0.08) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
-.card-col-secondary{
+.card-col-secondary {
   padding: 2rem;
   padding-top: 0;
 }
@@ -264,7 +263,7 @@ svg.site-header__wordmark {
   margin-top: 0;
 }
 
-.waitlist-success{
+.waitlist-success {
   padding-bottom: 2rem;
 }
 .waitlist-card {
@@ -310,12 +309,14 @@ svg.site-header__wordmark {
   gap: 0.5rem;
   /* width: 100%; */
   padding: 0.75rem 1rem;
-  background-color: #24A1DE; /* Official Telegram Blue */
-  color: #FFFFFF;
+  background-color: #24a1de; /* Official Telegram Blue */
+  color: #ffffff;
   border-radius: var(--radius-md, 8px);
   font-weight: 600;
   text-decoration: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .tg-join-btn:hover {
@@ -326,7 +327,6 @@ svg.site-header__wordmark {
 .tg-join-btn:active {
   transform: translateY(0);
 }
-
 
 /* ---- Form ---- */
 
@@ -354,10 +354,10 @@ svg.site-header__wordmark {
   margin-bottom: 0;
   cursor: default;
 }
-.form-field__error{
-  background-color: var(--status-error-bg);   
-  color: var(--status-error-text);  
-  border: 1px solid var(--status-error-border); 
+.form-field__error {
+  background-color: var(--status-error-bg);
+  color: var(--status-error-text);
+  border: 1px solid var(--status-error-border);
   border-radius: 8px;
   padding: 10px 16px;
 }
@@ -417,7 +417,6 @@ svg.site-header__wordmark {
   font-style: italic;
 }
 
-
 /* ============================================
    TRUST SIGNALS — mobile only by default
    ============================================ */
@@ -468,7 +467,6 @@ svg.site-header__wordmark {
   line-height: 1.55;
 }
 
-
 /* ============================================
    DECORATIVE BLOBS
    ============================================ */
@@ -493,7 +491,6 @@ svg.site-header__wordmark {
   top: -120px;
   right: -120px;
 }
-
 
 /* ============================================
    SITE FOOTER
@@ -551,13 +548,11 @@ svg.site-header__wordmark {
   color: var(--brand-primary);
 }
 
-
 /* ============================================
    DESKTOP — min-width: 768px
    ============================================ */
 
 @media (min-width: 768px) {
-
   /* Reveal header extras */
   .hidden-mobile {
     display: block;
@@ -611,16 +606,15 @@ svg.site-header__wordmark {
   }
 }
 
-
 .waitl-list-section,
 .how,
 .features,
 .testimonial,
-.stats{
+.stats {
   padding-top: 4rem !important;
 }
 
-.cta-btn{
+.cta-btn {
   box-shadow: none;
   width: unset;
   padding: 1rem 20px;
@@ -630,12 +624,10 @@ svg.site-header__wordmark {
   }
 }
 
-
 /* =============================================================
    GROWTHHAVEN — LANDING PAGE STYLES  (landing.css)
    Import order: after style.css, before queries.css
    ============================================================= */
-
 
 /* ============================================================
    SHARED SECTION PRIMITIVES
@@ -661,7 +653,6 @@ svg.site-header__wordmark {
   max-width: 56ch;
   margin: 0 0 3rem;
 }
-
 
 /* ============================================================
    BADGE PILL  (shared, was already used)
@@ -692,8 +683,15 @@ svg.site-header__wordmark {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 3px var(--brand-primary-soft); }
-  50%       { opacity: 0.7; box-shadow: 0 0 0 6px transparent; }
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--brand-primary-soft);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 6px transparent;
+  }
 }
 
 .badge-pill__label {
@@ -702,7 +700,6 @@ svg.site-header__wordmark {
   letter-spacing: 0.08em;
   color: var(--text-secondary);
 }
-
 
 /* ============================================================
    AVATAR STACK
@@ -730,7 +727,6 @@ svg.site-header__wordmark {
   color: var(--text-secondary);
   margin: 0;
 }
-
 
 /* ============================================================
    COUNTDOWN  (shared element)
@@ -768,10 +764,22 @@ svg.site-header__wordmark {
 
 /* tick animation — triggered in script.js */
 @keyframes cd-tick {
-  0%   { transform: translateY(0);    opacity: 1; }
-  40%  { transform: translateY(-6px); opacity: 0; }
-  60%  { transform: translateY(6px);  opacity: 0; }
-  100% { transform: translateY(0);    opacity: 1; }
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .countdown__value.ticking {
@@ -784,9 +792,10 @@ svg.site-header__wordmark {
 }
 
 @keyframes blink-launched {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
-
 
 /* ============================================================
    NAVBAR
@@ -798,14 +807,17 @@ svg.site-header__wordmark {
   left: 0;
   right: 0;
   z-index: 100;
-  transition: background var(--transition-global), box-shadow var(--transition-global), border-color var(--transition-global);
+  transition:
+    background var(--transition-global),
+    box-shadow var(--transition-global),
+    border-color var(--transition-global);
   border-bottom: 1px solid transparent;
 }
 
 .nav--scrolled {
   background: var(--surface-overlay);
   border-color: var(--border-subtle);
-  box-shadow: 0 1px 24px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 24px rgba(0, 0, 0, 0.04);
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
 }
@@ -864,16 +876,18 @@ svg.site-header__wordmark {
   flex-shrink: 0;
 }
 
-
 .dash-theme-toggle {
   min-height: 21px;
-  padding: 0.7rem .7rem;
+  padding: 0.7rem 0.7rem;
   font-size: var(--fs-caption);
   color: var(--text-secondary);
   border: var(--border-width) solid var(--border-subtle);
   border-radius: 999px;
-  background:
-    linear-gradient(145deg, var(--surface-card) 0%, var(--surface-card-muted) 100%);
+  background: linear-gradient(
+    145deg,
+    var(--surface-card) 0%,
+    var(--surface-card-muted) 100%
+  );
   box-shadow: var(--shadow-low);
   transition:
     color var(--transition-global),
@@ -911,7 +925,10 @@ svg.site-header__wordmark {
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
-  transition: background var(--transition-global), transform var(--transition-global), box-shadow var(--transition-global);
+  transition:
+    background var(--transition-global),
+    transform var(--transition-global),
+    box-shadow var(--transition-global);
   box-shadow: 0 4px 16px var(--brand-primary-ring);
   white-space: nowrap;
 }
@@ -980,7 +997,6 @@ svg.site-header__wordmark {
   margin-top: 0.5rem;
 }
 
-
 /* ============================================================
    HERO
    ============================================================ */
@@ -1001,7 +1017,6 @@ svg.site-header__wordmark {
   gap: 1.75rem;
 }
 
-
 .hero__heading {
   font-size: clamp(3rem, 14vw, 6.5rem);
   font-weight: 700;
@@ -1017,7 +1032,7 @@ svg.site-header__wordmark {
 }
 
 .hero__body {
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.7;
   max-width: 52ch;
@@ -1105,7 +1120,6 @@ a.cta-btn.hero__tg-link {
   right: -80px;
 }
 
-
 /* ============================================================
    STATS BAR
    ============================================================ */
@@ -1158,7 +1172,6 @@ a.cta-btn.hero__tg-link {
   flex-shrink: 0;
 }
 
-
 /* ============================================================
    FEATURES
    ============================================================ */
@@ -1188,18 +1201,41 @@ a.cta-btn.hero__tg-link {
   gap: 0.75rem;
   position: relative;
   overflow: hidden;
-  transition: transform var(--transition-global), box-shadow var(--transition-global), border-color var(--transition-global);
-  background: radial-gradient( 450px circle at calc(100% - 10px) calc(100% - 10px), hsla(142, 71%, 45%, 0.12) 0%, transparent 70% ), linear-gradient( 148deg, var(--surface-card) 0%, hsla(142, 71%, 45%, 0.045) 100% );
+  transition:
+    transform var(--transition-global),
+    box-shadow var(--transition-global),
+    border-color var(--transition-global);
+  background:
+    radial-gradient(
+      450px circle at calc(100% - 10px) calc(100% - 10px),
+      hsla(142, 71%, 45%, 0.12) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      148deg,
+      var(--surface-card) 0%,
+      hsla(142, 71%, 45%, 0.045) 100%
+    );
   transition: var(--transition-global);
 }
 
 .feature-card:hover {
-  background: radial-gradient( 600px circle at calc(100% - 10px) calc(100% - 10px), hsla(142, 71%, 45%, 0.12) 0%, transparent 70% ), linear-gradient( 148deg, var(--surface-card) 0%, hsla(142, 71%, 45%, 0.045) 100% );
+  background:
+    radial-gradient(
+      600px circle at calc(100% - 10px) calc(100% - 10px),
+      hsla(142, 71%, 45%, 0.12) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      148deg,
+      var(--surface-card) 0%,
+      hsla(142, 71%, 45%, 0.045) 100%
+    );
 }
 
 .feature-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.06);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.06);
   border-color: var(--brand-primary-ring);
 }
 
@@ -1275,7 +1311,6 @@ a.cta-btn.hero__tg-link {
   color: var(--text-tertiary);
   border: 1px solid var(--border-subtle);
 }
-
 
 /* ============================================================
    HOW IT WORKS
@@ -1360,7 +1395,6 @@ a.cta-btn.hero__tg-link {
   stroke-width: 1.5;
 }
 
-
 /* ============================================================
    TESTIMONIALS  (auto-scroll marquee)
    ============================================================ */
@@ -1385,7 +1419,7 @@ a.cta-btn.hero__tg-link {
 
 .testi-track-wrap::before,
 .testi-track-wrap::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: 0;
@@ -1416,8 +1450,12 @@ a.cta-btn.hero__tg-link {
 }
 
 @keyframes testi-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .testi-card {
@@ -1479,7 +1517,6 @@ a.cta-btn.hero__tg-link {
   color: var(--text-tertiary);
   margin-top: 0.125rem;
 }
-
 
 /* ============================================================
    WAITLIST SECTION
@@ -1552,13 +1589,12 @@ a.cta-btn.hero__tg-link {
   stroke-width: 3;
 }
 
-
 .waitlist-card {
   background: var(--surface-card);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
   padding: 2.25rem;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.05);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.05);
 }
 
 .waitlist-card__header {
@@ -1601,7 +1637,7 @@ a.cta-btn.hero__tg-link {
 }
 
 .form-field__label.required::after {
-  content: ' *';
+  content: " *";
   color: var(--status-error);
 }
 
@@ -1615,7 +1651,9 @@ a.cta-btn.hero__tg-link {
   font-family: var(--ff-primary);
   font-size: 0.9375rem;
   outline: none;
-  transition: border-color var(--transition-global), box-shadow var(--transition-global);
+  transition:
+    border-color var(--transition-global),
+    box-shadow var(--transition-global);
   width: 100%;
   box-sizing: border-box;
 }
@@ -1731,10 +1769,15 @@ a.cta-btn.hero__tg-link {
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
 
 /* ============================================================
    PRE-FOOTER CTA
@@ -1787,7 +1830,6 @@ a.cta-btn.hero__tg-link {
   padding: 0 2rem;
 }
 
-
 .deco-blob--prefooter {
   width: 500px;
   height: 500px;
@@ -1796,7 +1838,6 @@ a.cta-btn.hero__tg-link {
   left: 50%;
   transform: translateX(-50%);
 }
-
 
 /* ============================================================
    FOOTER
@@ -1847,7 +1888,6 @@ a.cta-btn.hero__tg-link {
 .site-footer__link:hover {
   color: var(--text-primary);
 }
-
 
 /* ============================================================
    RESPONSIVE
@@ -1962,4 +2002,3 @@ a.cta-btn.hero__tg-link {
     width: 290px;
   }
 }
-

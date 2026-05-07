@@ -1,26 +1,24 @@
-
-
 /**
  * GrowthHaven — Main Entry
  * CSS imports handled here via Vite
  */
 
 // ---- CSS Imports ----
-import '../styles/fonts.css'
-import '../styles/variables.css'
-import '../styles/utils.css'
-import '../styles/style.css'
-import '../styles/animations.css'
-import '../styles/landing.css'
-import '../styles/queries.css'
+import "../styles/fonts.css";
+import "../styles/variables.css";
+import "../styles/utils.css";
+import "../styles/style.css";
+import "../styles/animations.css";
+import "../styles/landing.css";
+import "../styles/queries.css";
 
 // JS Imports
-import { supabase } from './supabase.js';
-import { isValidEmail, isValidPhone } from './utils.js'
+import { supabase } from "./supabase.js";
+import { isValidEmail, isValidPhone } from "./utils.js";
 
-const THEME_STORAGE_KEY = 'gh_theme';
-const THEME_ATTRIBUTE = 'data-theme';
-const THEME_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+const THEME_STORAGE_KEY = "gh_theme";
+const THEME_ATTRIBUTE = "data-theme";
+const THEME_MEDIA_QUERY = "(prefers-color-scheme: dark)";
 let themeMediaQuery;
 let hasBoundThemeMediaListener = false;
 
@@ -33,36 +31,46 @@ function getThemeMediaQuery() {
 }
 
 function getSystemTheme() {
-  return getThemeMediaQuery()?.matches ? 'dark' : 'light';
+  return getThemeMediaQuery()?.matches ? "dark" : "light";
 }
 
 export function getTheme() {
-  return document.documentElement.getAttribute(THEME_ATTRIBUTE) || getStoredTheme() || getSystemTheme();
+  return (
+    document.documentElement.getAttribute(THEME_ATTRIBUTE) ||
+    getStoredTheme() ||
+    getSystemTheme()
+  );
 }
 
 export function getStoredTheme() {
   const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  return storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : null;
+  return storedTheme === "dark" || storedTheme === "light" ? storedTheme : null;
 }
 
 function updateThemeToggleButtons(theme, root = document) {
-  root.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-    const isDark = theme === 'dark';
-    const label = button.querySelector('[data-theme-label]');
+  root.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    const isDark = theme === "dark";
+    const label = button.querySelector("[data-theme-label]");
 
-    button.setAttribute('aria-pressed', String(isDark));
-    button.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-    button.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    button.setAttribute("aria-pressed", String(isDark));
+    button.setAttribute(
+      "aria-label",
+      isDark ? "Switch to light mode" : "Switch to dark mode",
+    );
+    button.setAttribute(
+      "title",
+      isDark ? "Switch to light mode" : "Switch to dark mode",
+    );
     button.dataset.themeState = theme;
 
     if (label) {
-      label.textContent = isDark ? 'Light mode' : 'Dark mode';
+      label.textContent = isDark ? "Light mode" : "Dark mode";
     }
   });
 }
 
 export function applyTheme(theme, { persist = true, root = document } = {}) {
-  const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
+  const resolvedTheme = theme === "dark" ? "dark" : "light";
   document.documentElement.setAttribute(THEME_ATTRIBUTE, resolvedTheme);
   updateThemeToggleButtons(resolvedTheme, root);
 
@@ -70,12 +78,14 @@ export function applyTheme(theme, { persist = true, root = document } = {}) {
     localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
   }
 
-  window.dispatchEvent(new CustomEvent('gh:themechange', { detail: { theme: resolvedTheme } }));
+  window.dispatchEvent(
+    new CustomEvent("gh:themechange", { detail: { theme: resolvedTheme } }),
+  );
   return resolvedTheme;
 }
 
 export function toggleTheme() {
-  const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+  const nextTheme = getTheme() === "dark" ? "light" : "dark";
   return applyTheme(nextTheme);
 }
 
@@ -91,7 +101,7 @@ function bindSystemThemeListener() {
   if (!mediaQuery) return;
 
   const handleThemeChange = () => syncThemeWithSystemPreference();
-  mediaQuery.addEventListener('change', handleThemeChange);
+  mediaQuery.addEventListener("change", handleThemeChange);
   hasBoundThemeMediaListener = true;
 }
 
@@ -99,14 +109,14 @@ export function initThemeToggle(root = document) {
   const initialTheme = getStoredTheme() || getSystemTheme();
   applyTheme(initialTheme, { persist: false, root });
 
-  root.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-    if (button.dataset.themeBound === 'true') return;
+  root.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    if (button.dataset.themeBound === "true") return;
 
-    button.addEventListener('click', () => {
+    button.addEventListener("click", () => {
       toggleTheme();
     });
 
-    button.dataset.themeBound = 'true';
+    button.dataset.themeBound = "true";
   });
 
   bindSystemThemeListener();
@@ -115,41 +125,41 @@ export function initThemeToggle(root = document) {
 function initializeSharedThemeUi() {
   initThemeToggle();
 
-  window.addEventListener('storage', (event) => {
+  window.addEventListener("storage", (event) => {
     if (event.key !== THEME_STORAGE_KEY) return;
 
-    const nextTheme = event.newValue === 'dark' ? 'dark' : 'light';
+    const nextTheme = event.newValue === "dark" ? "dark" : "light";
     applyTheme(nextTheme, { persist: false });
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeSharedThemeUi, { once: true });
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeSharedThemeUi, {
+    once: true,
+  });
 } else {
   initializeSharedThemeUi();
 }
 
-
-
 /**
  * Countdown Timer
- * 
+ *
  * Fixed launch date: May 13, 2026 at midnight (local time).
  * Every visitor sees the real remaining time from this moment.
  * To change the date, edit only this line.
  */
-const LAUNCH_DATE = new Date('2026-05-13T00:00:00');
+const LAUNCH_DATE = new Date("2026-05-13T00:00:00");
 
 const els = {
-  days:  document.getElementById('cd-days'),
-  hours: document.getElementById('cd-hours'),
-  mins:  document.getElementById('cd-mins'),
-  secs:  document.getElementById('cd-secs'),
+  days: document.getElementById("cd-days"),
+  hours: document.getElementById("cd-hours"),
+  mins: document.getElementById("cd-mins"),
+  secs: document.getElementById("cd-secs"),
 };
 
 /** Zero-pads a number to 2 digits: 4 → "04" */
 function pad(n) {
-  return String(n).padStart(2, '0');
+  return String(n).padStart(2, "0");
 }
 
 /**
@@ -169,16 +179,19 @@ export function updateEl(el, newVal) {
   // Remove first so re-adding always retriggers the animation,
   // even if the previous one hasn't fully finished (e.g. on fast ticks).
   if (el) {
-    el.classList.remove('ticking');
+    el.classList.remove("ticking");
     void el.offsetWidth; // force reflow — required to restart a CSS animation
-    el.classList.add('ticking');
-  
-    el.addEventListener('animationend', () => {
-      el.classList.remove('ticking');
-    }, { once: true });
+    el.classList.add("ticking");
+
+    el.addEventListener(
+      "animationend",
+      () => {
+        el.classList.remove("ticking");
+      },
+      { once: true },
+    );
   }
 }
-
 
 /** Called every second. Calculates remaining time and updates the DOM. */
 function tick() {
@@ -186,26 +199,26 @@ function tick() {
 
   // ---- Launch day reached ----
   if (remaining <= 0) {
-    Object.values(els).forEach(el => {
-      el.textContent = '00';
-      el.classList.remove('ticking');
-      el.classList.add('launched'); // triggers blink — see animations.css
+    Object.values(els).forEach((el) => {
+      el.textContent = "00";
+      el.classList.remove("ticking");
+      el.classList.add("launched"); // triggers blink — see animations.css
     });
     clearInterval(timer);
     return;
   }
 
   // ---- Calculate units ----
-  const totalSecs  = Math.floor(remaining / 1000);
-  const days       = Math.floor(totalSecs / 86400);
-  const hours      = Math.floor((totalSecs % 86400) / 3600);
-  const mins       = Math.floor((totalSecs % 3600) / 60);
-  const secs       = totalSecs % 60;
+  const totalSecs = Math.floor(remaining / 1000);
+  const days = Math.floor(totalSecs / 86400);
+  const hours = Math.floor((totalSecs % 86400) / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
 
-  updateEl(els.days,  pad(days));
+  updateEl(els.days, pad(days));
   updateEl(els.hours, pad(hours));
-  updateEl(els.mins,  pad(mins));
-  updateEl(els.secs,  pad(secs));
+  updateEl(els.mins, pad(mins));
+  updateEl(els.secs, pad(secs));
 }
 
 // Run once immediately so there's no 1-second blank on load,
@@ -213,100 +226,99 @@ function tick() {
 tick();
 const timer = setInterval(tick, 1000);
 
-
 // ============================================================
 //  FORM VALIDATION + SUCCESS STATE
 // ============================================================
- 
-const form       = document.querySelector('.waitlist-form');
-const nameInput  = document.getElementById('text');
-const emailInput = document.getElementById('email');
-const phoneInput = document.getElementById('phone');
-const card       = document.querySelector('.waitlist-card');
- 
-// ---- Helpers ----
- 
 
- 
+const form = document.querySelector(".waitlist-form");
+const nameInput = document.getElementById("text");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+const card = document.querySelector(".waitlist-card");
+
+// ---- Helpers ----
+
 function showError(input, message) {
-  input.classList.add('is-error');
- 
-  const err = document.createElement('p');
-  err.className = 'form-field__error';
-  err.setAttribute('role', 'alert'); // screen reader will announce this
+  input.classList.add("is-error");
+
+  const err = document.createElement("p");
+  err.className = "form-field__error";
+  err.setAttribute("role", "alert"); // screen reader will announce this
   err.textContent = message;
- 
-  input.insertAdjacentElement('afterend', err);
+
+  input.insertAdjacentElement("afterend", err);
 }
- 
+
 function clearErrors() {
-  document.querySelectorAll('.form-field__error').forEach(el => el.remove());
-  [nameInput, emailInput, phoneInput].forEach(el => el.classList.remove('is-error'));
+  document.querySelectorAll(".form-field__error").forEach((el) => el.remove());
+  [nameInput, emailInput, phoneInput].forEach((el) =>
+    el.classList.remove("is-error"),
+  );
 }
- 
+
 // Inside script.js, around line 126
-if (form && nameInput) { 
-  [nameInput, emailInput, phoneInput].forEach(input => {
+if (form && nameInput) {
+  [nameInput, emailInput, phoneInput].forEach((input) => {
     // Only add listener if the specific input exists
-    input?.addEventListener('input', () => {
-      input.classList.remove('is-error');
+    input?.addEventListener("input", () => {
+      input.classList.remove("is-error");
       const next = input.nextElementSibling;
-      if (next?.classList.contains('form-field__error')) next.remove();
+      if (next?.classList.contains("form-field__error")) next.remove();
     });
   });
 }
- 
+
 // ---- Validation ----
- 
+
 function validate() {
   clearErrors();
   let valid = true;
- 
-  const nameVal  = nameInput.value.trim();
+
+  const nameVal = nameInput.value.trim();
   const emailVal = emailInput.value.trim();
   const phoneVal = phoneInput.value.trim();
- 
+
   // Rule 1 — Name always required
   if (!nameVal) {
-    showError(nameInput, 'Your name is required.');
+    showError(nameInput, "Your name is required.");
     valid = false;
   }
- 
+
   // Rule 2 — At least one contact method required
   if (!emailVal && !phoneVal) {
-    showError(emailInput, 'Provide at least an email address or phone number.');
+    showError(emailInput, "Provide at least an email address or phone number.");
     valid = false;
   }
- 
+
   // Rule 3 — Email format check (only if something was entered)
   if (emailVal && !isValidEmail(emailVal)) {
-    showError(emailInput, 'Enter a valid email address.');
+    showError(emailInput, "Enter a valid email address.");
     valid = false;
   }
- 
+
   // Rule 4 — Phone format check (only if something was entered)
   if (phoneVal && !isValidPhone(phoneVal)) {
-    showError(phoneInput, 'Enter a valid phone number.');
+    showError(phoneInput, "Enter a valid phone number.");
     valid = false;
   }
- 
+
   return valid;
 }
- 
+
 // ---- Success State ----
 const TELEGRAM_LINK = "https://t.me/+UHPnYhMx6aI3NzBk";
 function showSuccess(firstName) {
   // Hide current card content
-  const header      = card.querySelector('.waitlist-card__header');
-  const socialProof = card.querySelector('.social-proof');
- 
-  [header, form, socialProof].forEach(el => {
-    if (el) el.style.display = 'none';
+  const header = card.querySelector(".waitlist-card__header");
+  const socialProof = card.querySelector(".social-proof");
+
+  [header, form, socialProof].forEach((el) => {
+    if (el) el.style.display = "none";
   });
- 
+
   // Inject success message — fades in via .waitlist-success animation in landing.css
-  const success = document.createElement('div');
-  success.className = 'waitlist-success';
+  const success = document.createElement("div");
+  success.className = "waitlist-success";
   success.innerHTML = `
     <div class="waitlist-success__icon">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -338,104 +350,101 @@ function showSuccess(firstName) {
       <span class="badge-pill__label uppercase">Position secured</span>
     </div>
   `;
- 
+
   card.appendChild(success);
 }
- 
+
 // ---- Submit handler ----
- 
+
 // ---- Submit handler ----
- if (form) {
-  form.addEventListener('submit', async (e) => {
+if (form) {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-  
+
     if (!validate()) return;
-  
-    const submitBtn = form.querySelector('.cta-btn');
+
+    const submitBtn = form.querySelector(".cta-btn");
     // Save the original innerHTML so we don't lose your Lucide icon when reverting
-    const originalBtnHTML = submitBtn.innerHTML; 
-  
+    const originalBtnHTML = submitBtn.innerHTML;
+
     // 1. Set Loading State
-    submitBtn.classList.add('disabled');
-    submitBtn.innerText = 'Securing Place...'; 
-  
+    submitBtn.classList.add("disabled");
+    submitBtn.innerText = "Securing Place...";
+
     const nameVal = nameInput.value.trim();
     // Pass null if empty so Supabase doesn't trigger a unique constraint error on empty strings
-    const emailVal = emailInput.value.trim() || null; 
+    const emailVal = emailInput.value.trim() || null;
     const phoneVal = phoneInput.value.trim() || null;
-  
+
     // 2. Send Data to Supabase
     const { error } = await supabase
-      .from('waitlist')
-      .insert([
-        { name: nameVal, email: emailVal, phone: phoneVal }
-      ]);
-  
+      .from("waitlist")
+      .insert([{ name: nameVal, email: emailVal, phone: phoneVal }]);
+
     // 3. Handle Response
     if (error) {
-      console.error('Supabase Error:', error);
-      
+      console.error("Supabase Error:", error);
+
       // Check if it's a unique constraint violation (they already signed up)
-      if (error.code === '23505') {
-        showError(emailInput, 'This email is already on the waitlist!');
+      if (error.code === "23505") {
+        showError(emailInput, "This email is already on the waitlist!");
       } else {
-        showError(emailInput, 'There was an issue securing your place. Please try again.');
+        showError(
+          emailInput,
+          "There was an issue securing your place. Please try again.",
+        );
       }
-      
+
       // Revert button state on error so they can try again
-      submitBtn.classList.remove('disabled');
-      submitBtn.innerHTML = originalBtnHTML; 
+      submitBtn.classList.remove("disabled");
+      submitBtn.innerHTML = originalBtnHTML;
     } else {
       // Success! Grab first name for the success screen
-      const firstName = nameVal.split(' ')[0];
-    
+      const firstName = nameVal.split(" ")[0];
+
       // Clear form inputs
-      [nameInput, emailInput, phoneInput].forEach(el => (el.value = ''));
-    
+      [nameInput, emailInput, phoneInput].forEach((el) => (el.value = ""));
+
       // Revert button state (optional since the form hides, but good practice)
-      submitBtn.classList.remove('disabled');
+      submitBtn.classList.remove("disabled");
       submitBtn.innerHTML = originalBtnHTML;
-      
+
       // Trigger your success UI
       showSuccess(firstName);
     }
   });
-  
 }
 
-
-
 // ---- Navbar scroll glass ----
-const nav = document.getElementById('nav');
+const nav = document.getElementById("nav");
 
 // ---- Mobile hamburger ----
-const hamburger = document.getElementById('navHamburger');
-const drawer    = document.getElementById('navDrawer');
+const hamburger = document.getElementById("navHamburger");
+const drawer = document.getElementById("navDrawer");
 
-hamburger?.addEventListener('click', () => {
-  const isOpen = drawer.classList.toggle('nav__drawer--open');
-  hamburger.setAttribute('aria-expanded', String(isOpen));
-  drawer.setAttribute('aria-hidden', String(!isOpen));
+hamburger?.addEventListener("click", () => {
+  const isOpen = drawer.classList.toggle("nav__drawer--open");
+  hamburger.setAttribute("aria-expanded", String(isOpen));
+  drawer.setAttribute("aria-hidden", String(!isOpen));
 });
 
 // Close drawer on drawer link click
-drawer?.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    drawer.classList.remove('nav__drawer--open');
-    hamburger.setAttribute('aria-expanded', 'false');
-    drawer.setAttribute('aria-hidden', 'true');
+drawer?.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    drawer.classList.remove("nav__drawer--open");
+    hamburger.setAttribute("aria-expanded", "false");
+    drawer.setAttribute("aria-hidden", "true");
   });
 });
 
 // ---- Testimonials marquee clone for seamless loop ----
-const track = document.getElementById('testiTrack');
+const track = document.getElementById("testiTrack");
 if (track) {
   // Clone all children and append so the marquee loops seamlessly
   const cards = Array.from(track.children);
-  cards.forEach(card => {
+  cards.forEach((card) => {
     const clone = card.cloneNode(true);
-    clone.setAttribute('aria-hidden', 'true');
+    clone.setAttribute("aria-hidden", "true");
     track.appendChild(clone);
   });
 }
-

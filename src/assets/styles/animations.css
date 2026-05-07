@@ -1,12 +1,9 @@
-
-
 /* ============================================
    ANIMATIONS — GrowthHaven / Veridian v1.0
    All entrance, hover, and ambient animations.
    Reduced-motion is already handled globally
    in normalize.css — no need to repeat here.
    ============================================ */
-
 
 /* ============================================
    KEYFRAMES
@@ -38,24 +35,43 @@
 
 /* Countdown number tick — JS toggles .ticking on each value update */
 @keyframes gh-tick {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(0.91); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.91);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Blob ambient drift — each blob gets a different path */
 @keyframes gh-drift-a {
-  0%, 100% { transform: translate(0, 0); }
-  33%       { transform: translate(28px, -18px); }
-  66%       { transform: translate(-12px, 22px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(28px, -18px);
+  }
+  66% {
+    transform: translate(-12px, 22px);
+  }
 }
 
 @keyframes gh-drift-b {
-  0%, 100% { transform: translate(0, 0); }
-  33%       { transform: translate(-22px, 16px); }
-  66%       { transform: translate(18px, -28px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-22px, 16px);
+  }
+  66% {
+    transform: translate(18px, -28px);
+  }
 }
-
 
 /* ============================================
    ENTRANCE SEQUENCE
@@ -66,7 +82,7 @@
    ============================================ */
 
 .badge-pill {
-  animation: gh-fade-up .8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+  animation: gh-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
 }
 
 .hero-heading {
@@ -91,13 +107,17 @@
   animation: gh-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
 }
 
-
 /* ---- ADD THIS TO THE BOTTOM OF animations.css ---- */
 
 /* Launch day — numbers blink indefinitely */
 @keyframes gh-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.15; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
 }
 
 .countdown__value.launched {
@@ -107,10 +127,18 @@
 
 /* Stagger each unit slightly so they don't all blink in sync —
    feels more alive, less like a broken LED sign */
-#cd-days.launched  { animation-delay: 0s; }
-#cd-hours.launched { animation-delay: 0.15s; }
-#cd-mins.launched  { animation-delay: 0.3s; }
-#cd-secs.launched  { animation-delay: 0.45s; }
+#cd-days.launched {
+  animation-delay: 0s;
+}
+#cd-hours.launched {
+  animation-delay: 0.15s;
+}
+#cd-mins.launched {
+  animation-delay: 0.3s;
+}
+#cd-secs.launched {
+  animation-delay: 0.45s;
+}
 
 /* Desktop: card slides in from the right instead */
 @media (min-width: 768px) {
@@ -118,7 +146,6 @@
     animation: gh-fade-right 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
   }
 }
-
 
 /* ============================================
    CARD HOVER LIFT
@@ -141,7 +168,6 @@
     0 0 0 1px rgba(34, 197, 94, 0.1);
 }
 
-
 /* ============================================
    CTA BUTTON — ARROW NUDGE
    The button itself already has hover styles
@@ -156,7 +182,6 @@
 .cta-btn:hover [data-lucide] {
   transform: translateX(5px);
 }
-
 
 /* ============================================
    COUNTDOWN TICK
@@ -175,7 +200,6 @@
   animation: gh-tick 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-
 /* ============================================
    DECORATIVE BLOBS — AMBIENT DRIFT
    Long loop, low displacement. The viewer
@@ -189,4 +213,20 @@
 
 .deco-blob--top-right {
   animation: gh-drift-b 13s ease-in-out infinite;
+}
+
+/* CTA ripple keyframe used by landing.css for a subtle press ripple */
+@keyframes gh-cta-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.15);
+    opacity: 0.55;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0.08;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
 }
