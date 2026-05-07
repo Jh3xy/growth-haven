@@ -620,3 +620,75 @@ if (track && trackWrap) {
     if (parseStat(el.textContent)) observer.observe(el);
   });
 })();
+
+  // ---- Staggered reveal for feature cards & testimonials ----
+  function initStaggeredReveal() {
+    const prefersReducedMotion =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const groups = [
+      {
+        containerSelector: ".features__grid",
+        itemSelector: ".feature-card",
+        itemClass: "reveal--card",
+        stagger: 120,
+      },
+      {
+        // Target only original testimonial cards (clones are aria-hidden)
+        containerSelector: ".testi-track-wrap",
+        itemSelector: ".testi-card:not([aria-hidden=\"true\"])",
+        itemClass: "reveal--simple",
+        stagger: 90,
+      },
+    ];
+
+    groups.forEach(({ containerSelector, itemSelector, itemClass, stagger }) => {
+      document.querySelectorAll(containerSelector).forEach((container) => {
+        if (!container) return;
+
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const items = Array.from(container.querySelectorAll(itemSelector));
+              if (!items.length) {
+                obs.unobserve(container);
+                return;
+              }
+
+              items.forEach((item, idx) => {
+                if (item.dataset.revealed) return;
+
+                item.classList.add("reveal", itemClass);
+                const delay = idx * stagger;
+                item.style.setProperty("--reveal-delay", `${delay}ms`);
+
+                if (prefersReducedMotion) {
+                  item.classList.add("revealed");
+                  item.dataset.revealed = "true";
+                } else {
+                  setTimeout(() => {
+                    item.classList.add("revealed");
+                    item.dataset.revealed = "true";
+                  }, delay);
+                }
+              });
+
+              obs.unobserve(container);
+            });
+          },
+          { threshold: 0.18 },
+        );
+
+        observer.observe(container);
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStaggeredReveal, { once: true });
+  } else {
+    initStaggeredReveal();
+  }
+

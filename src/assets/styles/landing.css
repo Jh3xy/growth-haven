@@ -1944,7 +1944,7 @@ a.cta-btn.hero__tg-link {
   }
 
   .hero {
-    padding: 7rem 1.5rem 4rem;
+    padding: 8rem 1.5rem 4rem;
   }
 
   .hero__ctas {
@@ -2012,3 +2012,45 @@ a.cta-btn.hero__tg-link {
     width: 290px;
   }
 }
+
+/* ============================================================
+   STAGGERED REVEAL — lightweight primitives
+   Used by script.js to trigger entrance animations with a
+   small stagger. Respects prefers-reduced-motion.
+   ============================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  will-change: transform, opacity;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Cards: fade up on mobile, slide in from right on desktop */
+.reveal--card.revealed {
+  animation: gh-fade-up 650ms var(--spring) var(--reveal-delay, 0ms) both;
+}
+
+@media (min-width: 768px) {
+  .reveal--card.revealed {
+    animation: gh-fade-right 650ms var(--spring) var(--reveal-delay, 0ms) both;
+  }
+}
+
+/* Simple upward reveal for compact items (testimonials) */
+.reveal--simple.revealed {
+  animation: gh-fade-up 600ms var(--spring) var(--reveal-delay, 0ms) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
