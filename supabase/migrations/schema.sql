@@ -59,6 +59,44 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ============================================================
+--  Deposit Unlock Trigger
+-- Unlocks blog access after a user's first completed deposit.
+-- Handles both:
+--   1. completed deposit inserted directly
+--   2. pending deposit later updated to completed
+-- ============================================================
+
+create or replace function public.mark_first_deposit()
+returns trigger
+security definer
+set search_path = public
+as $$
+begin
+  if new.type = 'deposit'
+     and new.status = 'completed'
+     and coalesce(old.status, '') is distinct from 'completed'
+  then
+    update public.members
+    set has_deposited = true
+    where id = new.user_id
+      and has_deposited = false;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists on_deposit_completion on public.transactions;
+
+create trigger on_deposit_completion
+after insert or update of status
+on public.transactions
+for each row
+execute function public.mark_first_deposit();
+
+
 
 -- ------------------------------------------------------------
 -- 2. admin_update_withdrawal_status

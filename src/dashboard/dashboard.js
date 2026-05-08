@@ -100,6 +100,38 @@ if (user) {
   });
 }
 
+(function handleDashboardParams() {
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get("page");
+
+  if (page === "blog") {
+    document.querySelectorAll('.dash-section').forEach((section) => {
+      section.classList.add('hidden');
+      section.classList.remove('section--active');
+    });
+    document.querySelectorAll('[data-nav]').forEach((link) => {
+      link.classList.remove('nav-active');
+    });
+
+    const target = document.getElementById('section-blog');
+    const link = document.querySelector('[data-nav="blog"]');
+
+    if (target) {
+      target.classList.remove('hidden');
+      target.classList.add('section--active');
+    }
+
+    if (link) {
+      link.classList.remove('hidden');
+      link.classList.add('nav-active');
+    }
+
+    localStorage.setItem('gh_current_tab', 'blog');
+  } else if (page) {
+    console.warn("Dashboard param is unknown", page);
+  }
+})();
+
 // ─── PERSONALISE ─────────────────────────────────────────────
 const firstName = user.user_metadata?.first_name || '';
 const lastName  = user.user_metadata?.last_name  || '';
