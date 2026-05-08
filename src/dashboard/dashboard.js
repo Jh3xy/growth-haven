@@ -418,6 +418,11 @@ async function fetchTransactions(userId) {
 
 const transactions = await fetchTransactions(user.id);
 if (transactions) renderActivity(transactions);
+
+window.__ghRefreshActivity = async () => {
+  const freshTransactions = await fetchTransactions(user.id);
+  if (freshTransactions) renderActivity(freshTransactions);
+};
  
  
 // ─── SPA NAVIGATION ──────────────────────────────────────────────
