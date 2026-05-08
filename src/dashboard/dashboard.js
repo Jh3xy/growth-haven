@@ -93,6 +93,10 @@ if (user) {
       document.getElementById('nav-blog-btn').classList.remove('hidden');
       console.log("📰 Blog access granted");
     }
+    if (posthog.isFeatureEnabled('quests') ) {
+      document.getElementById("nav-quest-btn").classList.remove("hidden");
+      console.log("🎮 Quest access granted");
+    }
   });
 }
 
@@ -404,7 +408,7 @@ function openSidebar() {
 
 
 // Define valid sections outside the function for better performance
-const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'support', 'blog', 'transact', 'sports', 'invest']);
+const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'quest', 'support', 'blog', 'transact', 'sports', 'invest']);
 
 export function switchSection(name) {
   //Validate the input. If it's trash, default to 'home'.
