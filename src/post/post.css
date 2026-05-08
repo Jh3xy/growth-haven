@@ -184,12 +184,16 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   font: inherit;
-  font-size: 1rem;
+  font-size: .95rem;
   line-height: 1.65;
   transition:
     border-color var(--transition-global),
     box-shadow var(--transition-global),
     background-color var(--transition-global);
+}
+
+.post-textarea::placeholder{
+  font-size: .87rem;
 }
 
 .post-textarea:focus {
@@ -291,9 +295,56 @@
   box-shadow: none;
 }
 
+.post-submit-btn.is-loading {
+  opacity: 0.72;
+  cursor: wait;
+}
+
 .post-submit-btn [data-lucide] {
   width: 16px;
   height: 16px;
+}
+
+.post-toast {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  z-index: 200;
+  max-width: calc(100vw - 2rem);
+  transform: translateX(-50%);
+  padding: 0.75rem 1rem;
+  color: var(--status-success-text);
+  background-color: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-low);
+  font-size: 0.875rem;
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  animation: post-toast-in 0.24s var(--spring) both;
+}
+
+.post-toast--warning {
+  color: var(--status-warning-text);
+  background-color: var(--status-warning-bg);
+  border-color: var(--status-warning-border);
+}
+
+.post-toast--error {
+  color: var(--status-error-text);
+  background-color: var(--status-error-bg);
+  border-color: var(--status-error-border);
+}
+
+@keyframes post-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .sr-only {
