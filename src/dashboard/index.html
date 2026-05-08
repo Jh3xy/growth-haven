@@ -705,14 +705,64 @@
            SECTION — Blog (shell only)
            ══════════════════════════════════════════════════════ -->
       <section id="section-blog" class="dash-section hidden">
-        <div class="dash-section__coming flex-col-center">
-          <div class="dash-section__coming-icon flex-center">
-            <i data-lucide="trophy" style="width:24px;height:24px"></i>
+        <div class="blog-shell">
+          <header class="blog-header">
+            <div class="blog-header__copy">
+              <p class="blog-eyebrow">Community</p>
+              <h2 class="blog-title">Blog Feed</h2>
+              <p class="blog-subtitle">Post, read, and earn from helpful activity.</p>
+            </div>
+            <a class="blog-compose-btn" href="/src/post/">
+              <i data-lucide="square-pen" style="width:16px;height:16px"></i>
+              <span>Post</span>
+            </a>
+          </header>
+
+          <div class="blog-feed" id="blogFeed" role="list" aria-live="polite">
+            <article class="blog-post blog-post--skeleton" aria-hidden="true">
+              <div class="blog-post__topline">
+                <span class="blog-post__identity skeleton"></span>
+                <span class="blog-post__time skeleton"></span>
+              </div>
+              <div class="blog-post__body">
+                <span class="blog-post__line skeleton"></span>
+                <span class="blog-post__line blog-post__line--short skeleton"></span>
+              </div>
+              <div class="blog-post__divider"></div>
+              <div class="blog-post__actions">
+                <span class="blog-post__like-skeleton skeleton"></span>
+              </div>
+            </article>
           </div>
-          <p class="dash-section__coming-title">Blog</p>
-          <span class="dash-section__coming-sub">
-            Make money by posting content and liking other's too
-          </span>
+
+          <div class="blog-empty hidden" id="blogEmpty">
+            <div class="blog-empty__icon">
+              <i data-lucide="message-square" style="width:22px;height:22px"></i>
+            </div>
+            <p class="blog-empty__title">No posts yet</p>
+            <p class="blog-empty__sub">Be the first to share something with the GrowthHaven feed.</p>
+          </div>
+
+          <button class="blog-load-more hidden" id="blogLoadMoreBtn" type="button">
+            Load more
+          </button>
+
+          <div class="blog-gate-overlay" id="blogGateOverlay" aria-hidden="true">
+            <div class="blog-gate-card">
+              <div class="blog-gate-icon">
+                <i data-lucide="lock" style="width:28px;height:28px"></i>
+              </div>
+              <h3 class="blog-gate-title">Start Earning from Posts</h3>
+              <p class="blog-gate-text">
+                Deposit to unlock the feed and earn ₦100 for every post you like.
+                Post owners earn ₦200 when you like their content.
+              </p>
+              <button class="blog-gate-cta" id="blogGateDepositBtn" type="button">
+                <i data-lucide="arrow-down-to-line" style="width:16px;height:16px"></i>
+                Make Your First Deposit
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 

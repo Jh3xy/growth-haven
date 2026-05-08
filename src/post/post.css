@@ -6,6 +6,28 @@
   box-sizing: border-box;
 }
 
+/* ─── SKELETON LOADING ───────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border-subtle) 25%,
+    var(--surface-card-muted) 50%,
+    var(--border-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+  color: transparent !important;
+  user-select: none;
+  min-width: 120px;
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .post-page {
   min-height: 100dvh;
   padding: 1.25rem;

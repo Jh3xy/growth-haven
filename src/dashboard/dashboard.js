@@ -14,6 +14,7 @@ import '../assets/styles/queries.css'
 import '../assets/styles/transactions.css'
 import '../assets/styles/dashboard.css'  
 import '../assets/styles/support.css';
+import '../assets/styles/blog.css';
 
 // ── Modal & Profile system ──
 import './modal.css';
@@ -23,6 +24,7 @@ import posthog from 'posthog-js';
 import { initProfile } from './profile.js';
 import { initTransactions, resetTransactions } from './transactions.js';
 import { openModal } from './modal.js';
+import { initBlogSection } from './blog.js';
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
 
@@ -65,6 +67,7 @@ const copyLinkBtn  = document.getElementById('copyLinkBtn');
 const signoutBtn   = document.getElementById('signoutBtn');
 
 let currentWalletBalance = 0;
+let loadBlogSection = async () => {};
 
 // ─── AUTH GUARD ──────────────────────────────────────────────
 // Reads from localStorage — instant, no network call.
@@ -147,7 +150,7 @@ if (firstName) {
 // ─── FETCH MEMBER DATA ────────────────────────────────────────
 const { data: member, error: memberError } = await supabase
   .from('members')
-  .select('referral_code, wallet_balance, vault_balance')
+  .select('referral_code, wallet_balance, vault_balance, has_deposited')
   .eq('id', user.id)
   .single();
 
@@ -466,6 +469,10 @@ export function switchSection(name) {
   }
  
   if (link) link.classList.add('nav-active');
+
+  if (activeSection === 'blog') {
+    loadBlogSection();
+  }
  
   closeSidebar();
 }
@@ -1326,6 +1333,12 @@ await loadInvestmentSection();
 
 const depositBtn = document.getElementById('depositBtn');
 const withdrawBtn = document.getElementById('withdrawBtn');
+
+loadBlogSection = initBlogSection({
+  user,
+  supabase,
+  openDeposit: () => depositBtn?.click(),
+});
 
 // ─── DEPOSIT / WITHDRAW TRIGGERS ─────────────────────────────────
 depositBtn?.addEventListener('click', () => {
