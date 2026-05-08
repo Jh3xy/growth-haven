@@ -86,8 +86,9 @@ async function loadAuthor() {
   const lastName = member.last_name || user.user_metadata?.last_name || '';
   const fullName = `${firstName} ${lastName}`.trim() || 'GrowthHaven Member';
 
-  authorName.innerHTML = fullName;
-  authorAvatar.innerHTML = getInitials(firstName, lastName);
+  authorName.textContent = fullName;
+  authorName.classList.remove('skeleton');
+  authorAvatar.textContent = getInitials(firstName, lastName);
 }
 
 textarea.addEventListener('input', updateCounter);

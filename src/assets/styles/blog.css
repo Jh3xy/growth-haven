@@ -348,8 +348,9 @@
 .blog-gate-text {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.86rem;
+  font-size: 0.71rem;
   line-height: 1.6;
+  margin-bottom: 1rem;
 }
 
 .blog-gate-cta {
@@ -363,7 +364,8 @@
   background-color: var(--brand-primary);
   border: 0;
   border-radius: 999px;
-  font-size: 0.84rem;
+  /* font-size: 0.84rem; */
+  font-family: inherit;
   font-weight: var(--fw-semibold);
   cursor: pointer;
 }

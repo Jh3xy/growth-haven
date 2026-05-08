@@ -296,7 +296,7 @@ rcPwForm.addEventListener('submit', async (e) => {
   }
 
   // Success — sign out and redirect to login so they sign in fresh
-  rcSetPwBtn.innerText = 'Password updated! Redirecting...';
+  rcSetPwBtn.innerText = 'Success! Redirecting...';
   await supabase.auth.signOut();
   setTimeout(() => {
     window.location.href = '/src/login/';
