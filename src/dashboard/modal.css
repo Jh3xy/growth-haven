@@ -25,6 +25,9 @@
   -webkit-backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity;
+  transform: translateZ(0); /* Force GPU acceleration for better mobile blur support */
+  -webkit-transform: translateZ(0);
 }
 
 .modal-shell.is-open .modal-shell__backdrop {
@@ -435,5 +438,4 @@
 .modal-pw-toggle:hover {
   color: var(--text-primary);
 }
-
 
