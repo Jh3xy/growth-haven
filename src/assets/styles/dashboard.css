@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--surface-card-rgb), 0.82);
+  background-color: rgba(var(--surface-card-rgb), 0.82);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   opacity: 1;
@@ -810,9 +810,9 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   animation: dash-fade-up 0.45s ease both;
 }
 
-.dash-hero     { animation-delay: 0.5s; }
-.dash-divider  { animation-delay: 1.2s; }
-.dash-cards    { animation-delay: 1.8s; }
+.dash-hero     { animation-delay: .5s; }
+.dash-divider  { animation-delay: .6s; }
+.dash-cards    { animation-delay: .8s; }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────── */
 
