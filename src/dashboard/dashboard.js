@@ -82,22 +82,26 @@ if (!session) {
 const user = session.user;
 
 if (user) {
-  // 1. Tell PostHog who this is so it can match the UUID
+  // 1. Identify user on PostHog
   posthog.identify(user.id);
 
-  // 2. Wait for flags to be ready, then check
+  // 2. Wiat fo rflags and then check
   posthog.onFeatureFlags(() => {
     if (posthog.isFeatureEnabled('casino-beta-flag')) {
       console.log('🎰 Casino access granted');
       // Show your casino UI element here
       document.getElementById('nav-games-casino').classList.remove('hidden');
+      document.getElementById('quick-link-games').classList.remove('hidden');
     }
     if (posthog.isFeatureEnabled("blog-access")) {
       document.getElementById('nav-blog-btn').classList.remove('hidden');
+      document.getElementById('quick-link-blog').classList.remove('hidden');
       console.log("📰 Blog access granted");
     }
     if (posthog.isFeatureEnabled('quests') ) {
       document.getElementById("nav-quest-btn").classList.remove("hidden");
+      document.getElementById('quick-link-quest').classList.remove('hidden');
+
       console.log("🎮 Quest access granted");
     }
   });
@@ -144,13 +148,13 @@ avatarEl.textContent    = initials.toUpperCase() || '?';
 headerNameEl.textContent = firstName ? `${firstName} ${lastName}`.trim() : '';
 
 if (firstName) {
-  greetingText.textContent = `Good day, ${firstName}.`;
-}
+  greetingText.textContent = `Welcome, ${firstName}.`;
+}``
 
 // ─── FETCH MEMBER DATA ────────────────────────────────────────
 const { data: member, error: memberError } = await supabase
   .from('members')
-  .select('referral_code, wallet_balance, vault_balance, has_deposited')
+  .select('referral_code, wallet_balance, vault_balance, has_deposited, is_new')
   .eq('id', user.id)
   .single();
 
@@ -229,6 +233,38 @@ if (member) {
   }
 }
 
+// Show Welcome Modal
+
+if (member?.is_new) {
+  const welcomeModal    = document.getElementById('welcomeModal');
+  const welcomeCta      = document.getElementById('welcomeModalCta');
+  const welcomeNameEl   = document.getElementById('welcomeModalName');
+ 
+  // Populate the first name in the title
+  if (welcomeNameEl) {
+    welcomeNameEl.textContent = (firstName && lastName) ? `${firstName} ${lastName}.` : 'Friend.';
+  }
+ 
+  // Show the modal
+  if (welcomeModal) {
+    welcomeModal.setAttribute('aria-hidden', 'false');
+    welcomeModal.classList.add('is-open');
+    if (window.lucide) lucide.createIcons({ nodes: [welcomeModal] });
+  }
+ 
+  // CTA — update DB then dismiss
+  welcomeCta?.addEventListener('click', async () => {
+    await supabase
+      .from('members')
+      .update({ is_new: false })
+      .eq('id', user.id);
+ 
+    welcomeModal?.classList.remove('is-open');
+    welcomeModal?.setAttribute('aria-hidden', 'true');
+  }, { once: true });
+}
+ 
+
 
 // ─── COPY FEEDBACK ───────────────────────────────────────────
 function flashCopied(btn) {
@@ -287,40 +323,48 @@ function renderReferralRow(ref) {
   return row;
 }
 
-(async () => {
-  const { data: referrals, error: refError } = await supabase.rpc('get_my_referrals');
 
-  // Clear skeletons regardless of outcome
-  refListEl.innerHTML = '';
-  refCountEl.classList.remove('skeleton');
+/**
+ * Fetch referrals via RPC function
+ * returns { first_name, last_name, created_at, has_deposited } for each referral.
+ * 
+ * Then render them into the referrals section. Show empty state if no referrals.
+ */
 
-  if (refError) {
-    console.error('[dashboard] Referrals fetch error:', refError);
-    refCountEl.textContent = '—';
-    refEmptyEl.classList.remove('hidden');
-    return;
-  }
-  // remove empty state
-  if (referrals) {
-    refEmptyEl.style.display = 'none';
-  }
-  
-  if (!referrals || referrals.length === 0) {
-    refCountEl.textContent = '0';
-    refEmptyEl.style.display = 'flex';
-    refEmptyEl.classList.remove('hidden');
-    return;
-  }
+ const referralsReady = (async () => {
+   const { data: referrals, error: refError } =
+     await supabase.rpc("get_my_referrals");
 
-  // Populate count badge
-  refCountEl.textContent = `${referrals.length} total`;
+   // Clear skeletons regardless of outcome
+   refListEl.innerHTML = "";
+   refCountEl.classList.remove("skeleton");
 
-  // Render each row
-  referrals.forEach(ref => {
-    refListEl.appendChild(renderReferralRow(ref));
-  });
-})();
- 
+   if (refError) {
+     console.error("[dashboard] Referrals fetch error:", refError);
+     refCountEl.textContent = "—";
+     refEmptyEl.classList.remove("hidden");
+     return;
+   }
+   // remove empty state
+   if (referrals) {
+     refEmptyEl.style.display = "none";
+   }
+
+   if (!referrals || referrals.length === 0) {
+     refCountEl.textContent = "0";
+     refEmptyEl.style.display = "flex";
+     refEmptyEl.classList.remove("hidden");
+     return;
+   }
+
+   // Populate count badge
+   refCountEl.textContent = `${referrals.length} total`;
+
+   // Render each row
+   referrals.forEach((ref) => {
+     refListEl.appendChild(renderReferralRow(ref));
+   });
+ })();
  
 // ─── RECENT ACTIVITY ─────────────────────────────────────────────
 
@@ -332,7 +376,7 @@ function renderReferralRow(ref) {
 *   { type, label, amount, created_at }
 *
 * Types: 'deposit' | 'withdrawal' | 'vault_fund' |
-*        'daily_claim' | 'referral_bonus' | 'vault_maturity'
+*        'daily_claim' | 'referral_bonus' | 'vault_maturity' | 'like'
 *
 * Call with an empty array to show the empty state.
 * Wire to a real Supabase query when the transactions table is ready.
@@ -361,15 +405,16 @@ function renderActivity(data) {
     withdrawal:     'arrow-up-right',
     vault_fund:     'shield',
     daily_claim:    'sun',
+    like: 'thumbs-up',
     early_exit: 'door-open',
     referral_bonus: 'users',
     vault_maturity: 'lock-open',
   };
  
-  const inboundTypes = new Set(['deposit', 'daily_claim', 'early_exit', 'referral_bonus', 'vault_maturity']);
+  const inboundTypes = new Set(['deposit', 'like', 'daily_claim', 'early_exit', 'referral_bonus', 'vault_maturity']);
  
   data.forEach(item => {
-    const icon     = iconMap[item.type] || 'circle';
+    const icon = iconMap[item.type] || "bell-dot";
     const isIn     = inboundTypes.has(item.type);
     const sign     = isIn ? '+' : '-';
     const amount   = Number(item.amount || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 });
@@ -406,7 +451,7 @@ async function fetchTransactions(userId) {
       .select('type, label, amount, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(3);
 
     if (error) throw error;
     return data ?? [];
@@ -1333,6 +1378,16 @@ function populateReviewSummary() {
 
 // ─── KICK OFF ────────────────────────────────────────────────────
 await loadInvestmentSection();
+await referralsReady;
+
+// Hide loader — everything critical has resolved
+const dashLoader = document.getElementById("dashLoader");
+if (dashLoader) {
+  dashLoader.classList.add("is-done");
+  dashLoader.addEventListener("transitionend", () => dashLoader.remove(), {
+    once: true,
+  });
+}
 
 
 

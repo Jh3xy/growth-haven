@@ -1,3 +1,39 @@
+
+/* ─── DASHBOARD LOADER ───────────────────────────────────────── */
+
+.dash-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--surface-card-rgb), 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 1;
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: all;
+}
+
+.dash-loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dash-loader__spinner {
+  width: 36px;
+  height: 36px;
+  border: 2.5px solid var(--border-subtle);
+  border-top-color: var(--brand-primary);
+  border-radius: 50%;
+  animation: dash-loader-spin 0.7s linear infinite;
+}
+
+@keyframes dash-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
 .blog-shell {
   position: relative;
   width: 100%;
@@ -223,6 +259,7 @@
   justify-content: space-between;
   gap: 0.2rem;
   color: var(--text-secondary);
+  width: 100%;
 }
 
 .blog-post__actions-primary {
@@ -283,33 +320,49 @@
 
 .blog-toast {
   position: fixed;
-  top: 1.25rem;
-  left: 50%;
-  z-index: 220;
-  max-width: calc(100vw - 2rem);
+  bottom: 7rem;
+  right: -5rem;
   transform: translateX(-50%);
-  padding: 0.75rem 1rem;
-  color: var(--status-success-text);
-  background-color: var(--status-success-bg);
-  border: 1px solid var(--status-success-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-low);
-  font-size: 0.8rem;
+  z-index: 200;
+  max-width: calc(100vw - 2.5rem);
+  width: max-content;
+  padding: 0.75rem 1.125rem;
+  background-color: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: 999px;
+  font-family: var(--ff-primary);
+  font-size: 0.8125rem;
   font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.22),
+    0 2px 8px rgba(0, 0, 0, 0.12);
   white-space: nowrap;
+  animation: toast-slide-up 0.28s var(--spring) both;
   transition: opacity 0.24s ease;
 }
-
-.blog-toast--warning {
-  color: var(--status-warning-text);
-  background-color: var(--status-warning-bg);
-  border-color: var(--status-warning-border);
+ 
+.blog-toast--success {
+  border-color: var(--status-success-border);
+  color: var(--status-success-text);
+  /* background-color: var(--status-success-bg); */
 }
-
-.blog-toast--error {
-  color: var(--status-error-text);
-  background-color: var(--status-error-bg);
-  border-color: var(--status-error-border);
+ 
+.blog-toast--warning {
+  border-color: var(--status-warning-border);
+  color: var(--status-warning-text);
+  /* background-color: var(--status-warning-bg); */
+}
+ 
+@keyframes toast-slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .blog-empty {

@@ -17,6 +17,26 @@
   text-align: center;
 }
 
+.avatar-wrap{
+  position: relative;
+}
+
+.avatar-wrap .add-profile-btn {
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  background-color: var(--surface-background);
+}
+
 .profile-avatar {
   width: 72px;
   height: 72px;

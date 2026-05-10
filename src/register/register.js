@@ -95,7 +95,6 @@ function initializeState() {
   if (currentStep === '2') {
     const savedEmail = localStorage.getItem('gh_reg_email');
     if (savedEmail) {
-      // These will now work because the variables exist!
       emailEl.value = savedEmail; 
       otpEmailHint.textContent = savedEmail;
       

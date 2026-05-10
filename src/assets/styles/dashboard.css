@@ -12,6 +12,179 @@
   display: none !important;
 }
 
+
+/* ─── DASHBOARD LOADER ───────────────────────────────────────── */
+
+.dash-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--surface-card-rgb), 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 1;
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: all;
+}
+
+.dash-loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dash-loader__spinner {
+  width: 36px;
+  height: 36px;
+  border: 2.5px solid var(--border-subtle);
+  border-top-color: var(--brand-primary);
+  border-radius: 50%;
+  animation: dash-loader-spin 0.7s linear infinite;
+}
+
+@keyframes dash-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* ─── WELCOME MODAL ──────────────────────────────────────────── */
+
+.welcome-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.welcome-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Backdrop */
+.welcome-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Card */
+.welcome-modal__card {
+  position: relative; /* sits above backdrop */
+  z-index: 1;
+  width: min(100%, 400px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem 1.75rem;
+  background-color: var(--surface-card);
+  border: var(--border-width) solid var(--brand-primary-ring);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 0 0 1px var(--brand-primary-ring),
+    0 24px 64px rgba(0, 0, 0, 0.32);
+  animation: welcome-card-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: paused; /* only plays when .is-open is added */
+}
+
+.welcome-modal.is-open .welcome-modal__card {
+  animation-play-state: running;
+}
+
+@keyframes welcome-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Icon circle */
+.welcome-modal__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid var(--brand-primary-ring);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+/* Title */
+.welcome-modal__title {
+  font-size: 1.25rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-tight);
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+/* Body */
+.welcome-modal__body {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 320px;
+  margin: 0;
+}
+
+.welcome-modal__body strong {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+/* CTA */
+.welcome-modal__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 48px;
+  padding: 0 1.75rem;
+  margin-top: 0.5rem;
+  background-color: var(--brand-primary);
+  color: var(--text-on-brand);
+  font-family: var(--ff-primary);
+  font-size: 0.9375rem;
+  font-weight: var(--fw-semibold);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: unset;
+  box-shadow: 0 8px 24px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.28);
+  transition:
+    background-color var(--transition-global),
+    transform 0.2s var(--spring),
+    box-shadow var(--transition-global);
+}
+
+.welcome-modal__cta:hover {
+  background-color: var(--brand-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.38);
+}
+
+.welcome-modal__cta:active {
+  transform: scale(0.97);
+}
+
 /* ─── LAYOUT ─────────────────────────────────────────────── */
 
 .dash-main {
@@ -106,6 +279,7 @@
 
 .dash-theme-toggle {
   min-height: 21px;
+  font-family: inherit;
   padding: 0.7rem .7rem;
   font-size: var(--fs-caption);
   color: var(--text-secondary);
@@ -200,7 +374,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   position: relative;
   width: 100%;
   height: 1px;
-  margin: 3rem 0 2.5rem;
+  margin: 2.3rem 0 1.4rem;
   background-color: var(--border-subtle);
   display: flex;
   align-items: center;
@@ -292,6 +466,77 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 0;
+}
+
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+ 
+.quick-action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 0.5rem;
+  background-color: var(--surface-background);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--ff-primary);
+  min-height: unset;
+  text-align: center;
+  transition:
+    background-color var(--transition-global),
+    border-color var(--transition-global),
+    transform 0.15s var(--spring);
+}
+ 
+.quick-action-tile:hover {
+  background-color: var(--brand-primary-soft);
+  border-color: var(--brand-primary-ring);
+  transform: translateY(-2px);
+}
+ 
+.quick-action-tile:active {
+  transform: scale(0.96);
+}
+ 
+.quick-action-tile__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: color var(--transition-global);
+}
+ 
+.quick-action-tile:hover .quick-action-tile__icon {
+  color: var(--brand-primary);
+}
+ 
+.quick-action-tile__label {
+  font-size: 0.625rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  transition: color var(--transition-global);
+}
+ 
+.quick-action-tile:hover .quick-action-tile__label {
+  color: var(--text-primary);
+}
+ 
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+ 
+/* Collapse to 2 columns only on very narrow viewports */
+@media (max-width: 320px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ─── COPY BUTTON ────────────────────────────────────────── */
@@ -873,6 +1118,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   letter-spacing: var(--ls-tight);
   line-height: 1.15;
   color: var(--text-primary);
+  margin-top: 0;
   margin-bottom: 0;
 }
  
@@ -2265,38 +2511,49 @@ html[data-theme='dark'] .invest-claim-warning {
 
 .invest-toast {
   position: fixed;
-  top: 2rem;
-  left: 50%;
-  transform: translateX(-50%) translateY(0);
+  bottom: 7rem;
+   right: -5rem;
+  transform: translateX(-50%);
+  z-index: 200;
+  max-width: calc(100vw - 2.5rem);
+  width: max-content;
+  padding: 0.75rem 1.125rem;
   background-color: var(--surface-card);
   border: var(--border-width) solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 0.875rem 1.25rem;
+  border-radius: 999px;   /* pill shape */
   font-family: var(--ff-primary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: var(--fw-medium);
   color: var(--text-primary);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-  z-index: 200;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.22),
+    0 2px 8px rgba(0, 0, 0, 0.12);
   white-space: nowrap;
-  animation: invest-toast-in 0.3s var(--spring) both;
+  animation: toast-slide-up 0.28s var(--spring) both;
 }
-
+ 
 .invest-toast--success {
   border-color: var(--status-success-border);
   color: var(--status-success-text);
-  background-color: var(--status-success-bg);
+  /* background-color: var(--status-success-bg); */
 }
-
+ 
 .invest-toast--warning {
   border-color: var(--status-warning-border);
   color: var(--status-warning-text);
-  background-color: var(--status-warning-bg);
+  /* background-color: var(--status-warning-bg); */
 }
-
-@keyframes invest-toast-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+ 
+/* Replace the old invest-toast-in keyframe with this */
+@keyframes toast-slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 

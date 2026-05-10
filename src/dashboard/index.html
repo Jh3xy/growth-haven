@@ -146,12 +146,8 @@
 
 
           <!-- ① WELCOME CARD ─────────────────────────────── -->
-          <!-- <div class="dash-welcome-card__status flex items-center gap-2">
-            <span class="badge-pill__dot"></span>
-            <span class="dash-welcome-card__label uppercase">Dashboard</span>
-          </div> -->
           <div class="greeting">
-            <h1 class="dash-welcome-card__greeting" id="greetingText">Good day.</h1>
+            <h1 class="dash-welcome-card__greeting" id="greetingText">Welcome</h1>
             <p class="dash-welcome-card__sub">Your investments are secure.</p>
           </div>
 
@@ -181,30 +177,64 @@
 
           </div>
 
+          <!-- ③ QUICK ACTIONS ───────────────────────────────── -->
 
-          <!-- ③ VAULT CARD ──────────────────────────────── -->
-          <div class="dash-card dash-welcome-card">
-            <div class="vault-card__wrap">
-              <p class="dash-card__label flex items-center gap-2 uppercase">
-                <i data-lucide="shield" style="width:13px;height:13px"></i>
-                Vault (₦)
-              </p>
-              <div class="dash-vault-card__balance flex-col gap-1">
-                <div class="flex items-baseline gap-1 dash-vault-card__wrap">
-                  <span class="dash-vault-card__currency">₦</span>
-                  <span class="dash-vault-card__amount skeleton" id="vaultBalance">0.00</span>
-                </div>
-              </div>
-              <!-- <p class="dash-card__hint">Capital <span class="dash-card__hint-value"></span></p> -->
-              <span class="dash-vault-card__tier skeleton" id="vaultTierInfo">7-Day Plan · 5% daily</span>
-              <button class="dash-action-btn dash-action-btn--secondary w-fit" id="fundVaultBtn">
-                <i data-lucide="arrow-left-right" style="width:14px;height:14px"></i>
-                Fund
-              </button>
-            </div>
+          <div class="dash-divider">
+            <span class="dash-divider__label uppercase">Quick Actions</span>
           </div>
 
-
+          <div class="quick-actions-grid" id="quickActionsGrid">
+        
+            <button class="quick-action-tile" type="button" data-nav="invest">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="trending-up" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Investments</span>
+            </button>
+        
+            <button class="quick-action-tile hidden" id="quick-link-blog" type="button" data-nav="blog">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="thumbs-up" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Blog</span>
+            </button>
+        
+            <button class="quick-action-tile hidden" id="quick-link-quest" type="button" data-nav="quest">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="award" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Quests</span>
+            </button>
+        
+            <button class="quick-action-tile" type="button" data-nav="transact">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="arrow-left-right" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Transactions</span>
+            </button>
+        
+            <button class="quick-action-tile hidden" id="quick-link-games" type="button" data-nav="sports">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="trophy" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Games</span>
+            </button>
+        
+            <button class="quick-action-tile" type="button" data-nav="support">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="help-circle" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Support</span>
+            </button>
+        
+            <button class="quick-action-tile" type="button" data-nav="profile">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="user" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Profile</span>
+            </button>
+        
+          </div>
 
           <!-- ④ RECENT ACTIVITY ─────────────────────────── -->
           <div class="dash-divider">
@@ -702,7 +732,7 @@
       </section>
 
       <!-- ══════════════════════════════════════════════════════
-           SECTION — Blog (shell only)
+           SECTION — Blog 
            ══════════════════════════════════════════════════════ -->
       <section id="section-blog" class="dash-section hidden">
         <div class="blog-shell">
@@ -898,10 +928,6 @@
       </div>
     </section>
 
-
-      <!-- ══════════════════════════════════════════════════════
-           SECTION — PROFILE (shell only)
-           ══════════════════════════════════════════════════════ -->
       <!-- ══════════════════════════════════════════════════════
      SECTION — PROFILE
      ══════════════════════════════════════════════════════ -->
@@ -912,7 +938,12 @@
         <!-- ① ACCOUNT IDENTITY ───────────────────────────── -->
         <div class="profile-identity flex-col items-center">
 
-          <div class="profile-avatar flex-center" id="profileAvatar">—</div>
+          <div class="avatar-wrap">
+            <div class="profile-avatar flex-center" id="profileAvatar"></div>
+            <button class="add-profile-btn">
+              <i data-lucide="square-pen" class="icon"></i>
+            </button>
+          </div>
 
           <h2 class="profile-identity__name skeleton" id="profileName">&nbsp;</h2>
           <p class="profile-identity__email skeleton" id="profileEmail">&nbsp;</p>
@@ -1128,6 +1159,50 @@
     </div>
   </div>
 
+  <!--
+    To edit the message later: update the text inside .welcome-modal__title,
+    .welcome-modal__body, and .welcome-modal__cta only.
+    To re-broadcast: set all members' is_new = true in DB and the modal
+    will show again for every user on their next login.
+  -->
+
+  <!-- WELCOME MODAL — static, shown once per user via is_new flag -->
+  <div class="welcome-modal" id="welcomeModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="welcomeModalTitle">
+
+    <div class="welcome-modal__backdrop" id="welcomeModalBackdrop"></div>
+
+    <div class="welcome-modal__card">
+
+      <div class="welcome-modal__icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+               class="site-header__wordmark" aria-hidden="true" focusable="false">
+            <g fill="currentColor">
+              <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+            </g>
+          </svg>
+      </div>
+
+      <!-- ── EDITABLE CONTENT STARTS HERE ── -->
+
+      <h2 class="welcome-modal__title" id="welcomeModalTitle">
+        Welcome to GrowthHaven, <span id="welcomeModalName"></span>
+      </h2>
+
+      <p class="welcome-modal__body">
+        Your account is set up and ready to go! <br> You can find answers to common questions in the <strong>Support</strong> section, or tap the blue button at the bottom of the screen to chat with our team directly.
+      </p>
+
+      <!-- ── EDITABLE CONTENT ENDS HERE ── -->
+
+      <button class="welcome-modal__cta" id="welcomeModalCta" type="button">
+        <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+        Explore
+      </button>
+
+    </div>
+
+  </div>
+
   <!-- FLOATING TELEGRAM SUPPORT BUTTON -->
   <a
     class="tg-float-btn flex items-center gap-2"
@@ -1140,6 +1215,11 @@
     <i data-lucide="send" style="width:18px;height:18px;flex-shrink:0;"></i>
     <span class="tg-float-btn__label">Support</span>
   </a>
+
+  <!-- DASHBOARD LOADER — visible by default, hidden by JS after all data resolves -->
+  <div class="dash-loader" id="dashLoader" aria-hidden="true">
+    <div class="dash-loader__spinner"></div>
+  </div>
 
   <script>
     lucide.createIcons();

@@ -1,0 +1,65 @@
+
+
+
+You are helping build a profile picture (PFP) upload feature for a web app called GrowthHaven.
+The stack is: Vite (MPA), Supabase (auth + Postgres + Storage), vanilla HTML/CSS/JS — no frameworks.
+
+I will attach the following files for context:
+- src/dashboard/index.html
+- src/dashboard/dashboard.js
+- src/dashboard/profile.js
+- src/assets/styles/dashboard.css
+- src/assets/styles/variables.css
+- src/assets/js/supabase.js
+
+---
+
+YOUR TASK:
+List every change needed — database, storage, and frontend — to implement end-to-end profile picture upload for this app. Do not write any code yet. Just produce a clear, ordered checklist I can work through one section at a time.
+
+---
+
+CONTEXT YOU NEED TO KNOW:
+
+1. The profile section lives in #section-profile inside the SPA dashboard.
+   It is initialized by initProfile(user) in profile.js and lazy-loads on first visit.
+
+2. The profile identity block (#profileAvatar) currently shows initials as text
+   inside a styled circle div. This needs to conditionally show a photo instead
+   when one exists.
+
+3. The members table in Supabase has: id, first_name, last_name, email, phone,
+   referral_code, created_at, wallet_balance, has_deposited, is_new.
+   There is no avatar_url column yet.
+
+4. There is no Supabase Storage bucket set up for avatars yet.
+
+5. The edit flow in profile.js already handles save/cancel for name and phone fields.
+   The PFP upload should feel like part of the same profile card — tapping the avatar
+   circle in edit mode should trigger a file input.
+
+6. Design constraints:
+   - No external image libraries.
+   - Accepted formats: JPG, PNG, WebP only.
+   - Max file size: 2MB enforced client-side before upload.
+   - The avatar circle is currently 80px on desktop. The photo should fill it,
+     cropped to a circle via CSS (border-radius: 50%, object-fit: cover).
+   - If no photo is set, fall back to initials as it works today.
+   - On upload, the new photo should appear immediately (optimistic update),
+     then confirm once the Supabase Storage upload resolves.
+
+7. The header also shows an avatar (#avatarInitials in the dashboard header).
+   This needs to update to show the photo too when one is set.
+
+---
+
+FORMAT YOUR OUTPUT AS:
+
+A) Supabase Database changes
+B) Supabase Storage setup
+C) RLS policies needed
+D) profile.js changes (describe, do not write code)
+E) dashboard.js changes (describe, do not write code)
+F) HTML changes to #section-profile (describe, do not write code)
+G) CSS changes needed (describe, do not write code)
+H) Edge cases and failure states to handle
