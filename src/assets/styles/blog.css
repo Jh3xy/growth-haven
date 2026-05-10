@@ -220,6 +220,14 @@
 .blog-post__actions {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0.2rem;
+  color: var(--text-secondary);
+}
+
+.blog-post__actions-primary {
+  display: flex;
+  align-items: center;
   gap: 0.2rem;
   color: var(--text-secondary);
 }

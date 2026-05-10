@@ -61,24 +61,35 @@ function createPostElement(post, { onLike }) {
         <div class="blog-post-content_wrap">
           <div class="blog-post__author">
             <span class="blog-post__name"></span>
-            <time class="blog-post__time" datetime="${post.created_at || ""}">${formatRelativeTime(post.created_at)} ago</time>
+            <time class="blog-post__time" datetime="${post.created_at || ""}">${formatRelativeTime(post.created_at)}</time>
           </div>
           <p class="blog-post__content"></p>
           <button class="blog-read-more hidden" type="button" aria-expanded="false">Read more</button>
         </div>
       </div>
       <div class="blog-post__actions">
-        <button
-          class="blog-like-btn${post.userLiked ? " is-liked" : ""}"
-          type="button"
-          aria-label="Like post"
-          aria-pressed="${post.userLiked ? 'true' : 'false'}"
-          ${post.userLiked ? 'disabled' : ''}
-        >
-          <i data-lucide="heart" style="width:17px;height:17px"></i>
-        </button>
-        —
-        <span class="blog-like-count">${pluralizeLikes(post.likeCount || 0)}</span>
+        <div class="blog-post__actions-primary">
+          <button
+            class="blog-like-btn${post.userLiked ? " is-liked" : ""}"
+            type="button"
+            aria-label="Like post"
+            aria-pressed="${post.userLiked ? "true" : "false"}"
+            ${post.userLiked ? "disabled" : ""}
+          >
+            <i data-lucide="heart" style="width:17px;height:17px"></i>
+          </button>
+          —
+          <span class="blog-like-count">${pluralizeLikes(post.likeCount || 0)}</span>
+        </div>
+        <div class="blog-post__actions-secondary">
+          <button
+            class="blog-like-btn"
+            type="button"
+            aria-label="Share post"
+          >
+            <i data-lucide="external-link" style="width:17px;height:17px"></i>
+          </button>
+        </div>
       </div>
     </div>
   `;
