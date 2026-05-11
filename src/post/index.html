@@ -53,13 +53,44 @@
             </div>
           </div>
 
+          <div class="post-image-section">
+            <input
+              type="file"
+              id="postImageInput"
+              class="post-image-input"
+              accept="image/jpeg,image/png,image/webp"
+              aria-label="Attach an image to your post"
+            />
+            <label for="postImageInput" class="post-image-label post-image-btn">
+                <i data-lucide="image" aria-hidden="true"></i>
+                <span>Add image</span>
+            </label>
+            <p id="imageHelp" class="post-image-help">
+              Optional. Max 5MB. JPEG, PNG, or WebP.
+            </p>
+            
+            <!-- Preview (hidden by default) -->
+            <div class="post-image-preview hidden" id="postImagePreview">
+              <div class="post-image-preview__thumbnail" id="postImageThumbnail">
+                <button
+                  type="button"
+                  class="post-image-remove"
+                  id="postImageRemove"
+                  aria-label="Remove image"
+                >
+                  <i data-lucide="x" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="post-field">
             <label class="sr-only" for="postContent">Post content</label>
             <textarea
               id="postContent"
               class="post-textarea"
               name="content"
-              maxlength="500"
+              maxlength="5000"
               rows="9"
               placeholder="What would you like to share?"
               required

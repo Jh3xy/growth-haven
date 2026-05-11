@@ -65,6 +65,7 @@ function createPostElement(post, { onLike }) {
           </div>
           <p class="blog-post__content"></p>
           <button class="blog-read-more hidden" type="button" aria-expanded="false">Read more</button>
+          ${post.image_url ? `<div class="blog-post__media"><img src="${post.image_url}" alt="" loading="lazy" /></div>` : ""}
         </div>
       </div>
       <div class="blog-post__actions">
@@ -184,13 +185,13 @@ export function initBlogSection({ user, supabase, openDeposit }) {
     }
 
     window.__ghUpdateWalletBalance?.(Number(data?.wallet_balance || 0));
-    console.log('[blog] Wallet balance refreshed after like:', data?.wallet_balance);
+    // console.log('[blog] Wallet balance refreshed after like:', data?.wallet_balance);
   }
 
   async function refreshActivity() {
     window.__ghResetTransactions?.();
     await window.__ghRefreshActivity?.();
-    console.log('[blog] Activity refresh requested after like.');
+    // console.log('[blog] Activity refresh requested after like.');
   }
 
   async function handleLike({ post, article, button }) {

@@ -21,6 +21,7 @@ import { openModal } from './modal.js';
 import { initBlogSection } from './blog.js';
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
+import { initCarousel } from "./carousel.js";
 
 // ─── CONFIG ──────────────────────────────────────────────────
 // This is the full URL of your register page.
@@ -405,7 +406,7 @@ function renderActivity(data) {
     vault_maturity: 'lock-open',
   };
  
-  const inboundTypes = new Set(['deposit', 'like', 'daily_claim', 'early_exit', 'referral_bonus', 'vault_maturity']);
+  const inboundTypes = new Set(['deposit', 'like', 'blog_like_reward', 'blog_post_reward', 'mines_win', 'daily_claim', 'early_exit', 'referral_bonus', 'vault_maturity']);
  
   data.forEach(item => {
     const icon = iconMap[item.type] || "bell-dot";
@@ -1373,6 +1374,9 @@ function populateReviewSummary() {
 // ─── KICK OFF ────────────────────────────────────────────────────
 await loadInvestmentSection();
 await referralsReady;
+
+
+
 
 // Hide loader — everything critical has resolved
 const dashLoader = document.getElementById("dashLoader");

@@ -52,10 +52,6 @@
           <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
           <span class="dash-theme-toggle__label" data-theme-label>Dark mode</span>
         </button>
-        <!-- <button class="dash-signout flex items-center gap-2" id="signoutBtn">
-          <i data-lucide="log-out" style="width:14px;height:14px"></i>
-          <span>Sign Out</span>
-        </button> -->
       </div>
 
     </div>
@@ -187,21 +183,21 @@
         
             <button class="quick-action-tile" type="button" data-nav="invest">
               <span class="quick-action-tile__icon">
-                <i data-lucide="trending-up" style="width:20px;height:20px"></i>
+                <i data-lucide="sprout" style="width:20px;height:20px"></i>
               </span>
               <span class="quick-action-tile__label">Investments</span>
             </button>
         
             <button class="quick-action-tile hidden" id="quick-link-blog" type="button" data-nav="blog">
               <span class="quick-action-tile__icon">
-                <i data-lucide="thumbs-up" style="width:20px;height:20px"></i>
+                <i data-lucide="message-circle-heart" style="width:20px;height:20px"></i>
               </span>
               <span class="quick-action-tile__label">Blog</span>
             </button>
         
             <button class="quick-action-tile hidden" id="quick-link-quest" type="button" data-nav="quest">
               <span class="quick-action-tile__icon">
-                <i data-lucide="award" style="width:20px;height:20px"></i>
+                <i data-lucide="alarm-clock-check" style="width:20px;height:20px"></i>
               </span>
               <span class="quick-action-tile__label">Quests</span>
             </button>
@@ -742,10 +738,16 @@
               <h2 class="blog-title">Blog Feed</h2>
               <p class="blog-subtitle">Post, read, and earn from helpful activity.</p>
             </div>
-            <a class="blog-compose-btn" href="/src/post/">
-              <i data-lucide="square-pen" style="width:16px;height:16px"></i>
-              <span>Post</span>
-            </a>
+            <div class="blog-header-wrap">
+              <a class="blog-compose-btn" href="/src/post/">
+                <i data-lucide="square-pen" style="width:16px;height:16px"></i>
+                <span>Post</span>
+              </a>
+              <a class="blog-compose-btn blog-compose-btn-alt" href="/src/dashboard/?page=blog">
+                <i data-lucide="refresh-cw" style="width:16px;height:16px"></i>
+                <span>Refresh Feed</span>
+              </a>
+            </div>
           </header>
 
           <div class="blog-feed" id="blogFeed" role="list" aria-live="polite">

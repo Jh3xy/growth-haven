@@ -14,7 +14,11 @@ if (window.lucide) {
 }
 
 const DASHBOARD_BLOG_URL = '/src/dashboard/?page=blog';
-const MAX_POST_LENGTH = 500;
+const MAX_POST_LENGTH = 5000;
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+const MAX_IMAGE_WIDTH = 1200;
+const COMPRESSION_QUALITY = 0.78;
 
 const form = document.getElementById('postForm');
 const textarea = document.getElementById('postContent');
@@ -23,6 +27,15 @@ const submitBtn = document.getElementById('postSubmitBtn');
 const errorEl = document.getElementById('postError');
 const authorAvatar = document.getElementById('postAuthorAvatar');
 const authorName = document.getElementById('postAuthorName');
+const imageInput = document.getElementById('postImageInput');
+const imagePreview = document.getElementById('postImagePreview');
+const imageThumbnail = document.getElementById('postImageThumbnail');
+const imageRemoveBtn = document.getElementById('postImageRemove');
+
+// State variables
+let selectedImageFile = null;
+let isImageLoaded = false;
+let compressedImageBlob = null;
 
 const { data: { session } } = await supabase.auth.getSession();
 
@@ -46,7 +59,7 @@ function setSubmitting(isSubmitting) {
 function updateCounter() {
   const length = textarea.value.length;
   counter.textContent = `${length}/${MAX_POST_LENGTH}`;
-  counter.classList.toggle('is-warning', length >= 420 && length < MAX_POST_LENGTH);
+  counter.classList.toggle('is-warning', length >= 900 && length < MAX_POST_LENGTH);
   counter.classList.toggle('is-danger', length >= MAX_POST_LENGTH);
   submitBtn.disabled = length === 0 || length > MAX_POST_LENGTH;
   if (length > 0) setError('');
@@ -91,15 +104,139 @@ async function loadAuthor() {
   authorAvatar.textContent = getInitials(firstName, lastName);
 }
 
+
+/**
+ * Compress image using Canvas API
+ * - Resizes to max 1200px width (maintains aspect ratio)
+ * - Exports as JPEG at 0.78 quality
+ * - Target: 200-400KB for typical phone photos
+ */
+async function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let { width, height } = img;
+        
+        // Resize if wider than max width
+        if (width > MAX_IMAGE_WIDTH) {
+          height = Math.round((height * MAX_IMAGE_WIDTH) / width);
+          width = MAX_IMAGE_WIDTH;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('Canvas compression failed'));
+              return;
+            }
+            console.log('[post] Image compressed:', {
+              original: `${(file.size / 1024).toFixed(0)}KB`,
+              compressed: `${(blob.size / 1024).toFixed(0)}KB`,
+              dimensions: `${width}×${height}`,
+            });
+            resolve(blob);
+          },
+          'image/jpeg',
+          COMPRESSION_QUALITY
+        );
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = e.target.result;
+    };
+    
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+
+function clearImageSelection() {
+  selectedImageFile = null;
+  compressedImageBlob = null;
+  imageInput.value = "";
+  imagePreview.classList.add("hidden");
+  imageThumbnail.style.backgroundImage = "";
+}
+
+
+async function handleImageSelection(file) {
+  if (!file) return;
+  if (isImageLoaded) {
+    // prevent double upload
+    showToast("An image is already selected. Remove it before adding another.", "info");
+    return;
+  }
+
+  // Validate MIME type
+  const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!validTypes.includes(file.type)) {
+    showToast("Only JPEG, PNG, and WebP images are supported.", "warning");
+    clearImageSelection();
+    return;
+  }
+
+  // Validate size
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    showToast(`Image must be under ${MAX_IMAGE_SIZE_MB}MB.`, "warning");
+    clearImageSelection();
+    return;
+  }
+
+  try {
+    // Compress the image
+    const blob = await compressImage(file);
+    compressedImageBlob = blob;
+    selectedImageFile = file;
+    isImageLoaded = true;
+    // Show preview
+    const previewUrl = URL.createObjectURL(blob);
+    imageThumbnail.style.backgroundImage = `url(${previewUrl})`;
+    imagePreview.classList.remove("hidden");
+
+    // Re-initialize Lucide icons for the remove button
+    if (window.lucide) {
+      window.lucide.createIcons({ nodes: [imagePreview] });
+    }
+  } catch (error) {
+    console.error("[post] Image compression failed:", error);
+    showToast("Failed to process image. Try a different file.", "error");
+    clearImageSelection();
+  }
+}
+
+
+imageInput.addEventListener("change", (e) => {
+  const file = e.target.files?.[0];
+  if (file) handleImageSelection(file);
+});
+
+imageRemoveBtn.addEventListener("click", () => {
+  clearImageSelection();
+});
+
+
 textarea.addEventListener('input', updateCounter);
 
-form.addEventListener('submit', async (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const content = textarea.value.trim();
 
   if (!content) {
-    setError('Write something before posting.');
+    setError("Write something before posting.");
     textarea.focus();
     return;
   }
@@ -111,28 +248,82 @@ form.addEventListener('submit', async (event) => {
   }
 
   setSubmitting(true);
-  setError('');
+  setError("");
 
-  const { error } = await supabase
-    .from('posts')
-    .insert({
-      user_id: user.id,
-      content,
-      is_dummy: false,
-    });
+  try {
+    //  Insert post and get the ID back
+    const { data: newPost, error: insertError } = await supabase
+      .from("posts")
+      .insert({
+        user_id: user.id,
+        content,
+        is_dummy: false,
+      })
+      .select("id")
+      .single();
 
-  if (error) {
-    console.error('[post] Failed to create post:', error);
-    setError('Could not publish your post. Please try again.');
-    showToast('Post failed. Try again.', 'error');
+    if (insertError) {
+      throw insertError;
+    }
+
+    const postId = newPost.id;
+    console.log("[post] Post created:", postId);
+
+    // Step 2: Upload image if one was selected
+    if (compressedImageBlob) {
+      const filePath = `${user.id}/${postId}/image.jpg`;
+
+      console.log("[post] Uploading image to:", filePath);
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(filePath, compressedImageBlob, {
+          contentType: "image/jpeg",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("[post] Image upload failed:", uploadError);
+        showToast("Post created, but image upload failed.", "warning");
+        // Post exists without image - acceptable, continue to redirect
+        window.setTimeout(() => {
+          window.location.href = DASHBOARD_BLOG_URL;
+        }, 1200);
+        return;
+      }
+
+      console.log("[post] Image uploaded:", uploadData.path);
+
+      // Step 3: Get public URL
+      const { data: urlData } = supabase.storage
+        .from("post-images")
+        .getPublicUrl(filePath);
+
+      const publicUrl = urlData.publicUrl;
+      console.log("[post] Public URL:", publicUrl);
+
+      // Step 4: Update post with image_url
+      const { error: updateError } = await supabase
+        .from("posts")
+        .update({ image_url: publicUrl })
+        .eq("id", postId);
+
+      if (updateError) {
+        console.error("[post] Failed to update image_url:", updateError);
+        showToast("Post created, but image link failed.", "warning");
+      }
+    }
+
+    showToast("Post published.");
+    window.setTimeout(() => {
+      window.location.href = DASHBOARD_BLOG_URL;
+    }, 650);
+  } catch (error) {
+    console.error("[post] Failed to create post:", error);
+    setError("Could not publish your post. Please try again.");
+    showToast("Post failed. Try again.", "error");
     setSubmitting(false);
-    return;
   }
-
-  showToast('Post published.');
-  window.setTimeout(() => {
-    window.location.href = DASHBOARD_BLOG_URL;
-  }, 650);
 });
 
 await loadAuthor();
