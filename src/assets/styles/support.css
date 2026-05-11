@@ -104,11 +104,14 @@
 .support-faq-item__body {
   display: grid;
   grid-template-rows: 0fr;
+  overflow: hidden;
+  visibility: hidden;
   transition: grid-template-rows 0.35s var(--spring);
 }
 
 .support-faq-item.is-open .support-faq-item__body {
   grid-template-rows: 1fr;
+  visibility: visible;
 }
 
 /* Inner wrapper needed for the grid-rows trick to work */
