@@ -818,8 +818,13 @@ svg.site-header__wordmark {
   background: var(--surface-overlay);
   border-color: var(--border-subtle);
   box-shadow: 0 1px 24px rgba(0, 0, 0, 0.04);
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  z-index: 9999;
+  opacity: 1;
+  will-change: opacity;
+  backdrop-filter: blur(30px);
+  transform: translateZ(0); /* Force GPU acceleration for better mobile blur support */
+  -webkit-backdrop-filter: blur(30px);
+  -webkit-transform: translateZ(0);
 }
 
 .nav__inner {

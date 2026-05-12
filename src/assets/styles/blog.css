@@ -158,6 +158,7 @@
 
 .blog-post__media img {
   width: 100%;
+  display: block;
   max-height: 360px;
   object-fit: cover;
 }
@@ -443,6 +444,7 @@
   align-self: center;
   min-height: 40px;
   padding: 0 1.1rem;
+  font-family: inherit;
   color: var(--text-primary);
   background-color: var(--surface-card);
   border: 1px solid var(--border-subtle);
