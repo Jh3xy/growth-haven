@@ -16,6 +16,26 @@
   pointer-events: all;
 }
 
+.loader-wrap{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.loader-wrap #statusHint {
+  color: var(--text-secondary);
+  max-width: 300px;
+  margin-top: 3rem;
+  font-size: 12px;
+  text-align: center;
+}
+
+.loader-wrap #statusHint a {
+  font-size: 13px;
+  color: var(--brand-primary);
+}
+
 .dash-loader.is-done {
   opacity: 0;
   pointer-events: none;
@@ -73,10 +93,17 @@
   line-height: 1.15;
   letter-spacing: 0;
 }
+html[data-theme='light']  .blog-title,
+html[data-theme='light']  .blog-subtitle,
+html[data-theme='light']  .invest-header__title,
+html[data-theme='light']  .txn-header p,
+html[data-theme='light']  .dash-welcome-card__greeting {
+  color: #FFFFFF;
+}
 
 .blog-subtitle {
-  margin: 0.35rem 0 0;
-  color: var(--text-secondary);
+  margin: 0;
+  /* color: var(--text-secondary); */
   font-size: var(--fs-caption);
   line-height: 1.5;
 }

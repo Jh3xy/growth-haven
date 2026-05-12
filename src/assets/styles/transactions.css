@@ -10,9 +10,11 @@
 
 .txn-header {
   display: flex;
+  /* gap: 0.25rem; */
+  position: absolute;
+  bottom: 3rem;
   flex-direction: column;
-  gap: 0.25rem;
-  margin-bottom: 0.25rem;
+  /* margin-bottom: 0.25rem; */
 }
 
 .txn-header__title {

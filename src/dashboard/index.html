@@ -142,10 +142,22 @@
 
 
           <!-- ① WELCOME CARD ─────────────────────────────── -->
-          <div class="greeting">
+          <!-- <div class="greeting">
             <h1 class="dash-welcome-card__greeting" id="greetingText">Welcome</h1>
             <p class="dash-welcome-card__sub">Your investments are secure.</p>
+          </div> -->
+
+          <!-- Carousel header -->
+         <div class="dash-carousel-header" id="homeCarousel">
+          <div class="dash-carousel-header__content">
+            <div class="dash-section-header">
+              <div class="txn-header">
+                <h2 class="txn-header__title dash-welcome-card__greeting" id="greetingText">Welcome</h2>
+                <p class="txn-header__sub dash-welcome-card__sub">Your value and activity counts</p>
+              </div>
+            </div>
           </div>
+        </div>
 
 
           <!-- ② WALLET CARD ─────────────────────────────── -->
@@ -274,6 +286,12 @@
             </div>
 
           </div><!-- /#activityList -->
+          <button class="quick-action-tile quick-action-tile-alt" type="button" data-nav="transact">
+            <span class="quick-action-tile__label">View All Transactions</span>
+              <span class="quick-action-tile__icon">
+                <i data-lucide="move-right"></i>
+              </span>
+            </button>
 
 
           <!-- ⑤ REFERRAL TOOLS ──────────────────────────── -->
@@ -397,10 +415,15 @@
       <section id="section-invest" class="dash-section hidden">
         <div class="dash-section__inner flex-col">
 
-          <!-- Section heading — always visible regardless of state -->
-          <div class="invest-header">
-            <h2 class="invest-header__title">Investments</h2>
-            <p class="invest-header__sub">Grow your money. Lock it, earn daily, claim on time.</p>
+          <div class="dash-carousel-header" id="investmentsCarousel">
+            <div class="dash-carousel-header__content">
+              <div class="dash-section-header">
+                <div class="txn-header">
+                  <h2 class="txn-header__title invest-header__title">Investments</h2>
+                  <p class="txn-header__sub invest-header__sub">Grow your money. Lock it, earn daily, claim on time.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
 
@@ -733,10 +756,15 @@
       <section id="section-blog" class="dash-section hidden">
         <div class="blog-shell">
           <header class="blog-header">
-            <div class="blog-header__copy">
-              <p class="blog-eyebrow">Community</p>
-              <h2 class="blog-title">Blog Feed</h2>
-              <p class="blog-subtitle">Post, read, and earn from helpful activity.</p>
+            <div class="dash-carousel-header" id="blogCarousel">
+              <div class="dash-carousel-header__content">
+                <div class="dash-section-header">
+                  <div class="txn-header">
+                    <h2 class="txn-header__title blog-title">Blog Feed</h2>
+                    <p class="txn-header__sub blog-subtitle">Post, read, and earn from helpful activity.</p>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="blog-header-wrap">
               <a class="blog-compose-btn" href="/src/post/">
@@ -821,9 +849,21 @@
       <div class="dash-section__inner flex-col">
 
         <!-- Heading -->
-        <div class="txn-header">
+        <!-- <div class="txn-header">
           <h2 class="txn-header__title">Transactions</h2>
           <p class="txn-header__sub">Your complete activity ledger.</p>
+        </div> -->
+
+        <!-- Carousel header -->
+         <div class="dash-carousel-header" id="transactionsCarousel">
+          <div class="dash-carousel-header__content">
+            <div class="dash-section-header">
+              <div class="txn-header">
+                <h2 class="txn-header__title">Transactions</h2>
+                <p class="txn-header__sub">Your complete activity ledger.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Filter Tabs -->
@@ -1220,7 +1260,10 @@
 
   <!-- DASHBOARD LOADER — visible by default, hidden by JS after all data resolves -->
   <div class="dash-loader" id="dashLoader" aria-hidden="true">
-    <div class="dash-loader__spinner"></div>
+    <div class="loader-wrap">
+      <div class="dash-loader__spinner"></div>
+      <div class="hidden" id="statusHint">Something seems wrong - (or your network is slow). <br> <br> If the issues persists try refreshing your browser <br> or contact Support on <a href="https://t.me/growthhavensupport" target="_blank" rel="noopener noreferrer" aria-label="Contact support on Telegram">Telegram</a> </div>
+    </div>
   </div>
 
   <script>

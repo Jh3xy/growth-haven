@@ -21,12 +21,104 @@ import { openModal } from './modal.js';
 import { initBlogSection } from './blog.js';
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
-import { initCarousel } from "./carousel.js";
+import { initCarouselHeader } from "./carousel.js";
 
 // ─── CONFIG ──────────────────────────────────────────────────
 // This is the full URL of your register page.
 // In prod, change this to your actual domain.
 const REGISTER_URL = `${window.location.origin}/src/register/`;
+
+
+
+// ─── STATE - Carousel ──────────────────────────────────────────────────
+
+// Start loading timer immediately
+const networkTimer = setTimeout(() => {
+  const statusHint = document.getElementById("statusHint");
+  if (statusHint) statusHint.classList.remove("hidden");
+}, 6000);
+
+
+let isLoaded = false;
+// Track which carousels have been initialized
+const initializedCarousels = new Set();
+
+/**
+ * Carousel configuration
+ * !NOTE: The section name keys (e.g. 'blog') must match the data-nav attributes of the corresponding nav links, 
+*           !and the id values must match the id of the carousel container in the HTML.
+ * example data: blog: {
+ *                id: 'blogCarousel',
+*                   images: [...] },
+  */
+const carouselConfigs = {
+  transact: {
+    id: 'transactionsCarousel',
+    images: [
+      '/assets/other/db-banner-01.jpg',
+      '/assets/other/db-banner-02.jpg',
+      '/assets/other/db-banner-03.jpg',
+      '/assets/other/db-banner-04.jpg',
+      '/assets/other/db-banner-05.jpg',
+    ]
+  },
+  invest: {
+    id: 'investmentsCarousel',
+    images: [
+      '/assets/other/db-banner-01.jpg',
+      '/assets/other/db-banner-02.jpg',
+      '/assets/other/db-banner-03.jpg',
+      '/assets/other/db-banner-04.jpg',
+      '../../public/assets/other/db-banner-05.jpg',
+    ]
+  },
+  blog: {
+    id: 'blogCarousel',
+    images: [
+      '/assets/other/db-banner-01.jpg',
+      '/assets/other/db-banner-02.jpg',
+      '/assets/other/db-banner-03.jpg',
+      '/assets/other/db-banner-04.jpg',
+      '/assets/other/db-banner-05.jpg',
+    ]
+  },
+  home: {
+    id: 'homeCarousel',
+    images: [
+      '/assets/other/db-banner-01.jpg',
+      '/assets/other/db-banner-02.jpg',
+      '/assets/other/db-banner-03.jpg',
+      '/assets/other/db-banner-04.jpg',
+      '/assets/other/db-banner-05.jpg',
+    ]
+  },
+  
+};
+
+
+// Also initialize for the default section (if it has a carousel)
+const defaultSection = localStorage.getItem('gh_current_tab') || 'home';
+ensureCarouselInitialized(defaultSection, defaultSection.images);
+
+// Function to initialize carousel if not already done
+function ensureCarouselInitialized(sectionName) {
+  const config = carouselConfigs[sectionName];
+  if (!config) {
+    // Section doesn't have a carousel
+    console.warn('[carousel]: No config found')
+    return; 
+  }
+  
+  if (initializedCarousels.has(sectionName)) return; // Already initialized
+  
+  const container = document.getElementById(config.id);
+  if (container) {
+    initCarouselHeader(config.id, config.images);
+    initializedCarousels.add(sectionName);
+    console.log(`[carousel] Initialized ${config.id}`);
+  }
+}
+
 
 // Initialize PostHog for Error tracking and Feature Flags
 posthog.init('phc_yTajNg3srP52CjfjDBAWnCNBLthdgHXcGzaV4x35CD8n', {
@@ -359,6 +451,7 @@ function renderReferralRow(ref) {
    referrals.forEach((ref) => {
      refListEl.appendChild(renderReferralRow(ref));
    });
+   isLoaded = true;
  })();
  
 // ─── RECENT ACTIVITY ─────────────────────────────────────────────
@@ -539,7 +632,13 @@ document.addEventListener('keydown', (e) => {
  
 // ── Nav link clicks ──
 navLinks.forEach(link => {
-  link.addEventListener('click', () => switchSection(link.dataset.nav));
+  link.addEventListener('click', () => {
+    const sectionName = link.dataset.nav;
+    switchSection(sectionName);
+    // Initialize carousel if needed
+    // !NOTE: it is initiliazed with data-nav attribute of link
+    ensureCarouselInitialized(sectionName);
+  });
 });
 
 // In initInvestEvents or after switchSection is defined:
@@ -1381,6 +1480,7 @@ await referralsReady;
 // Hide loader — everything critical has resolved
 const dashLoader = document.getElementById("dashLoader");
 if (dashLoader) {
+  clearTimeout(networkTimer); // Stop the hint from showing if it hasn't already
   dashLoader.classList.add("is-done");
   dashLoader.addEventListener("transitionend", () => dashLoader.remove(), {
     once: true,
