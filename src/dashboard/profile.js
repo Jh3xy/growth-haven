@@ -41,7 +41,7 @@ export function initProfile(user) {
 async function loadProfile(user) {
   const { data: member, error } = await supabase
     .from('members')
-    .select('first_name, last_name, email, phone, referral_code, created_at')
+    .select('first_name, last_name, email, phone, referral_code, created_at, avatar_url')
     .eq('id', user.id)
     .single();
 
@@ -55,6 +55,24 @@ async function loadProfile(user) {
   initEditFlow(user, member);
 }
 
+
+
+function renderAvatarEl(el, avatarUrl, initials, fullName = "") {
+  // Remove any existing photo (safe on first render too)
+  el.querySelector(".avatar-photo")?.remove();
+  // Text layer: initials always sit underneath as a fallback
+  el.textContent = initials;
+
+  if (!avatarUrl) return;
+
+  const img = document.createElement("img");
+  img.src = avatarUrl;
+  img.alt = fullName;
+  img.className = "avatar-photo";
+  // On error: img removes itself, initials text underneath is already visible
+  img.onerror = () => img.remove();
+  el.appendChild(img);
+}
 
 // ─── IDENTITY BLOCK ──────────────────────────────────────────────
 
@@ -72,7 +90,8 @@ function populateIdentity(member) {
     ? new Date(member.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
     : '—';
 
-  if (avatarEl)  avatarEl.textContent  = initials || '?';
+  if (avatarEl)
+    renderAvatarEl(avatarEl, member.avatar_url, initials || "?", fullName);
 
   if (nameEl)    { nameEl.textContent  = fullName || '—';               nameEl.classList.remove('skeleton'); }
   if (emailEl)   { emailEl.textContent = member.email || '—';           emailEl.classList.remove('skeleton'); }
@@ -98,6 +117,150 @@ function populateFields(member) {
   if (phoneEl) phoneEl.value = member.phone      || '';
 }
 
+
+function initAvatarUpload(user, currentAvatarUrl) {
+  const avatarEl = document.getElementById("profileAvatar");
+  const addBtn = document.querySelector(".add-profile-btn");
+  const editBtn = document.getElementById("profileEditBtn");
+  const cancelBtn = document.getElementById("profileCancelBtn");
+  const saveBtn = document.getElementById("profileSaveBtn");
+
+  if (!avatarEl) return;
+
+  // Create a hidden file input — no HTML change needed
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/jpeg,image/png,image/webp";
+  fileInput.style.display = "none";
+  document.body.appendChild(fileInput);
+
+  let isEditing = false;
+  let committedUrl = currentAvatarUrl || null; // last confirmed-good URL
+
+  // ── Track edit mode so avatar click only fires in edit mode ──
+  editBtn?.addEventListener("click", () => {
+    isEditing = true;
+    avatarEl.classList.add("is-editable");
+    addBtn?.classList.add("is-visible");
+  });
+
+  function exitEditMode() {
+    isEditing = false;
+    avatarEl.classList.remove("is-editable");
+    addBtn?.classList.remove("is-visible");
+  }
+
+  cancelBtn?.addEventListener("click", exitEditMode);
+
+  // saveBtn click exits edit mode via existing initEditFlow logic;
+  // we also need to clear the editable state here
+  saveBtn?.addEventListener("click", () => {
+    // Wait one tick so initEditFlow's setEditing(false) runs first
+    setTimeout(exitEditMode, 0);
+  });
+
+  // ── Trigger file picker on avatar or pencil btn click ──
+  function onAvatarClick() {
+    if (!isEditing) return;
+    fileInput.click();
+  }
+
+  avatarEl.addEventListener("click", onAvatarClick);
+  addBtn?.addEventListener("click", (e) => {
+    e.stopPropagation(); // prevent bubbling to avatarEl listener
+    onAvatarClick();
+  });
+
+  // ── Handle file selection ──
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files?.[0];
+    fileInput.value = ""; // reset so same file can be re-selected
+    if (!file) return;
+
+    // Client-side guards (storage also enforces these, this is UX only)
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      showAvatarError("Only JPEG, PNG, or WebP images are accepted.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      showAvatarError("Image must be under 2MB.");
+      return;
+    }
+
+    // Optimistic update — show local blob immediately
+    const blobUrl = URL.createObjectURL(file);
+    renderAvatarEl(avatarEl, blobUrl, avatarEl.textContent);
+    avatarEl.classList.add("is-uploading");
+
+    const ext = file.name.split(".").pop().toLowerCase() || "jpg";
+    const path = `${user.id}/avatar.${ext}`;
+
+    // Upload — upsert:true overwrites any previous file at the same path
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    avatarEl.classList.remove("is-uploading");
+
+    if (uploadError) {
+      console.error("[profile] Avatar upload failed:", uploadError);
+      renderAvatarEl(avatarEl, committedUrl, avatarEl.textContent); // revert
+      showAvatarError("Upload failed. Please try again.");
+      return;
+    }
+
+    // Get the stable public URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("avatars").getPublicUrl(path);
+
+    // Persist to members table
+    const { error: dbError } = await supabase
+      .from("members")
+      .update({ avatar_url: publicUrl })
+      .eq("id", user.id);
+
+    if (dbError) {
+      console.error("[profile] avatar_url update failed:", dbError);
+      renderAvatarEl(avatarEl, committedUrl, avatarEl.textContent); // revert
+      showAvatarError("Could not save photo. Please try again.");
+      return;
+    }
+
+    // Commit: replace blob URL with real CDN URL
+    committedUrl = publicUrl;
+    // Add cache-buster so the browser doesn't serve the old image
+    const freshUrl = `${publicUrl}?t=${Date.now()}`;
+    renderAvatarEl(avatarEl, freshUrl, avatarEl.textContent);
+
+    // Sync header avatar
+    const headerAvatar = document.getElementById("avatarInitials");
+    if (headerAvatar) {
+      const initials = headerAvatar.textContent || "";
+      renderAvatarEl(headerAvatar, freshUrl, initials);
+    }
+
+    URL.revokeObjectURL(blobUrl); // clean up
+  });
+
+  // ── Inline error helper (reuses profile-field-error pattern) ──
+  function showAvatarError(msg) {
+    const existing = document.getElementById("avatarUploadError");
+    if (existing) {
+      existing.textContent = msg;
+      return;
+    }
+    const err = document.createElement("p");
+    err.id = "avatarUploadError";
+    err.className = "profile-field-error";
+    err.style.textAlign = "center";
+    err.style.marginTop = "0.5rem";
+    err.textContent = msg;
+    avatarEl.closest(".profile-identity")?.appendChild(err);
+    setTimeout(() => err.remove(), 4000);
+  }
+}
 
 // ─── EDIT FLOW ───────────────────────────────────────────────────
 
@@ -226,7 +389,14 @@ function initEditFlow(user, originalMember) {
     const nameEl    = document.getElementById('profileName');
     const avatarEl  = document.getElementById('profileAvatar');
     if (nameEl)   nameEl.textContent   = fullName;
-    if (avatarEl) avatarEl.textContent = newInitials;
+    if (avatarEl) {
+      // Re-render: keeps any existing photo, updates initials fallback
+      renderAvatarEl(avatarEl, committedUrl ?? null, newInitials);
+    }
+    if (headerAvatar) {
+      const headerInitials = newInitials.toUpperCase();
+      renderAvatarEl(headerAvatar, committedUrl ?? null, headerInitials);
+    }
 
     // 4. Update header avatar + name (rendered from user_metadata on load)
     const headerAvatar = document.getElementById('avatarInitials');

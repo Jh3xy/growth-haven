@@ -226,6 +226,8 @@ html[data-theme='light']  .dash-welcome-card__greeting {
 .blog-post__avatar {
   width: 30px;
   height: 30px;
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -237,6 +239,48 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   font-size: 0.68rem;
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
+}
+
+
+/* Initials fallback layer — always rendered, covered by img when present */
+.blog-post__avatar::before {
+  content: attr(data-initials);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Inherit font sizing/weight/color from whatever your current
+     .blog-post__avatar text styles are. Example: */
+  font-size: 0.6rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: inherit;
+  z-index: 0; /* behind the img */
+}
+ 
+/* The img from blog.js renderAvatarContent() */
+.blog-post__avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  z-index: 1; /* above ::before */
+}
+
+.avatar-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  /* Sits above the text content layer (initials) */
+  z-index: 1;
 }
 
 .blog-post__name {

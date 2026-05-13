@@ -67,6 +67,18 @@ function normalizeAuthor(author) {
   return author || {};
 }
 
+// Conditionally render img and avatar url or initials
+function renderAvatarContent(avatarUrl, fullName, initials) {
+  if (!avatarUrl) return initials;
+  return `<img
+    src="${avatarUrl}"
+    alt="${fullName}"
+    class="blog-post__avatar-img"
+    onerror="this.style.display='none';this.parentElement.dataset.fallback='true'"
+  />`;
+  // onerror hides the broken img and lets the CSS :not([data-fallback]) fallback
+}
+
 function createPostElement(post, { onLike }) {
   const author = normalizeAuthor(post.author || post.members);
   const firstName = author.first_name || '';
@@ -82,7 +94,7 @@ function createPostElement(post, { onLike }) {
   article.innerHTML = `
     <div class="blog-post__topline">
       <div class="blog-post-content">
-        <span class="blog-post__avatar" aria-hidden="true">${initials}</span>
+        <span class="blog-post__avatar" aria-hidden="true" data-initials="${initials}">${renderAvatarContent(author.avatar_url, fullName, initials)}</span>
         <div class="blog-post-content_wrap">
           <div class="blog-post__author">
             <span class="blog-post__name"></span>
@@ -350,13 +362,14 @@ export function initBlogSection({ user, supabase, openDeposit }) {
       author: {
         first_name: p.author_first_name,
         last_name: p.author_last_name,
+        avatar_url: p.author_avatar_url || null,
       },
       likeCount: Number(p.like_count || 0),
       userLiked: Boolean(p.user_liked),
       created_at:
         p.created_at instanceof Date
           ? p.created_at.toISOString()
-          : p.created_at, 
+          : p.created_at,
     }));
 
     if (!posts?.length && currentPage === 0) {

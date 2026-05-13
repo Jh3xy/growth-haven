@@ -238,7 +238,20 @@ const firstName = user.user_metadata?.first_name || '';
 const lastName  = user.user_metadata?.last_name  || '';
 const initials  = (firstName[0] || '') + (lastName[0] || '');
 
-avatarEl.textContent    = initials.toUpperCase() || '?';
+const headerInitials = initials.toUpperCase() || '?';
+renderHeaderAvatar(avatarEl, null, headerInitials);
+
+function renderHeaderAvatar(el, avatarUrl, initials) {
+  el.querySelector(".avatar-photo")?.remove();
+  el.textContent = initials;
+  if (!avatarUrl) return;
+  const img = document.createElement("img");
+  img.src = avatarUrl;
+  img.alt = "";
+  img.className = "avatar-photo";
+  img.onerror = () => img.remove();
+  el.appendChild(img);
+}
 headerNameEl.textContent = firstName ? `${firstName} ${lastName}`.trim() : '';
 
 if (firstName) {
@@ -247,9 +260,11 @@ if (firstName) {
 
 // ─── FETCH MEMBER DATA ────────────────────────────────────────
 const { data: member, error: memberError } = await supabase
-  .from('members')
-  .select('referral_code, wallet_balance, vault_balance, has_deposited, is_new')
-  .eq('id', user.id)
+  .from("members")
+  .select(
+    "referral_code, wallet_balance, vault_balance, has_deposited, is_new, avatar_url",
+  )
+  .eq("id", user.id)
   .single();
 
 if (memberError || !member?.referral_code) {
@@ -356,6 +371,12 @@ if (member?.is_new) {
     welcomeModal?.classList.remove('is-open');
     welcomeModal?.setAttribute('aria-hidden', 'true');
   }, { once: true });
+}
+
+if (member?.avatar_url) {
+  // avatarEl is already in scope from the personalise block above
+  const headerInitials = initials.toUpperCase() || "?";
+  renderHeaderAvatar(avatarEl, member.avatar_url, headerInitials);
 }
  
 

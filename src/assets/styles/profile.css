@@ -17,6 +17,76 @@
   text-align: center;
 }
 
+.profile-avatar {
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: filter var(--transition-global);
+}
+
+/* Edit mode: dim the avatar slightly to imply it's interactive */
+.profile-avatar.is-editable {
+  cursor: pointer;
+}
+ 
+.profile-avatar.is-editable:hover {
+  filter: brightness(0.82);
+}
+ 
+/* Upload in progress: spinner overlay */
+.profile-avatar.is-uploading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+ 
+/* Spinner ring inside the overlay */
+.profile-avatar.is-uploading::before {
+  content: '';
+  position: absolute;
+  inset: 25%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  animation: avatar-spin 0.7s linear infinite;
+  z-index: 3;
+}
+ 
+@keyframes avatar-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 4. PROFILE ADD BUTTON — .add-profile-btn ──────────────────
+   Hidden by default. JS adds .is-visible in edit mode.
+   ------------------------------------------------------------ */
+.add-profile-btn {
+  /* Preserve your existing positioning styles (bottom-right of avatar).
+     Add these on top: */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-global);
+}
+ 
+.add-profile-btn.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.avatar-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  /* Sits above the text content layer (initials) */
+  z-index: 1;
+}
+
 .avatar-wrap{
   position: relative;
 }

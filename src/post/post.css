@@ -169,6 +169,29 @@
   font-weight: var(--fw-semibold);
 }
 
+#postAuthorAvatar {
+  position: relative;
+  overflow: hidden;
+}
+ 
+.post-author-avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.post-author-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
 .post-author__meta {
   display: flex;
   flex-direction: column;

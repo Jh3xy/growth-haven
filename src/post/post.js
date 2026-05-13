@@ -76,7 +76,7 @@ function showToast(message, type = 'success') {
 async function loadAuthor() {
   const { data: member, error } = await supabase
     .from('members')
-    .select('first_name, last_name, has_deposited')
+    .select('first_name, last_name, has_deposited, avatar_url')
     .eq('id', user.id)
     .single();
 
@@ -101,7 +101,24 @@ async function loadAuthor() {
 
   authorName.textContent = fullName;
   authorName.classList.remove('skeleton');
-  authorAvatar.textContent = getInitials(firstName, lastName);
+  // Conditionally build pfp with avatar or initials
+  if (member.avatar_url) {
+    // Show PFP — remove text content so initials don't show behind the img
+    authorAvatar.textContent = "";
+    const img = document.createElement("img");
+    img.src = member.avatar_url;
+    img.alt = fullName;
+    img.className = "post-author-avatar-img";
+    img.onerror = () => {
+      // If the URL is stale or 404, fall back to initials silently
+      authorAvatar.removeChild(img);
+      authorAvatar.textContent = getInitials(firstName, lastName);
+    };
+    authorAvatar.appendChild(img);
+  } else {
+    authorAvatar.textContent = getInitials(firstName, lastName);
+  }
+
 }
 
 
