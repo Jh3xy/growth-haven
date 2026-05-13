@@ -21,17 +21,26 @@ const FILTER_GROUPS = {
 };
 
 const INBOUND_TYPES = new Set([
-  'deposit', 'daily_claim', 'referral_bonus', 'vault_maturity', 'early_exit'
+  "deposit",
+  "like",
+  "blog_like_reward",
+  "blog_post_reward",
+  "mines_win",
+  "daily_claim",
+  "early_exit",
+  "referral_bonus",
+  "vault_maturity",
 ]);
 
 const ICON_MAP = {
-  deposit:        'arrow-down-to-line',
-  withdrawal:     'arrow-up-right',
-  vault_fund:     'shield',
-  vault_maturity: 'lock-open',
-  early_exit:     'door-open',
-  daily_claim:    'sun',
-  referral_bonus: 'users',
+  deposit: "arrow-down-to-line",
+  withdrawal: "arrow-up-right",
+  vault_fund: "shield",
+  daily_claim: "sun",
+  like: "thumbs-up",
+  early_exit: "door-open",
+  referral_bonus: "users",
+  vault_maturity: "lock-open",
 };
 
 // ─── STATE ───────────────────────────────────────────────────────
@@ -110,7 +119,7 @@ function updateSummary() {
 function renderRow(txn) {
   const isIn   = INBOUND_TYPES.has(txn.type);
   const sign   = isIn ? '+' : '-';
-  const icon   = ICON_MAP[txn.type] || 'circle';
+  const icon   = ICON_MAP[txn.type] || 'bell-dot';
   const status = txn.status || 'completed';
 
   const row = document.createElement('div');
