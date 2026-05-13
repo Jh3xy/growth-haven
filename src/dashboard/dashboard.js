@@ -197,7 +197,14 @@ if (user) {
 (function handleDashboardParams() {
   const params = new URLSearchParams(window.location.search);
   const page = params.get("page");
+  const action = params.get("action");
 
+  if (action === "deposit") {
+    // Open the deposit modal and exit early (don't switch section)
+    depositBtn?.click();
+    return;
+  }
+  
   if (page === "blog") {
     document.querySelectorAll('.dash-section').forEach((section) => {
       section.classList.add('hidden');

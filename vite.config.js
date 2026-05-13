@@ -23,6 +23,7 @@ export default defineConfig({
         limbo: resolve(__dirname, "src/casino/limbo/index.html"),
         plinko: resolve(__dirname, "src/casino/plinko/index.html"),
         "coin-flip": resolve(__dirname, "src/casino/coin-flip/index.html"),
+        "view-post": resolve(__dirname, "src/view-post/index.html"),
       },
     },
   },

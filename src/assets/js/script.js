@@ -193,38 +193,38 @@ export function updateEl(el, newVal) {
   }
 }
 
-/** Called every second. Calculates remaining time and updates the DOM. */
-function tick() {
-  const remaining = LAUNCH_DATE - Date.now();
+// /** Called every second. Calculates remaining time and updates the DOM. */
+// function tick() {
+//   const remaining = LAUNCH_DATE - Date.now();
 
-  // ---- Launch day reached ----
-  if (remaining <= 0) {
-    Object.values(els).forEach((el) => {
-      el.textContent = "00";
-      el.classList.remove("ticking");
-      el.classList.add("launched"); // triggers blink — see animations.css
-    });
-    clearInterval(timer);
-    return;
-  }
+//   // ---- Launch day reached ----
+//   if (remaining <= 0) {
+//     Object.values(els).forEach((el) => {
+//       el.textContent = "00";
+//       el.classList.remove("ticking");
+//       el.classList.add("launched"); // triggers blink — see animations.css
+//     });
+//     clearInterval(timer);
+//     return;
+//   }
 
-  // ---- Calculate units ----
-  const totalSecs = Math.floor(remaining / 1000);
-  const days = Math.floor(totalSecs / 86400);
-  const hours = Math.floor((totalSecs % 86400) / 3600);
-  const mins = Math.floor((totalSecs % 3600) / 60);
-  const secs = totalSecs % 60;
+//   // ---- Calculate units ----
+//   const totalSecs = Math.floor(remaining / 1000);
+//   const days = Math.floor(totalSecs / 86400);
+//   const hours = Math.floor((totalSecs % 86400) / 3600);
+//   const mins = Math.floor((totalSecs % 3600) / 60);
+//   const secs = totalSecs % 60;
 
-  updateEl(els.days, pad(days));
-  updateEl(els.hours, pad(hours));
-  updateEl(els.mins, pad(mins));
-  updateEl(els.secs, pad(secs));
-}
+//   updateEl(els.days, pad(days));
+//   updateEl(els.hours, pad(hours));
+//   updateEl(els.mins, pad(mins));
+//   updateEl(els.secs, pad(secs));
+// }
 
-// Run once immediately so there's no 1-second blank on load,
-// then update every second.
-tick();
-const timer = setInterval(tick, 1000);
+// // Run once immediately so there's no 1-second blank on load,
+// // then update every second.
+// tick();
+// const timer = setInterval(tick, 1000);
 
 // ============================================================
 //  FORM VALIDATION + SUCCESS STATE

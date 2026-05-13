@@ -37,6 +37,31 @@ function showBlogToast(message, type = 'success') {
   }, 2600);
 }
 
+async function handleShare(post) {
+  const shareUrl = `${window.location.origin}/src/view-post/?id=${post.id}`;
+ 
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Post on GrowthHaven',
+        url: shareUrl,
+      });
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('[blog] Share failed:', err);
+        showBlogToast('Could not open share sheet.', 'warning');
+      }
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showBlogToast('Link copied to clipboard.');
+    } catch {
+      showBlogToast('Could not copy link. Try manually.', 'warning');
+    }
+  }
+}
+
 function normalizeAuthor(author) {
   if (Array.isArray(author)) return author[0] || {};
   return author || {};
@@ -84,7 +109,7 @@ function createPostElement(post, { onLike }) {
         </div>
         <div class="blog-post__actions-secondary">
           <button
-            class="blog-like-btn"
+            class="blog-like-btn blog-share-btn"
             type="button"
             aria-label="Share post"
           >
@@ -105,6 +130,10 @@ function createPostElement(post, { onLike }) {
       button: event.currentTarget,
     });
   });
+
+  article.querySelector('.blog-share-btn')?.addEventListener('click', () => {
+    handleShare(post)
+  })
 
   return article;
 }
@@ -254,7 +283,7 @@ export function initBlogSection({ user, supabase, openDeposit }) {
     //   result: data,
     // });
   }
-
+  
   async function checkAccess() {
     const { data, error } = await supabase
       .from('members')

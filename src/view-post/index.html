@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 160 160'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z'/%3E%3C/g%3E%3C/svg%3E">
+  <!-- ── Static OG defaults (dynamic population planned for later) ── -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="GrowthHaven" />
+  <meta property="og:title" content="Post on GrowthHaven" />
+  <meta property="og:description" content="Join GrowthHaven — your content, your community you activity." />
+  <meta property="og:image" content="/assets/other/og-default.png" />
+  <meta name="twitter:card"  content="summary_large_image" />
+  <meta name="twitter:title"  content="Post on GrowthHaven" />
+  <meta name="twitter:description" content="Join GrowthHaven — your content, your community you activity." />
+  <meta name="twitter:image" content="/assets/other/og-default.png" />
+  <title>Post — GrowthHaven</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <!-- Vite entry — handles all CSS imports -->
+  <script type="module" src="../assets/js/script.js"></script>
+  <script type="module" src="./view-post.js"></script>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════
+       MINIMAL HEADER
+  ══════════════════════════════════════ -->
+  <header class="vp-header" role="banner">
+    <nav class="vp-nav" aria-label="Site navigation">
+
+      <a href="/" class="vp-nav__logo" aria-label="GrowthHaven home">
+        <div class="site-header__logo flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 160 160"
+               class="site-header__wordmark" aria-hidden="true" focusable="false">
+            <g fill="currentColor">
+              <path d="M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z"/>
+            </g>
+          </svg>
+          <span class="site-header__wordmark">GrowthHaven</span>
+        </div>
+      </a>
+
+      <!-- Back link — href updated by JS depending on auth state -->
+      <a href="/src/dashboard/?page=blog" class="vp-nav__back" id="vpBackNav">
+        <i data-lucide="arrow-left" style="width:15px;height:15px" aria-hidden="true"></i>
+        <span>Blog feed</span>
+      </a>
+
+    </nav>
+  </header>
+
+
+  <!-- ══════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════ -->
+  <main class="vp-main" id="vpMain">
+
+    <!-- ── Loading skeleton ── -->
+    <div class="vp-skeleton" id="vpSkeleton" aria-hidden="true" aria-label="Loading post">
+      <div class="vp-skeleton__author-row">
+        <div class="vp-skeleton__avatar"></div>
+        <div class="vp-skeleton__lines">
+          <div class="vp-skeleton__line vp-skeleton__line--name"></div>
+          <div class="vp-skeleton__line vp-skeleton__line--time"></div>
+        </div>
+      </div>
+      <div class="vp-skeleton__line"></div>
+      <div class="vp-skeleton__line"></div>
+      <div class="vp-skeleton__line vp-skeleton__line--short"></div>
+    </div>
+
+
+    <!-- ── Post card (hidden until data loads) ── -->
+    <article class="vp-post hidden" id="vpPost" aria-label="Blog post">
+
+      <header class="vp-post__header">
+        <div class="vp-post__avatar" id="vpAvatar" aria-hidden="true">GH</div>
+        <div class="vp-post__meta">
+          <span class="vp-post__name"  id="vpAuthorName">GrowthHaven Member</span>
+          <time  class="vp-post__time" id="vpTime" datetime=""></time>
+        </div>
+      </header>
+
+      <div class="vp-post__body">
+        <p class="vp-post__content" id="vpContent"></p>
+      </div>
+
+      <!-- Post image — revealed by JS if post.image_url exists -->
+      <div class="vp-post__media hidden" id="vpMedia">
+        <img id="vpImage" src="" alt="Post image" loading="lazy" />
+      </div>
+
+      <!-- Stats row -->
+      <footer class="vp-post__stats" aria-label="Post statistics">
+        <span class="vp-post__like-count" id="vpLikeCount" aria-live="polite">0 likes</span>
+      </footer>
+
+    </article>
+
+
+    <!-- ══════════════════════════════════════
+         AUTH STATE LAYERS
+    ══════════════════════════════════════ -->
+
+    <!-- State A ── Guest (no session) -->
+    <section class="vp-cta hidden" id="vpGuestCta" aria-label="Join GrowthHaven to earn">
+      <div class="vp-cta-wrap">
+        <div class="vp-cta__icon" aria-hidden="true">
+          <i data-lucide="heart" style="width:20px;height:20px"></i>
+        </div>
+        <h2 class="vp-cta__title">Like posts. Earn real money.</h2>
+        <p class="vp-cta__body">
+          GrowthHaven members earn <strong>₦100</strong> for every post they like.
+          Join for free to start earning from your feed and content.
+        </p>
+        <div class="vp-cta__actions">
+          <a href="/src/register/" class="cta-btn vp-cta__primary">Create free account</a>
+          <a href="/src/login/"    class="vp-cta__secondary">Already a member? Log in →</a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- State B ── Locked (session, no deposit) -->
+    <section class="vp-cta vp-cta--locked hidden" id="vpLockedCta" aria-label="Unlock liking and earnings">
+      <div class="vp-cta__icon vp-cta__icon--lock" aria-hidden="true">
+        <i data-lucide="lock" style="width:20px;height:20px"></i>
+      </div>
+      <h2 class="vp-cta__title">Unlock likes &amp; earnings</h2>
+      <p class="vp-cta__body">
+        Make your first deposit to activate your wallet and start earning from likes.
+      </p>
+      <div class="vp-cta__actions">
+        <a href="/src/dashboard/?action=deposit" class="cta-btn vp-cta__primary">Fund your wallet</a>
+      </div>
+    </section>
+
+
+    <!-- State C ── Full access (auth + deposited) -->
+    <div class="vp-actions hidden" id="vpFullActions" aria-label="Post actions">
+      <button
+        class="vp-like-btn"
+        id="vpLikeBtn"
+        type="button"
+        aria-label="Like this post"
+        aria-pressed="false"
+      >
+        <i data-lucide="heart" style="width:17px;height:17px" aria-hidden="true"></i>
+        <span id="vpLikeBtnLabel">Like post</span>
+      </button>
+    </div>
+
+
+    <!-- ── Error / Not found ── -->
+    <div class="vp-error hidden" id="vpError" role="alert" aria-live="assertive">
+      <div class="vp-error__icon" aria-hidden="true">
+        <i data-lucide="file-x" style="width:30px;height:30px"></i>
+      </div>
+      <h2 class="vp-error__title">Post not found</h2>
+      <p class="vp-error__body">This post may have been deleted, or the link is incorrect.</p>
+      <a href="/src/dashboard/?page=blog" class="cta-btn">Go Back to Feed</a>
+    </div>
+
+  </main>
+
+
+  <!-- ══════════════════════════════════════
+       MINIMAL FOOTER
+  ══════════════════════════════════════ -->
+  <footer class="vp-footer" role="contentinfo">
+    <p class="vp-footer__copy">&copy; 2025 GrowthHaven. All rights reserved.</p>
+    <nav class="vp-footer__links" aria-label="Footer links">
+      <a href="/src/terms/">Terms</a>
+      <a href="/src/privacy/">Privacy</a>
+    </nav>
+  </footer>
+
+</body>
+</html>

@@ -181,6 +181,7 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   border-radius: 6px;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
+  background-color: var(--surface-card);
 }
 
 .blog-post__media img {
@@ -267,7 +268,7 @@ html[data-theme='light']  .dash-welcome-card__greeting {
 }
 
 .blog-post--has-media .blog-post__content {
-  --blog-content-collapsed-height: 6.25rem;
+  --blog-content-collapsed-height: 5.15rem;
 }
 
 .blog-post__content.is-collapsed {
@@ -288,7 +289,7 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   display: inline-flex;
   align-self: flex-start;
   min-height: unset;
-  margin-top: 0.35rem;
+  margin-top: 0.15rem;
   padding: 0;
   color: var(--brand-primary);
   background: none;
