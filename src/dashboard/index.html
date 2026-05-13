@@ -976,9 +976,20 @@
     <section id="section-profile" class="dash-section hidden">
       <div class="dash-section__inner flex-col">
 
+        <div class="dash-carousel-header" id="profileCarousel">
+          <div class="dash-carousel-header__content">
+            <div class="dash-section-header">
+              <div class="txn-header">
+                <h2 class="txn-header__title invest-header__title">Profile</h2>
+                <p class="txn-header__sub invest-header__sub">View, read, update account data</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         <!-- ① ACCOUNT IDENTITY ───────────────────────────── -->
-        <div class="profile-identity flex-col items-center">
+        <div class="profile-identity flex-row items-center">
 
           <div class="avatar-wrap">
             <div class="profile-avatar flex-center" id="profileAvatar"></div>
@@ -986,15 +997,17 @@
               <i data-lucide="camera" class="icon"></i>
             </button>
           </div>
-
-          <h2 class="profile-identity__name skeleton" id="profileName">&nbsp;</h2>
-          <p class="profile-identity__email skeleton" id="profileEmail">&nbsp;</p>
-          <p class="profile-identity__since skeleton" id="profileSince">&nbsp;</p>
-
-          <div class="profile-ref-pill flex items-center gap-2 skeleton" id="profileRefPill">
-            <i data-lucide="key-round" style="width:11px;height:11px"></i>
-            <span id="profileRefCode">&nbsp;</span>
+          <div class="profile-identity__wrap">
+            <h2 class="profile-identity__name skeleton" id="profileName">&nbsp;</h2>
+            <p class="profile-identity__email skeleton" id="profileEmail">&nbsp;</p>
+            <p class="profile-identity__since skeleton" id="profileSince">&nbsp;</p>
+            <div class="profile-ref-pill flex items-center gap-2 skeleton" id="profileRefPill">
+              <i data-lucide="key-round" style="width:11px;height:11px"></i>
+              <span id="profileRefCode">&nbsp;</span>
+            </div>
           </div>
+
+
 
         </div>
 
@@ -1262,7 +1275,7 @@
   <div class="dash-loader" id="dashLoader" aria-hidden="true">
     <div class="loader-wrap">
       <div class="dash-loader__spinner"></div>
-      <div class="hidden" id="statusHint">Something seems wrong - (or your network is slow). <br> <br> If the issues persists try refreshing your browser <br> or contact Support on <a href="https://t.me/growthhavensupport" target="_blank" rel="noopener noreferrer" aria-label="Contact support on Telegram">Telegram</a> </div>
+      <div class="hidden" id="statusHint">Network connection might be slow. <br> <br> If the issues persists try refreshing your browser <br> or contact Support on <a href="https://t.me/growthhavensupport" target="_blank" rel="noopener noreferrer" aria-label="Contact support on Telegram">Telegram</a> </div>
     </div>
   </div>
 

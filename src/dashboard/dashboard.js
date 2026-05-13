@@ -92,6 +92,16 @@ const carouselConfigs = {
       '/assets/other/db-banner-05.jpg',
     ]
   },
+  profile: {
+    id: 'profileCarousel',
+    images: [
+      '/assets/other/db-banner-01.jpg',
+      '/assets/other/db-banner-02.jpg',
+      '/assets/other/db-banner-03.jpg',
+      '/assets/other/db-banner-04.jpg',
+      '/assets/other/db-banner-05.jpg',
+    ]
+  },
   
 };
 

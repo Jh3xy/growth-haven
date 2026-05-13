@@ -53,6 +53,7 @@ async function loadProfile(user) {
   populateIdentity(member);
   populateFields(member);
   initEditFlow(user, member);
+  initAvatarUpload(user, member.avatar_url);
 }
 
 
@@ -357,66 +358,78 @@ function initEditFlow(user, originalMember) {
   saveBtn?.addEventListener('click', async () => {
     if (!validate()) return;
 
-    saveBtn.disabled    = true;
-    saveBtn.textContent = 'Saving...';
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
 
-    const firstName = firstEl?.value.trim() || '';
-    const lastName  = lastEl?.value.trim()  || '';
-    const phone     = phoneEl?.value.trim() || null;
+    const firstName = firstEl?.value.trim() || "";
+    const lastName = lastEl?.value.trim() || "";
+    const phone = phoneEl?.value.trim() || null;
 
     // 1. Persist to members table
     const { error: dbError } = await supabase
-      .from('members')
+      .from("members")
       .update({ first_name: firstName, last_name: lastName, phone })
-      .eq('id', user.id);
+      .eq("id", user.id);
 
     if (dbError) {
-      console.error('[profile] Save error:', dbError);
+      console.error("[profile] Save error:", dbError);
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '<i data-lucide="check" style="width:12px;height:12px"></i> Save Changes';
+      saveBtn.innerHTML =
+        '<i data-lucide="check" style="width:12px;height:12px"></i> Save Changes';
       if (window.lucide) lucide.createIcons({ nodes: [saveBtn] });
-      setFieldError(firstEl, 'err-profileFirstName', 'Could not save. Please try again.');
+      setFieldError(
+        firstEl,
+        "err-profileFirstName",
+        "Could not save. Please try again.",
+      );
       return;
     }
 
     // 2. Keep auth metadata in sync so initials survive a page refresh
-    await supabase.auth.updateUser({ data: { first_name: firstName, last_name: lastName } });
+    await supabase.auth.updateUser({
+      data: { first_name: firstName, last_name: lastName },
+    });
 
     // 3. Update identity block in-place
     const fullName = `${firstName} ${lastName}`.trim();
-    const newInitials = getInitials(firstName, lastName) || '?';
+    const newInitials = getInitials(firstName, lastName) || "?";
 
-    const nameEl    = document.getElementById('profileName');
-    const avatarEl  = document.getElementById('profileAvatar');
-    if (nameEl)   nameEl.textContent   = fullName;
-    if (avatarEl) {
-      // Re-render: keeps any existing photo, updates initials fallback
-      renderAvatarEl(avatarEl, committedUrl ?? null, newInitials);
-    }
-    if (headerAvatar) {
-      const headerInitials = newInitials.toUpperCase();
-      renderAvatarEl(headerAvatar, committedUrl ?? null, headerInitials);
-    }
+    const nameEl = document.getElementById("profileName");
+    const avatarEl = document.getElementById("profileAvatar");
+    const headerAvatar = document.getElementById("avatarInitials"); // declared FIRST
+    const headerName = document.getElementById("headerName");
 
-    // 4. Update header avatar + name (rendered from user_metadata on load)
-    const headerAvatar = document.getElementById('avatarInitials');
-    const headerName   = document.getElementById('headerName');
-    if (headerAvatar) headerAvatar.textContent = newInitials.toUpperCase();
-    if (headerName)   headerName.textContent   = fullName;
+    if (nameEl) nameEl.textContent = fullName;
+
+    // Read the current photo URL directly from the DOM.
+    // This avoids the cross-scope dependency on committedUrl entirely —
+    // whatever photo is currently showing in the circle is the right one.
+    const existingImg = avatarEl?.querySelector(".avatar-photo");
+    const currentAvatarUrl = existingImg?.src || null;
+
+    if (avatarEl) renderAvatarEl(avatarEl, currentAvatarUrl, newInitials);
+    if (headerAvatar)
+      renderAvatarEl(headerAvatar, currentAvatarUrl, newInitials.toUpperCase());
+    if (headerName) headerName.textContent = fullName;
 
     // 5. Advance the saved baseline so Cancel works correctly going forward
-    savedValues = { first_name: firstName, last_name: lastName, phone: phone || '' };
+    savedValues = {
+      first_name: firstName,
+      last_name: lastName,
+      phone: phone || "",
+    };
 
     // 6. Revert UI
     saveBtn.disabled = false;
-    saveBtn.innerHTML = '<i data-lucide="check" style="width:12px;height:12px"></i> Save Changes';
+    saveBtn.innerHTML =
+      '<i data-lucide="check" style="width:12px;height:12px"></i> Save Changes';
     if (window.lucide) lucide.createIcons({ nodes: [saveBtn] });
 
     setEditing(false);
 
     if (successEl) {
-      successEl.classList.remove('hidden');
-      setTimeout(() => successEl.classList.add('hidden'), 4000);
+      successEl.classList.remove("hidden");
+      setTimeout(() => successEl.classList.add("hidden"), 4000);
     }
   });
 }
