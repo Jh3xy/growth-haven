@@ -1139,9 +1139,26 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   align-items: center;
   gap: 0.5rem;
   padding: 1.5rem 1.25rem 1rem;
-  border-bottom: var(--border-width) solid var(--border-subtle);
-  margin-bottom: 0.5rem;
   flex-shrink: 0;
+}
+
+.dash-sidebar__user-wrap{
+  font-size: 12px;
+  padding-left: 1.25rem;
+  padding-right: 10px;
+  width: 100%;  
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  align-items: flex-start;
+  font-weight: var(--fw-regular);
+  flex-direction: column;
+  border-bottom: var(--border-width) solid var(--border-subtle);
+}
+
+.dash-sidebar__user {
+  margin-bottom: 0.5rem;
+  font-weight: var(--fw-regular);
 }
  
 .dash-sidebar__logo-mark {

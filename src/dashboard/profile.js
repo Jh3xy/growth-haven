@@ -84,6 +84,7 @@ function populateIdentity(member) {
   const sinceEl   = document.getElementById('profileSince');
   const refPillEl = document.getElementById('profileRefPill');
   const refCodeEl = document.getElementById('profileRefCode');
+  const usernameSecondary = document.querySelector('.dash-sidebar__user')
 
   const initials = getInitials(member.first_name, member.last_name);
   const fullName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
@@ -94,9 +95,10 @@ function populateIdentity(member) {
   if (avatarEl)
     renderAvatarEl(avatarEl, member.avatar_url, initials || "?", fullName);
 
-  if (nameEl)    { nameEl.textContent  = fullName || '—';               nameEl.classList.remove('skeleton'); }
-  if (emailEl)   { emailEl.textContent = member.email || '—';           emailEl.classList.remove('skeleton'); }
-  if (sinceEl)   { sinceEl.textContent = `Member since ${since}`;       sinceEl.classList.remove('skeleton'); }
+  if (nameEl)    { nameEl.textContent  = fullName || '—';    nameEl.classList.remove('skeleton'); }
+  if (usernameSecondary)    { usernameSecondary.textContent  = fullName || '—';    usernameSecondary.classList.remove('skeleton'); }
+  if (emailEl)   { emailEl.textContent = member.email || '—';  emailEl.classList.remove('skeleton'); }
+  if (sinceEl)   { sinceEl.textContent = `Member since ${since}`;   sinceEl.classList.remove('skeleton'); }
 
   if (refPillEl && refCodeEl) {
     refCodeEl.textContent = member.referral_code || '—';

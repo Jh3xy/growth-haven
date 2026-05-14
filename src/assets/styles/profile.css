@@ -153,6 +153,11 @@
   border-radius: 4px;
 }
 
+.profile-identity__email.skeleton{
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
 .profile-identity__since {
   font-size: 11px;
   color: var(--text-secondary);
