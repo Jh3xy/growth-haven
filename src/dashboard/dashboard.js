@@ -18,7 +18,7 @@ import posthog from 'posthog-js';
 import { initProfile } from './profile.js';
 import { initTransactions, resetTransactions } from './transactions.js';
 import { openModal } from './modal.js';
-import { initBlogSection } from './blog.js';
+import { initBlogSection } from "./blog.js";
 import { getInitials, formatDate } from '../assets/js/utils.js';
 import { supabase } from '../assets/js/supabase.js';
 import { initCarouselHeader } from "./carousel.js";
@@ -106,10 +106,6 @@ const carouselConfigs = {
 };
 
 
-// Also initialize for the default section (if it has a carousel)
-const defaultSection = localStorage.getItem('gh_current_tab') || 'home';
-ensureCarouselInitialized(defaultSection, defaultSection.images);
-
 // Function to initialize carousel if not already done
 function ensureCarouselInitialized(sectionName) {
   const config = carouselConfigs[sectionName];
@@ -164,6 +160,7 @@ const copyLinkBtn  = document.getElementById('copyLinkBtn');
 const signoutBtn   = document.getElementById('signoutBtn');
 
 let currentWalletBalance = 0;
+let dashboardActivity = [];
 let loadBlogSection = async () => {};
 
 // ─── AUTH GUARD ──────────────────────────────────────────────
@@ -499,7 +496,7 @@ function renderReferralRow(ref) {
  * Renders transaction rows into #activityList.
 *
 * Expected shape of each item in data[]:
-*   { type, label, amount, created_at }
+*   { type, label, amount, created_at, id }
 *
 * Types: 'deposit' | 'withdrawal' | 'vault_fund' |
 *        'daily_claim' | 'referral_bonus' | 'vault_maturity' | 'like'
@@ -513,6 +510,7 @@ function renderActivity(data) {
   activityListEl.innerHTML = '';
  
   if (!data || data.length === 0) {
+    // Empty State
     activityListEl.innerHTML = `
       <div class="dash-ref-empty flex-col-center" style="padding: 2.5rem 1.5rem;">
         <div class="dash-ref-empty__icon flex-center">
@@ -547,6 +545,7 @@ function renderActivity(data) {
  
     const row = document.createElement('div');
     row.className = 'dash-activity-row';
+    row.setAttribute('data-txn-id', item.id);
     row.innerHTML = `
       <div class="dash-activity-row__left flex items-center gap-3">
         <div class="dash-activity-row__icon dash-activity-row__icon--${item.type} flex-center">
@@ -566,15 +565,28 @@ function renderActivity(data) {
  
   if (window.lucide) lucide.createIcons({ nodes: [activityListEl] });
 }
- 
-// Stub call — shows empty state until backend is wired
+
+/**
+ * Delegated click listener that reads e.target.closest('[data-txn-id]')?.dataset.txnId 
+ *    calls openModal('transaction_detail', { txnId })
+ */
+activityListEl.addEventListener("click", (e) => {
+  const txnId = e.target.closest("[data-txn-id]")?.dataset.txnId;
+  if (txnId) {
+    // Use the variable you created at the top
+    const transaction = dashboardActivity.find(item => item.id === txnId);
+    if (transaction) {
+      openModal("txn_detail", { txn: transaction });
+    }
+  }
+});
 
 
 async function fetchTransactions(userId) {
   try {
     const { data, error } = await supabase
       .from('transactions')
-      .select('type, label, amount, created_at')
+      .select('type, label, amount, created_at, id')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(3);
@@ -588,11 +600,19 @@ async function fetchTransactions(userId) {
 }
 
 const transactions = await fetchTransactions(user.id);
-if (transactions) renderActivity(transactions);
+if (transactions) {
+  // Store tranactions in a global variable so activityList in Dashboard can access it for the modal details
+  dashboardActivity = transactions;
+  renderActivity(transactions);
+}
 
 window.__ghRefreshActivity = async () => {
   const freshTransactions = await fetchTransactions(user.id);
-  if (freshTransactions) renderActivity(freshTransactions);
+  if (freshTransactions) {
+    // Update global variable here as well so modals can access the latest data
+    dashboardActivity = freshTransactions;
+    renderActivity(freshTransactions);
+  }
 };
  
  
@@ -642,6 +662,7 @@ export function switchSection(name) {
     target.classList.remove('hidden');
     void target.offsetWidth; // force reflow — restarts the CSS animation each switch
     target.classList.add('section--active');
+    ensureCarouselInitialized(activeSection);
   }
  
   if (link) link.classList.add('nav-active');
@@ -656,6 +677,64 @@ export function switchSection(name) {
 // ── Hamburger toggle ──
 hamburger?.addEventListener('click', () => {
   sidebar?.classList.contains('is-open') ? closeSidebar() : openSidebar();
+});
+
+const refreshFeedBtn = document.getElementById("refreshFeedBtn");
+refreshFeedBtn?.addEventListener("click", async () => {
+  const feedEl = document.getElementById("blogFeed");
+  if (!feedEl) return;
+
+  //  Enter Loading State
+  refreshFeedBtn.disabled = true;
+  
+  // Inject your skeleton (Add 2-3 for a better look)
+  feedEl.innerHTML = `
+    <article class="blog-post blog-post--skeleton" aria-hidden="true">
+      <div class="blog-post__topline">
+        <span class="blog-post__identity skeleton"></span>
+        <span class="blog-post__time skeleton"></span>
+      </div>
+      <div class="blog-post__body">
+        <span class="blog-post__line skeleton"></span>
+        <span class="blog-post__line blog-post__line--short skeleton"></span>
+      </div>
+      <div class="blog-post__divider"></div>
+      <div class="blog-post__actions">
+        <span class="blog-post__like-skeleton skeleton"></span>
+      </div>
+    </article>
+  `.repeat(3); // Shows 3 skeletons for a fuller look
+
+  // Update Button Text & add your spinner class
+  refreshFeedBtn.innerHTML = `<span class="dash-loader__spinner refresh-spinner"></span> <span>Refreshing...</span>`;
+
+  try {
+    //  Execute
+    await Promise.all([
+      loadBlogSection({ force: true }),
+      new Promise((resolve) => setTimeout(resolve, 600)), 
+    ]);
+  } catch (err) {
+    console.error("Refresh failed:", err);
+  } finally {
+    //  Exit Loading State & Restore Button
+    refreshFeedBtn.disabled = false;
+    
+    refreshFeedBtn.innerHTML = `
+      <i data-lucide="refresh-cw" style="width:16px;height:16px"></i>
+      <span>Refresh Feed</span>
+    `;
+
+    //Re-initialize Lucide for the newly injected <i> tag
+    if (window.lucide) {
+      window.lucide.createIcons({
+        nodes: [refreshFeedBtn] // Only scan the button to save performance
+      });
+    }
+
+    // Smooth scroll to top of feed
+    feedEl.scrollTo({ top: 0, behavior: "smooth" });
+  }
 });
  
 // ── Overlay click closes sidebar ──
@@ -673,9 +752,6 @@ navLinks.forEach(link => {
   link.addEventListener('click', () => {
     const sectionName = link.dataset.nav;
     switchSection(sectionName);
-    // Initialize carousel if needed
-    // !NOTE: it is initiliazed with data-nav attribute of link
-    ensureCarouselInitialized(sectionName);
   });
 });
 

@@ -181,6 +181,7 @@ async function compressImage(file) {
 
 
 function clearImageSelection() {
+  isImageLoaded = false;
   selectedImageFile = null;
   compressedImageBlob = null;
   imageInput.value = "";
@@ -286,7 +287,7 @@ form.addEventListener("submit", async (event) => {
     const postId = newPost.id;
     console.log("[post] Post created:", postId);
 
-    // Step 2: Upload image if one was selected
+    // Upload image if one was selected
     if (compressedImageBlob) {
       const filePath = `${user.id}/${postId}/image.jpg`;
 

@@ -138,6 +138,7 @@ html[data-theme='light']  .dash-welcome-card__greeting {
 .blog-compose-btn-alt {
   background-color: transparent;
   color: var(--text-secondary);
+  font-family: inherit;
   border: var(--border-width) solid var(--border-subtle);
 }
 
@@ -638,6 +639,9 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   height: 14px;
   margin-bottom: 0.55rem;
 }
+.blog-post__line.skeleton {
+  margin-top: 1rem;
+}
 
 .blog-post__line--short {
   width: 68%;
@@ -646,6 +650,7 @@ html[data-theme='light']  .dash-welcome-card__greeting {
 .blog-post__like-skeleton {
   width: 96px;
   height: 20px;
+  margin-top: 1rem;
 }
 
 @media (max-width: 520px) {

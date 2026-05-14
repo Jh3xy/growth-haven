@@ -370,7 +370,8 @@
   font-weight: var(--fw-semibold);
   color: var(--text-primary);
   text-align: right;
-  max-width: 29%;
+  max-width: 40%;
+  min-width: 20%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -210,21 +210,32 @@ export const MODAL_TEMPLATES = {
   // ── TRANSACTION DETAIL ────────────────────────────────────────
   txn_detail: (data) => {
     const { txn } = data;
-    const isIn    = ['deposit','daily_claim','referral_bonus','vault_maturity','early_exit'].includes(txn.type);
+    const isIn = [
+      "deposit",
+      "like",
+      "blog_like_reward",
+      "blog_post_reward",
+      "mines_win",
+      "daily_claim",
+      "early_exit",
+      "referral_bonus",
+      "vault_maturity",
+    ].includes(txn.type);
     const sign    = isIn ? '+' : '-';
     const status  = txn.status || 'completed';
 
     const ICON_MAP = {
-      deposit:        'arrow-down-to-line',
-      withdrawal:     'arrow-up-right',
-      vault_fund:     'shield',
-      vault_maturity: 'lock-open',
-      early_exit:     'door-open',
-      daily_claim:    'sun',
-      referral_bonus: 'users',
+      deposit: "arrow-down-to-line",
+      withdrawal: "arrow-up-right",
+      vault_fund: "shield",
+      daily_claim: "sun",
+      like: "thumbs-up",
+      early_exit: "door-open",
+      referral_bonus: "users",
+      vault_maturity: "lock-open",
     };
 
-    const icon = ICON_MAP[txn.type] || 'circle';
+    const icon = ICON_MAP[txn.type] || 'bell-dot';
 
     const statusClass = {
       completed: 'txn-row__status--completed',

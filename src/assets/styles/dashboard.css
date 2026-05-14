@@ -69,6 +69,12 @@
   animation: dash-loader-spin 0.7s linear infinite;
 }
 
+.dash-loader__spinner.refresh-spinner{
+  width: 15px;
+  height: 15px;
+  animation: dash-loader-spin 0.7s linear infinite;
+}
+
 @keyframes dash-loader-spin {
   to { transform: rotate(360deg); }
 }
@@ -721,7 +727,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   gap: 0.8rem;
   background-color: var(--surface-background);
   padding: 0.975rem 0.7rem;
-  border: var(--border-width) solid var(--border-subtle);
+  border: var(--border-width) solid var(--brand-primary-ring);
   border-radius: var(--radius-md);
 }
 
@@ -738,7 +744,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
   padding: 0.875rem 0.5rem;
   background-color: transparent;
   border-radius: var(--radius-md);
-  border: var(--border-width) solid var(--border-subtle);
+  border: var(--border-width) solid var(--brand-primary-ring);
   transition:
     background-color var(--transition-global),
     border-color var(--transition-global),
@@ -1566,6 +1572,7 @@ align-items: anchor-center;
  
 .dash-activity-row {
   margin-bottom: 10px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
