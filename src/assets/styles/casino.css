@@ -1,0 +1,374 @@
+
+
+/* Extract to casino.css */
+
+/* ─── BALANCE STRIP ──────────────────────────────────────────── */
+
+.casino-balance-strip {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.5rem 1.125rem;
+  box-shadow: var(--shadow-low);
+  width: fit-content;
+}
+
+.casino-balance-strip__label {
+  font-size: 0.625rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.casino-balance-strip__right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.casino-balance-strip__value {
+  font-size: 0.875rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  min-width: 90px;
+  min-height: 14px;
+  border-radius: 4px;
+  text-align: right;
+}
+
+.casino-balance-strip__refresh {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  min-height: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition-global);
+}
+
+.casino-balance-strip__refresh:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  background: var(--brand-primary-soft);
+}
+
+.casino-balance-strip__refresh.is-spinning [data-lucide] {
+  animation: dash-loader-spin 0.65s linear;
+}
+
+
+/* ─── TICKER ─────────────────────────────────────────────────── */
+
+.casino-ticker-wrap {
+  overflow: hidden;
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.6rem 0;
+  /* bleed to section edges, matching carousel pattern */
+  margin-left: -2.5rem;
+  margin-right: -2.5rem;
+}
+
+.casino-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: casino-ticker-scroll 150s linear infinite;
+  will-change: transform;
+}
+
+.casino-ticker-track.is-paused {
+  animation-play-state: paused;
+}
+
+@keyframes casino-ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.casino-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 1.5rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.casino-ticker-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+  font-size: 0.6rem;
+  font-weight: var(--fw-semibold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.casino-ticker-amount {
+  color: var(--brand-primary);
+  font-weight: var(--fw-semibold);
+}
+
+.casino-ticker-sep {
+  color: var(--text-tertiary);
+  font-size: 0.6rem;
+  margin: 0 0.25rem;
+}
+
+
+/* ─── SEARCH ─────────────────────────────────────────────────── */
+
+.casino-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.casino-search-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: var(--text-tertiary);
+  pointer-events: none;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.casino-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 1rem 0 2.75rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-family: var(--ff-primary);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-global), box-shadow var(--transition-global);
+}
+
+.casino-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.casino-search-input:focus {
+  border-color: var(--brand-primary-ring);
+  box-shadow: 0 0 0 3px var(--brand-primary-soft);
+}
+
+.casino-search-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.casino-search-empty [data-lucide] {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+
+/* ─── FILTER TABS ────────────────────────────────────────────── */
+
+.casino-filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.casino-filter-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 1.125rem;
+  font-family: var(--ff-primary);
+  font-size: 0.75rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: unset;
+  transition: var(--transition-global);
+  white-space: nowrap;
+}
+
+.casino-filter-tab:hover {
+  border-color: var(--brand-primary-ring);
+  color: var(--text-primary);
+}
+
+.casino-filter-tab.is-active {
+  background: var(--brand-primary);
+  color: var(--text-on-brand);
+  border-color: var(--brand-primary);
+  font-weight: var(--fw-semibold);
+}
+
+
+/* ─── GAME GRID ──────────────────────────────────────────────── */
+
+.casino-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+
+
+/* ─── GAME CARD ──────────────────────────────────────────────── */
+
+.casino-game-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-card-muted);
+  transition:
+    transform 0.2s var(--spring),
+    box-shadow 0.2s var(--spring);
+}
+
+.casino-game-card:not(.casino-game-card--coming-soon):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.casino-game-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.casino-game-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.78) 12%, rgba(0,0,0,0.0) 116%);
+  pointer-events: none;
+}
+
+.casino-game-card__info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  padding: 0.75rem;
+}
+
+.casino-game-card__name {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: var(--fw-semibold);
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.casino-game-card__players {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.8);
+  /* margin-top: 0.25rem; */
+}
+
+.casino-game-card__live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  animation: casino-dot-pulse 2s ease infinite;
+}
+
+@keyframes casino-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+
+/* ─── COMING SOON ────────────────────────────────────────────── */
+
+.casino-game-card--coming-soon {
+  pointer-events: none;
+  cursor: default;
+}
+
+.casino-coming-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  z-index: 2;
+}
+
+.casino-coming-pill {
+  background: var(--brand-primary);
+  color: var(--text-on-brand);
+  font-size: 0.6rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+}
+
+
+/* ─── RESPONSIVE — MOBILE ────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .casino-ticker-wrap {
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .casino-ticker-wrap {
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+}
+

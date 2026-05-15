@@ -9,19 +9,21 @@ import '../assets/styles/transactions.css'
 import '../assets/styles/dashboard.css'  
 import '../assets/styles/support.css';
 import '../assets/styles/blog.css';
+import '../assets/styles/casino.css';
 
 // ── Modal & Profile system ──
 import './modal.css';
 import '../assets/styles/profile.css';
 
 import posthog from 'posthog-js';
-import { initProfile } from './profile.js';
-import { initTransactions, resetTransactions } from './transactions.js';
 import { openModal } from './modal.js';
+import { initProfile } from './profile.js';
 import { initBlogSection } from "./blog.js";
-import { getInitials, formatDate } from '../assets/js/utils.js';
+import { initCasinoSection } from './casino.js';
 import { supabase } from '../assets/js/supabase.js';
 import { initCarouselHeader } from "./carousel.js";
+import { getInitials, formatDate } from '../assets/js/utils.js';
+import { initTransactions, resetTransactions } from './transactions.js';
 
 // ─── CONFIG ──────────────────────────────────────────────────
 // This is the full URL of your register page.
@@ -53,56 +55,65 @@ const initializedCarousels = new Set();
   */
 const carouselConfigs = {
   transact: {
-    id: 'transactionsCarousel',
+    id: "transactionsCarousel",
     images: [
-      '/assets/other/db-banner-01.jpg',
-      '/assets/other/db-banner-02.jpg',
-      '/assets/other/db-banner-03.jpg',
-      '/assets/other/db-banner-04.jpg',
-      '/assets/other/db-banner-05.jpg',
-    ]
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
   },
   invest: {
-    id: 'investmentsCarousel',
+    id: "investmentsCarousel",
     images: [
-      '/assets/other/db-banner-01.jpg',
-      '/assets/other/db-banner-02.jpg',
-      '/assets/other/db-banner-03.jpg',
-      '/assets/other/db-banner-04.jpg',
-      '../../public/assets/other/db-banner-05.jpg',
-    ]
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
   },
   blog: {
-    id: 'blogCarousel',
+    id: "blogCarousel",
     images: [
-      '/assets/other/db-banner-01.jpg',
-      '/assets/other/db-banner-02.jpg',
-      '/assets/other/db-banner-03.jpg',
-      '/assets/other/db-banner-04.jpg',
-      '/assets/other/db-banner-05.jpg',
-    ]
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
   },
   home: {
-    id: 'homeCarousel',
+    id: "homeCarousel",
     images: [
-      '/assets/other/db-banner-01.jpg',
-      '/assets/other/db-banner-02.jpg',
-      '/assets/other/db-banner-03.jpg',
-      '/assets/other/db-banner-04.jpg',
-      '/assets/other/db-banner-05.jpg',
-    ]
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
+  },
+  sports: {
+    id: "casinoCarousel",
+    images: [
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
   },
   profile: {
-    id: 'profileCarousel',
+    id: "profileCarousel",
     images: [
-      '/assets/other/db-banner-01.jpg',
-      '/assets/other/db-banner-02.jpg',
-      '/assets/other/db-banner-03.jpg',
-      '/assets/other/db-banner-04.jpg',
-      '/assets/other/db-banner-05.jpg',
-    ]
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
   },
-  
 };
 
 
@@ -145,9 +156,12 @@ window.__ghResetTransactions = resetTransactions;
 
 window.__ghUpdateWalletBalance = (newBalance) => {
   currentWalletBalance = newBalance;
+  window.__ghCurrentWalletBalance = newBalance;
   const el = document.getElementById('walletBalance');
   if (el) el.textContent = Number(newBalance).toLocaleString('en-NG', { minimumFractionDigits: 2 });
 };
+window.__ghCurrentWalletBalance = 0;
+
 
 // ─── DOM REFS ────────────────────────────────────────────────
 const greetingText = document.getElementById('greetingText');
@@ -237,6 +251,30 @@ if (user) {
     }
 
     localStorage.setItem('gh_current_tab', 'blog');
+
+  } else if (page === "sports") {
+    document.querySelectorAll('.dash-section').forEach((section) => {
+      section.classList.add('hidden');
+      section.classList.remove('section--active');
+    });
+    document.querySelectorAll('[data-nav]').forEach((link) => {
+      link.classList.remove('nav-active');
+    });
+
+    const target = document.getElementById('section-sports');
+    const link = document.querySelector('[data-nav="sports"]');
+
+    if (target) {
+      target.classList.remove('hidden');
+      target.classList.add('section--active');
+    }
+
+    if (link) {
+      link.classList.remove('hidden');
+      link.classList.add('nav-active');
+    }
+
+    localStorage.setItem('gh_current_tab', 'sports');
   } else if (page) {
     console.warn("Dashboard param is unknown", page);
   }
@@ -328,6 +366,7 @@ if (member) {
     console.warn('Invalid balance');
   }
   currentWalletBalance = isNaN(balance) ? 0 : balance;
+  window.__ghCurrentWalletBalance = currentWalletBalance;
 
   // Home — Wallet card display
   const walletBalanceEl = document.getElementById('walletBalance');
@@ -776,6 +815,16 @@ const investObserver = new MutationObserver(() => {
   }
 });
 investObserver.observe(investSection, { attributes: true, attributeFilter: ['class'] });
+const sportsSection = document.getElementById("section-sports");
+const casinoObserver = new MutationObserver(() => {
+  if (!sportsSection.classList.contains("hidden")) {
+    initCasinoSection();
+  }
+});
+casinoObserver.observe(sportsSection, {
+  attributes: true,
+  attributeFilter: ["class"],
+});
  
 // ── Sidebar sign-out button ──
 const sidebarSignoutBtn = document.getElementById('sidebarSignoutBtn');

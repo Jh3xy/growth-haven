@@ -4,7 +4,7 @@ GROWTH-HAVEN PROJECT TODOS - Project additions, features, bug fixes, updates and
 
 
 ═══════════════════════════════════════════════════════════════════════════════
-BLOG FEATURE (Twitter/X Style Feed + Likes + Wallet Rewards)
+BLOG FEATURE (Twitter/X Style Feed + Likes + Wallet Rewards) - Done and complete
 ═══════════════════════════════════════════════════════════════════════════════
 
 OVERVIEW:
