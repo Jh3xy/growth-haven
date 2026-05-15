@@ -158,6 +158,8 @@ const refLinkEl    = document.getElementById('refLink');
 const copyCodeBtn  = document.getElementById('copyCodeBtn');
 const copyLinkBtn  = document.getElementById('copyLinkBtn');
 const signoutBtn   = document.getElementById('signoutBtn');
+const usernameSecondary = document.querySelector('.dash-sidebar__user')
+const userMailSecondary = document.querySelector('.dash-sidebar__mail')
 
 let currentWalletBalance = 0;
 let dashboardActivity = [];
@@ -243,7 +245,18 @@ if (user) {
 // ─── PERSONALISE ─────────────────────────────────────────────
 const firstName = user.user_metadata?.first_name || '';
 const lastName  = user.user_metadata?.last_name  || '';
+const email  = user.user_metadata?.email  || 'unknown';
 const initials  = (firstName[0] || '') + (lastName[0] || '');
+
+if (usernameSecondary) { 
+  const fullName = `${firstName} ${lastName}`
+  usernameSecondary.textContent  = fullName || '—';
+  usernameSecondary.classList.remove('skeleton');
+}
+if (userMailSecondary) { 
+  userMailSecondary.textContent  = email || '—';
+  userMailSecondary.classList.remove('skeleton');
+}
 
 const headerInitials = initials.toUpperCase() || '?';
 renderHeaderAvatar(avatarEl, null, headerInitials);

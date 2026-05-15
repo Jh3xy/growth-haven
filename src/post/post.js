@@ -51,18 +51,28 @@ function setError(message = '') {
 }
 
 function setSubmitting(isSubmitting) {
-  submitBtn.disabled = isSubmitting || !textarea.value.trim();
-  submitBtn.classList.toggle('is-loading', isSubmitting);
-  submitBtn.querySelector('span').textContent = isSubmitting ? 'Posting...' : 'Post';
+  submitBtn.disabled = isSubmitting || !canSubmit();
+  submitBtn.classList.toggle("is-loading", isSubmitting);
+  submitBtn.querySelector("span").textContent = isSubmitting
+    ? "Posting..."
+    : "Post";
+}
+
+function canSubmit() {
+  const length = textarea.value.length;
+  return (length > 0 || isImageLoaded) && length <= MAX_POST_LENGTH;
 }
 
 function updateCounter() {
   const length = textarea.value.length;
   counter.textContent = `${length}/${MAX_POST_LENGTH}`;
-  counter.classList.toggle('is-warning', length >= 900 && length < MAX_POST_LENGTH);
-  counter.classList.toggle('is-danger', length >= MAX_POST_LENGTH);
-  submitBtn.disabled = length === 0 || length > MAX_POST_LENGTH;
-  if (length > 0) setError('');
+  counter.classList.toggle(
+    "is-warning",
+    length >= 4000 && length < MAX_POST_LENGTH,
+  );
+  counter.classList.toggle("is-danger", length >= MAX_POST_LENGTH);
+  submitBtn.disabled = !canSubmit();
+  if (length > 0) setError("");
 }
 
 function showToast(message, type = 'success') {
@@ -187,6 +197,7 @@ function clearImageSelection() {
   imageInput.value = "";
   imagePreview.classList.add("hidden");
   imageThumbnail.style.backgroundImage = "";
+  submitBtn.disabled = !canSubmit();
 }
 
 
@@ -228,6 +239,7 @@ async function handleImageSelection(file) {
     if (window.lucide) {
       window.lucide.createIcons({ nodes: [imagePreview] });
     }
+    submitBtn.disabled = !canSubmit();
   } catch (error) {
     console.error("[post] Image compression failed:", error);
     showToast("Failed to process image. Try a different file.", "error");
@@ -253,8 +265,8 @@ form.addEventListener("submit", async (event) => {
 
   const content = textarea.value.trim();
 
-  if (!content) {
-    setError("Write something before posting.");
+  if (!content && !compressedImageBlob) {
+    setError("Write something or attach an image before posting.");
     textarea.focus();
     return;
   }
@@ -274,7 +286,7 @@ form.addEventListener("submit", async (event) => {
       .from("posts")
       .insert({
         user_id: user.id,
-        content,
+        content: content || null,
         is_dummy: false,
       })
       .select("id")

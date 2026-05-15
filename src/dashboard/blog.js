@@ -1,4 +1,6 @@
-import { getInitials, formatDate } from '../assets/js/utils.js';
+
+
+import { getInitials, formatDate, initImagePreviewOverlay } from '../assets/js/utils.js';
 
 const POSTS_PER_PAGE = 20;
 
@@ -198,6 +200,10 @@ export function initBlogSection({ user, supabase, openDeposit }) {
   let hasMore = true;
   let hasAccess = false;
 
+  initImagePreviewOverlay(feed, { 
+    imageSelector: '.blog-post__media img',
+  });
+
   if (!section || !feed || !empty || !loadMoreBtn) {
     console.warn('[blog] Blog section markup is missing. Feed initialization skipped.');
     return async function noopBlogLoader() {};
@@ -327,8 +333,8 @@ export function initBlogSection({ user, supabase, openDeposit }) {
   }
 
   async function loadPosts() {
-    if (loading || !hasMore || !hasAccess) {
-      // console.log('[blog] Load skipped:', { loading, hasMore, hasAccess });
+    if (loading || !hasMore ) {
+      //posts load regardless; gate overlay covers them visually
       return;
     }
 
@@ -398,19 +404,14 @@ export function initBlogSection({ user, supabase, openDeposit }) {
   }
 
   async function loadBlogSection({ force = false } = {}) {
-    // console.log('[blog] Section load requested:', { initialized, force });
-
-    const accessGranted = await checkAccess();
-    if (!accessGranted) {
-      // console.log('[blog] Feed gated because member has not deposited.');
-      return;
-    }
+    // checkAccess sets hasAccess and toggles .is-gated on the section (shows/hides overlay)
+    await checkAccess();
 
     if (initialized && !force) return;
 
     resetFeed();
     initialized = true;
-    await loadPosts();
+    await loadPosts(); // always runs — overlay covers feed visually for non-deposited members
   }
 
   return loadBlogSection;

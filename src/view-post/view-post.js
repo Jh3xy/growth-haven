@@ -5,9 +5,10 @@ import '../assets/styles/blog.css';
 import './view-post.css';
 
 import { supabase } from "../assets/js/supabase.js";
-import { getInitials } from "../assets/js/utils.js";
+import { getInitials, initImagePreviewOverlay } from "../assets/js/utils.js";
 
 // ── DOM Refs ─────────────────────────────────────────────────────────
+const vpMain  = document.getElementById('vpMain');
 const vpSkeleton  = document.getElementById('vpSkeleton');
 const vpPost  = document.getElementById('vpPost');
 const vpAvatar = document.getElementById('vpAvatar');
@@ -24,6 +25,10 @@ const vpFullActions = document.getElementById('vpFullActions');
 const vpLikeBtn  = document.getElementById('vpLikeBtn');
 const vpLikeBtnLabel = document.getElementById('vpLikeBtnLabel');
 const vpBackNav  = document.getElementById('vpBackNav');
+
+initImagePreviewOverlay(vpMain, {
+  imageSelector: ".vp-post__media img",
+});
 
 
 // ── Helpers ──────────────────────────────────────────────────────────

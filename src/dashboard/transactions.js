@@ -13,11 +13,13 @@ import { openModal }          from './modal.js';
 const PAGE_SIZE = 15;
 
 const FILTER_GROUPS = {
-  all:        null,
-  deposit:    ['deposit'],
-  withdrawal: ['withdrawal'],
-  vault:      ['vault_fund', 'vault_maturity', 'early_exit'],
-  earnings:   ['daily_claim', 'referral_bonus'],
+  all: null,
+  deposit: ["deposit"],
+  casino: ["mines_bet", "mines_win", "coin-flip"],
+  withdrawal: ["withdrawal"],
+  vault: ["vault_fund", "vault_maturity", "early_exit"],
+  earnings: ["daily_claim", "referral_bonus"],
+  blog: ["blog_like_reward", "blog_post_reward"],
 };
 
 const INBOUND_TYPES = new Set([
