@@ -1567,12 +1567,12 @@
             </button>
             <div class="support-faq-item__body" aria-hidden="true">
               <p class="support-faq-item__answer">
-                GrowthHaven is a platform that lets your money grow across multiple avenues — the Vault for savings and fixed-term investments, Sports for live betting, and a referral system that rewards you for growing the community. It's not a one-size-fits-all product. You choose where your money works and how aggressively.
+                GrowthHaven is a platform that lets your money grow across multiple avenues — the Blog for creators to find the right audience, Sports for live betting, Library for streaming and advertising new music , and a referral system that rewards you for growing the community. It's not a one-size-fits-all product. You choose where your money works and how aggressively.
               </p>
             </div>
           </div>
 
-          <div class="support-faq-item" data-faq="1">
+          <!-- <div class="support-faq-item" data-faq="1">
             <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
               <span class="support-faq-item__question">How does the Vault work?</span>
               <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
@@ -1582,9 +1582,9 @@
                 You lock a sum of money into a fixed plan — 7, 14, or 30 days — and earn a set daily yield for the duration. Each day, you must claim your yield before midnight WAT or it is forfeited for that day. When your plan matures, your original principal is returned to your wallet. Early exit is available under certain conditions, but comes with a penalty on accrued earnings.
               </p>
             </div>
-          </div>
+          </div> -->
 
-          <div class="support-faq-item" data-faq="2">
+          <!-- <div class="support-faq-item" data-faq="2">
             <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
               <span class="support-faq-item__question">Where does the funding come from?</span>
               <i data-lucide="chevron-down" class="support-faq-item__chevron" style="width:16px;height:16px;flex-shrink:0;"></i>
@@ -1594,7 +1594,7 @@
                 GrowthHaven pools member capital and deploys it across diversified market instruments, including index-style positions in top-performing companies. The platform is also sustained through community activity and the referral network — growth feeds the ecosystem. Your plan's returns are fixed at the point of commitment, not tied to real-time market swings.
               </p>
             </div>
-          </div>
+          </div> -->
 
           <div class="support-faq-item" data-faq="3">
             <button class="support-faq-item__trigger flex-between" type="button" aria-expanded="false">
@@ -1603,7 +1603,7 @@
             </button>
             <div class="support-faq-item__body" aria-hidden="true">
               <p class="support-faq-item__answer">
-                Funds are managed under strict internal controls. Withdrawal requests are processed within 2–3 business days, excluding weekends. We do not guarantee returns beyond what your chosen plan explicitly specifies. Only invest what you are prepared to commit for the plan's duration.
+                Funds are managed under strict internal controls. Withdrawal requests are processed within 2–3 business days, excluding weekends. We do not guarantee returns beyond what your chosen plan explicitly specifies.
               </p>
             </div>
           </div>
@@ -1692,20 +1692,27 @@
       <!-- ── EDITABLE CONTENT STARTS HERE ── -->
 
       <h2 class="welcome-modal__title" id="welcomeModalTitle">
-        Welcome to GrowthHaven, <span id="welcomeModalName"></span>
+        Welcome, <span id="welcomeModalName"></span>
       </h2>
+      <p class="welcome-modal__desc">Your account is set up and ready.</p>
 
       <p class="welcome-modal__body">
-        Your account is set up and ready to go! <br> You can find answers to common questions in the <strong>Support</strong> section, or tap the blue button at the bottom of the screen to chat with our team directly.
+         Updates roll out every week — join the channel to stay up to date on new features, contests and methods for rewards. <br> <br> You can find answers to common questions in the <strong>Support</strong> section, or tap the blue button at the bottom of the screen to chat with the team.
       </p>
-
-      <!-- ── EDITABLE CONTENT ENDS HERE ── -->
-
-      <button class="welcome-modal__cta" id="welcomeModalCta" type="button">
-        <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
-        Explore
-      </button>
-
+      <div class="flex items-center gap-2">
+        <button class="welcome-modal__cta" id="welcomeModalCta" type="button">
+          Explore
+        </button>
+        <a
+          class="flex items-center gap-2"
+          href="https://t.me/growthhavensupport?text=Hello%20Growthhaven%20Support%2C%20I%20have%20just%20set%20up%20my%20account%21%0APlease%20add%20me%20to%20the%20official%20broadcast%20list%20and%20community%20group%20so%20I%20can%20stay%20updated."  
+          id="channel-btn"
+          aria-label="Contact support on Telegram"
+        >
+          <i data-lucide="send" style="width:18px;height:18px;flex-shrink:0;"></i>
+          <span class="tg-float-btn__label">Join Now</span>
+        </a>
+      </div>
     </div>
 
   </div>
@@ -1731,6 +1738,25 @@
     </div>
   </div>
 
+
+  <script>
+    (function() {
+      const linkElement = document.getElementById('channel-btn');
+      
+      // "iOS Check"
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (isIOS) {
+        // swap to the 'tg://' version
+        const username = "paramountentertainment1";
+        const msg = "Hello VERITAS Support, I have completed my payment";
+        linkElement.href = `tg://resolve?domain=${username}&text=${encodeURIComponent(msg)}`;
+        
+        // Safety: ensure no target="_blank" on iOS
+        linkElement.removeAttribute('target');
+      } 
+    })();   
+  </script>
   <script>
     lucide.createIcons();
   </script>

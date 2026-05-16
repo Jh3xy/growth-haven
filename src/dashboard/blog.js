@@ -210,7 +210,7 @@ export function initBlogSection({ user, supabase, openDeposit }) {
   }
 
   gateDepositBtn?.addEventListener('click', () => {
-    console.log('[blog] Gate deposit CTA clicked.');
+    document.body.style.overflow = "";
     openDeposit?.();
   });
 
@@ -316,6 +316,7 @@ export function initBlogSection({ user, supabase, openDeposit }) {
 
     hasAccess = Boolean(data?.has_deposited);
     section.classList.toggle('is-gated', !hasAccess);
+    document.body.style.overflow = hasAccess ? "" : "hidden";
     // console.log('[blog] Gate check complete:', { hasAccess });
     return hasAccess;
   }

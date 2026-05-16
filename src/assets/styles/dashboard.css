@@ -320,7 +320,7 @@
   gap: 1rem;
   padding: 2rem 1.75rem;
   background-color: var(--surface-card);
-  border: var(--border-width) solid var(--brand-primary-ring);
+  border: var(--border-width) solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow:
     0 0 0 1px var(--brand-primary-ring),
@@ -373,11 +373,21 @@
   line-height: 1.7;
   max-width: 320px;
   margin: 0;
+  margin-bottom: 1rem;
 }
 
 .welcome-modal__body strong {
   color: var(--text-primary);
   font-weight: var(--fw-semibold);
+}
+
+.welcome-modal__desc {
+  font-size: var(--fs-caption);
+  color: var(--text-primary);
+  margin: 0;
+  margin-top: -10px;
+  /* opacity: .75; */
+  font-weight: var(--fw-medium);
 }
 
 /* CTA */
@@ -388,17 +398,15 @@
   gap: 0.5rem;
   height: 48px;
   padding: 0 1.75rem;
-  margin-top: 0.5rem;
-  background-color: var(--brand-primary);
-  color: var(--text-on-brand);
+  background: transparent;
+  color: var(--text-primary);
   font-family: var(--ff-primary);
   font-size: 0.9375rem;
   font-weight: var(--fw-semibold);
-  border: none;
+  border: 1px solid var(--border-subtle);
   border-radius: 999px;
   cursor: pointer;
   min-height: unset;
-  box-shadow: 0 8px 24px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.28);
   transition:
     background-color var(--transition-global),
     transform 0.2s var(--spring),
@@ -406,9 +414,8 @@
 }
 
 .welcome-modal__cta:hover {
-  background-color: var(--brand-primary-hover);
+  border: 1px solid var(--border-strong);
   transform: translateY(-1px);
-  box-shadow: 0 12px 32px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.38);
 }
 
 .welcome-modal__cta:active {

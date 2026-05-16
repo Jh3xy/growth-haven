@@ -6,7 +6,7 @@
 // ─── CSS IMPORTS ─────────────────────────────────────────────
 
 import '../assets/styles/dashboard.css'
-import '../assets/styles/transactions.css'
+// import '../assets/styles/transactions.css'
 import '../assets/styles/affiliate.css'
 import '../dashboard/modal.css'
 

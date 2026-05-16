@@ -11,6 +11,9 @@ import '../assets/styles/support.css';
 import '../assets/styles/blog.css';
 import '../assets/styles/casino.css';
 
+// Lock scroll immediately — loader is visible from first paint
+document.body.style.overflow = 'hidden';
+
 // ── Modal & Profile system ──
 import './modal.css';
 import '../assets/styles/profile.css';
@@ -37,6 +40,7 @@ const REGISTER_URL = `${window.location.origin}/src/register/`;
 // Start loading timer immediately
 const networkTimer = setTimeout(() => {
   const statusHint = document.getElementById("statusHint");
+  document.body.style.overflow = 'hidden'
   if (statusHint) statusHint.classList.remove("hidden");
 }, 6000);
 
@@ -132,7 +136,7 @@ function ensureCarouselInitialized(sectionName) {
   if (container) {
     initCarouselHeader(config.id, config.images);
     initializedCarousels.add(sectionName);
-    console.log(`[carousel] Initialized ${config.id}`);
+    // console.log(`[carousel] Initialized ${config.id}`);
   }
 }
 
@@ -192,10 +196,11 @@ if (!session) {
 const user = session.user;
 
 if (user) {
-  // 1. Identify user on PostHog
+
+  // Identify user on PostHog
   posthog.identify(user.id);
 
-  // 2. Wiat fo rflags and then check
+  // Wiat for flags and then check
   posthog.onFeatureFlags(() => {
     if (posthog.isFeatureEnabled('casino-beta-flag')) {
       console.log('🎰 Casino access granted');
@@ -216,69 +221,6 @@ if (user) {
     }
   });
 }
-
-(function handleDashboardParams() {
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page");
-  const action = params.get("action");
-
-  if (action === "deposit") {
-    // Open the deposit modal and exit early (don't switch section)
-    depositBtn?.click();
-    return;
-  }
-  
-  if (page === "blog") {
-    document.querySelectorAll('.dash-section').forEach((section) => {
-      section.classList.add('hidden');
-      section.classList.remove('section--active');
-    });
-    document.querySelectorAll('[data-nav]').forEach((link) => {
-      link.classList.remove('nav-active');
-    });
-
-    const target = document.getElementById('section-blog');
-    const link = document.querySelector('[data-nav="blog"]');
-
-    if (target) {
-      target.classList.remove('hidden');
-      target.classList.add('section--active');
-    }
-
-    if (link) {
-      link.classList.remove('hidden');
-      link.classList.add('nav-active');
-    }
-
-    localStorage.setItem('gh_current_tab', 'blog');
-
-  } else if (page === "sports") {
-    document.querySelectorAll('.dash-section').forEach((section) => {
-      section.classList.add('hidden');
-      section.classList.remove('section--active');
-    });
-    document.querySelectorAll('[data-nav]').forEach((link) => {
-      link.classList.remove('nav-active');
-    });
-
-    const target = document.getElementById('section-sports');
-    const link = document.querySelector('[data-nav="sports"]');
-
-    if (target) {
-      target.classList.remove('hidden');
-      target.classList.add('section--active');
-    }
-
-    if (link) {
-      link.classList.remove('hidden');
-      link.classList.add('nav-active');
-    }
-
-    localStorage.setItem('gh_current_tab', 'sports');
-  } else if (page) {
-    console.warn("Dashboard param is unknown", page);
-  }
-})();
 
 // ─── PERSONALISE ─────────────────────────────────────────────
 const firstName = user.user_metadata?.first_name || '';
@@ -320,7 +262,7 @@ if (firstName) {
 const { data: member, error: memberError } = await supabase
   .from("members")
   .select(
-    "referral_code, wallet_balance, vault_balance, has_deposited, is_new, avatar_url",
+    "referral_code, wallet_balance, vault_balance, has_deposited, is_new, promoter, role, avatar_url",
   )
   .eq("id", user.id)
   .single();
@@ -335,6 +277,12 @@ if (memberError || !member?.referral_code) {
   // renderFatalState(); // show “something went wrong”
   throw "Something went wrong try refreshing your browser"
 } else {
+
+  if (member?.role  === "admin"  || member?.promoter) {
+    console.warn("[auth]: Non User detected redirecting to login portal")
+    window.location.href = '/src/login/';
+  }
+
   const code = member.referral_code;
   const link = `${REGISTER_URL}?ref=${code}`;
 
@@ -401,34 +349,48 @@ if (member) {
   }
 }
 
-// Show Welcome Modal
-
+// Welcome Modal
 if (member?.is_new) {
-  const welcomeModal    = document.getElementById('welcomeModal');
-  const welcomeCta      = document.getElementById('welcomeModalCta');
-  const welcomeNameEl   = document.getElementById('welcomeModalName');
- 
-  // Populate the first name in the title
+  const welcomeModal = document.getElementById("welcomeModal");
+  const welcomeCta = document.getElementById("welcomeModalCta");
+  const welcomeNameEl = document.getElementById("welcomeModalName");
+  const tgJoinBtn = welcomeModal?.querySelector(".welcome-modal__tg-link");
+
   if (welcomeNameEl) {
-    welcomeNameEl.textContent = (firstName && lastName) ? `${firstName} ${lastName}.` : 'Friend.';
+    welcomeNameEl.textContent =
+      firstName && lastName ? `${firstName} ${lastName}.` : "Friend.";
   }
- 
-  // Show the modal
+
   if (welcomeModal) {
-    welcomeModal.setAttribute('aria-hidden', 'false');
-    welcomeModal.classList.add('is-open');
+    welcomeModal.setAttribute("aria-hidden", "false");
+    welcomeModal.classList.add("is-open");
+    document.body.style.overflow = "hidden";
     if (window.lucide) lucide.createIcons({ nodes: [welcomeModal] });
   }
- 
-  // CTA — update DB then dismiss
-  welcomeCta?.addEventListener('click', async () => {
-    await supabase
-      .from('members')
-      .update({ is_new: false })
-      .eq('id', user.id);
- 
-    welcomeModal?.classList.remove('is-open');
-    welcomeModal?.setAttribute('aria-hidden', 'true');
+
+  // Shared dismiss — always awaits the DB write before doing anything visual
+  async function dismissWelcomeModal() {
+    await supabase.from("members").update({ is_new: false }).eq("id", user.id);
+
+    welcomeModal?.classList.remove("is-open");
+    welcomeModal?.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  // Explore button — just closes
+  welcomeCta?.addEventListener("click", () => dismissWelcomeModal(), {
+    once: true,
+  });
+
+  // TG button — prevents default so the await finishes before navigation
+  tgJoinBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const href = tgJoinBtn.getAttribute('href') || 'https://t.me/+UHPnYhMx6aI3NzBk';
+    // Must open synchronously before any await — iOS blocks window.open() after async gaps
+    const newTab = window.open(href, '_blank', 'noopener,noreferrer');
+    await dismissWelcomeModal();
+    // Fallback if popup was blocked (some browsers return null)
+    if (!newTab) window.location.href = href;
   }, { once: true });
 }
 
@@ -437,6 +399,71 @@ if (member?.avatar_url) {
   const headerInitials = initials.toUpperCase() || "?";
   renderHeaderAvatar(avatarEl, member.avatar_url, headerInitials);
 }
+
+
+
+(function handleDashboardParams() {
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get("page");
+  const action = params.get("action");
+
+  if (action === "deposit") {
+    // Open the deposit modal and exit early (don't switch section)
+    depositBtn?.click();
+    return;
+  }
+  
+  if (page === "blog") {
+    document.querySelectorAll('.dash-section').forEach((section) => {
+      section.classList.add('hidden');
+      section.classList.remove('section--active');
+    });
+    document.querySelectorAll('[data-nav]').forEach((link) => {
+      link.classList.remove('nav-active');
+    });
+
+    const target = document.getElementById('section-blog');
+    const link = document.querySelector('[data-nav="blog"]');
+
+    if (target) {
+      target.classList.remove('hidden');
+      target.classList.add('section--active');
+    }
+
+    if (link) {
+      link.classList.remove('hidden');
+      link.classList.add('nav-active');
+    }
+
+    localStorage.setItem('gh_current_tab', 'blog');
+
+  } else if (page === "sports") {
+    document.querySelectorAll('.dash-section').forEach((section) => {
+      section.classList.add('hidden');
+      section.classList.remove('section--active');
+    });
+    document.querySelectorAll('[data-nav]').forEach((link) => {
+      link.classList.remove('nav-active');
+    });
+
+    const target = document.getElementById('section-sports');
+    const link = document.querySelector('[data-nav="sports"]');
+
+    if (target) {
+      target.classList.remove('hidden');
+      target.classList.add('section--active');
+    }
+
+    if (link) {
+      link.classList.remove('hidden');
+      link.classList.add('nav-active');
+    }
+
+    localStorage.setItem('gh_current_tab', 'sports');
+  } else if (page) {
+    console.warn("Dashboard param is unknown", page);
+  }
+})();
  
 
 
@@ -1658,9 +1685,10 @@ const dashLoader = document.getElementById("dashLoader");
 if (dashLoader) {
   clearTimeout(networkTimer); // Stop the hint from showing if it hasn't already
   dashLoader.classList.add("is-done");
-  dashLoader.addEventListener("transitionend", () => dashLoader.remove(), {
-    once: true,
-  });
+  dashLoader.addEventListener("transitionend", () => {
+    dashLoader.remove();
+    document.body.style.overflow = ''; // restore here, not before
+  }, { once: true });
 }
 
 
@@ -1671,7 +1699,12 @@ const withdrawBtn = document.getElementById('withdrawBtn');
 loadBlogSection = initBlogSection({
   user,
   supabase,
-  openDeposit: () => depositBtn?.click(),
+  openDeposit: () =>
+    openModal("deposit", {
+      walletBalance: currentWalletBalance,
+      userName: `${firstName} ${lastName}`.trim(),
+      userId: user.id,
+    }),
 });
 
 // ─── DEPOSIT / WITHDRAW TRIGGERS ─────────────────────────────────

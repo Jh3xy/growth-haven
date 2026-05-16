@@ -140,7 +140,7 @@ function renderPost(post) {
     vpContent.innerHTML =
       `
       <p class="post-content blog-post__content">
-        ${post.content}
+        ${post.content || ''}
       </p>
       <button class="blog-read-more hidden" type="button" aria-expanded="false">Read more</button>
         ` || "";
