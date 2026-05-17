@@ -555,6 +555,12 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  opacity: 1;
+  will-change: opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   background-color: rgba(7, 17, 11, 0.72);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);

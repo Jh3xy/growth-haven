@@ -132,12 +132,16 @@
 
 /* ─── FLOATING TELEGRAM BUTTON ───────────────────────────────── */
 
-.tg-float-btn {
+.floats {
   position: fixed;
   bottom: 2rem;
   right: 1.5rem;
   z-index: 150;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
 
+.tg-float-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -209,6 +213,55 @@
   line-height: 1;
 }
 
+.scroll-top-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: 50%;
+  background-color: var(--surface-card);
+  color: var(--text-primary);
+  box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition:
+    opacity var(--transition-global),
+    visibility var(--transition-global),
+    transform 0.2s var(--spring),
+    border-color var(--transition-global),
+    background-color var(--transition-global);
+}
+
+.scroll-top-btn.is-visible {
+  display: inline-flex;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.scroll-top-btn [data-lucide] {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5px;
+}
+
+.scroll-top-btn:hover {
+  border-color: var(--text-secondary);
+  background-color: var(--surface-card-muted);
+  transform: translateY(-2px);
+}
+
+.scroll-top-btn:active {
+  transform: translateY(0);
+}
+
 
 /* ─── DARK MODE ───────────────────────────────────────────────── */
 
@@ -225,7 +278,7 @@ html[data-theme='dark'] .support-faq-item.is-open .support-faq-item__trigger {
 /* ─── RESPONSIVE ─────────────────────────────────────────────── */
 
 @media (max-width: 767px) {
-  .tg-float-btn {
+  .floats {
     bottom: 3rem;
     right: 2rem;
   }
@@ -251,6 +304,11 @@ html[data-theme='dark'] .support-faq-item.is-open .support-faq-item__trigger {
     padding: 0;
     justify-content: center;
     border-radius: 50%;
+  }
+
+  .scroll-top-btn {
+    width: 56px;
+    height: 56px;
   }
 }
 

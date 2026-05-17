@@ -707,14 +707,58 @@ function closeSidebar() {
   overlay?.classList.remove('is-open');
   hamburger?.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
+  requestScrollTopButtonUpdate();
 }
- 
+  
 function openSidebar() {
   sidebar?.classList.add('is-open');
   overlay?.classList.add('is-open');
   hamburger?.setAttribute('aria-expanded', 'true');
   document.body.style.overflow = 'hidden'; // prevent scroll behind overlay on mobile
+  requestScrollTopButtonUpdate();
 }
+
+const scrollTopBtn = document.getElementById('scrollTopBtn');
+let scrollTopRaf = null;
+
+function getScrollTopThreshold() {
+  return Math.max(480, Math.min(800, window.innerHeight * 0.85));
+}
+
+function updateScrollTopButton() {
+  if (!scrollTopBtn) return;
+
+  const root = document.documentElement;
+  const scrollTop = window.scrollY || root.scrollTop || document.body.scrollTop || 0;
+  const pageHeight = Math.max(root.scrollHeight, document.body.scrollHeight);
+  const maxScroll = pageHeight - window.innerHeight;
+  const threshold = getScrollTopThreshold();
+  const isSidebarOpen = sidebar?.classList.contains('is-open');
+  const shouldShow = maxScroll > threshold && scrollTop > threshold && !isSidebarOpen;
+
+  scrollTopBtn.classList.toggle('is-visible', shouldShow);
+}
+
+function requestScrollTopButtonUpdate() {
+  if (scrollTopRaf) return;
+
+  scrollTopRaf = requestAnimationFrame(() => {
+    scrollTopRaf = null;
+    updateScrollTopButton();
+  });
+}
+
+scrollTopBtn?.addEventListener('click', () => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({
+    top: 0,
+    behavior: reduceMotion ? 'auto' : 'smooth',
+  });
+});
+
+window.addEventListener('scroll', requestScrollTopButtonUpdate, { passive: true });
+window.addEventListener('resize', requestScrollTopButtonUpdate);
+requestScrollTopButtonUpdate();
 
 
 // Define valid sections outside the function for better performance
@@ -749,8 +793,9 @@ export function switchSection(name) {
   if (activeSection === 'blog') {
     loadBlogSection();
   }
- 
+  
   closeSidebar();
+  requestScrollTopButtonUpdate();
 }
  
 // ── Hamburger toggle ──
