@@ -718,7 +718,7 @@ function openSidebar() {
 
 
 // Define valid sections outside the function for better performance
-const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'quest', 'support', 'blog', 'transact', 'sports', 'invest']);
+const VALID_SECTIONS = new Set(['home', 'invest', 'profile', 'quest', 'music', 'support', 'blog', 'transact', 'sports', 'invest']);
 
 export function switchSection(name) {
   //Validate the input. If it's trash, default to 'home'.

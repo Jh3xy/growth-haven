@@ -730,7 +730,7 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
 
 .quick-actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
   gap: 0.8rem;
   background-color: var(--surface-background);
   padding: 0.975rem 0.7rem;

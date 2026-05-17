@@ -39,6 +39,26 @@ function showBlogToast(message, type = 'success') {
   }, 2600);
 }
 
+
+function initGuidelinesStrips() {
+  document.querySelectorAll(".blog-rules-strip").forEach((strip) => {
+    const trigger = strip.querySelector(".blog-rules-trigger");
+    const panel = strip.querySelector(".blog-rules-panel");
+    if (!trigger || !panel) return;
+
+    trigger.addEventListener("click", () => {
+      const isOpen = strip.classList.toggle("is-open");
+
+      // ARIA state
+      strip.setAttribute("aria-expanded", String(isOpen));
+      panel.setAttribute("aria-hidden", String(!isOpen));
+    });
+  });
+}
+
+// Call immediately 
+initGuidelinesStrips();
+
 async function handleShare(post) {
   const shareUrl = `${window.location.origin}/src/view-post/?id=${post.id}`;
  

@@ -99,6 +99,10 @@
           <i data-lucide="message-circle-heart" style="width:16px;height:16px"></i>
           <span>Blog</span>
         </button>
+        <button id="nav-blog-btn" class="dash-nav-link flex items-center gap-3" data-nav="music" type="button">
+          <i data-lucide="music-2" style="width:16px;height:16px"></i>
+          <span>Music</span>
+        </button>
         <button id="nav-quest-btn" class="dash-nav-link flex items-center gap-3 hidden" data-nav="quest" type="button">
           <i data-lucide="award" style="width:16px;height:16px"></i>
           <span>Quests</span>
@@ -211,6 +215,13 @@
                 <i data-lucide="message-circle-heart" style="width:20px;height:20px"></i>
               </span>
               <span class="quick-action-tile__label">Blog</span>
+            </button>
+
+            <button class="quick-action-tile" id="quick-link-blog" type="button" data-nav="music">
+              <span class="quick-action-tile__icon">
+                <i data-lucide="music-2" style="width:20px;height:20px"></i>
+              </span>
+              <span class="quick-action-tile__label">Music</span>
             </button>
         
             <button class="quick-action-tile hidden" id="quick-link-quest" type="button" data-nav="quest">
@@ -1203,17 +1214,17 @@
            ══════════════════════════════════════════════════════ -->
       <section id="section-blog" class="dash-section hidden">
         <div class="blog-shell">
-          <header class="blog-header">
-            <div class="dash-carousel-header" id="blogCarousel">
-              <div class="dash-carousel-header__content">
-                <div class="dash-section-header">
-                  <div class="txn-header">
-                    <h2 class="txn-header__title blog-title">Blog Feed</h2>
-                    <p class="txn-header__sub blog-subtitle">Post, read, and earn from helpful activity.</p>
-                  </div>
+          <div class="dash-carousel-header" id="blogCarousel">
+            <div class="dash-carousel-header__content">
+              <div class="dash-section-header">
+                <div class="txn-header">
+                  <h2 class="txn-header__title blog-title">Blog Feed</h2>
+                  <p class="txn-header__sub blog-subtitle">Post, read, and earn from helpful activity.</p>
                 </div>
               </div>
             </div>
+          </div>
+          <header class="blog-header">
             <div class="blog-header-wrap">
               <a class="blog-compose-btn" href="/src/post/">
                 <i data-lucide="square-pen" style="width:16px;height:16px"></i>
@@ -1225,6 +1236,77 @@
               </button>
             </div>
           </header>
+
+          <div class="blog-rules-strip" id="blogRulesStrip" aria-expanded="false">
+            <button
+              class="blog-rules-trigger"
+              id="blogRulesTrigger"
+              type="button"
+              aria-controls="blogRulesPanel"
+            >
+              <i data-lucide="shield-check" class="blog-rules-trigger__icon" aria-hidden="true"></i>
+              <span class="blog-rules-trigger__label">Community Guidelines</span>
+              <span class="blog-rules-trigger__dot" aria-hidden="true"></span>
+              <i data-lucide="chevron-down" class="blog-rules-chevron" aria-hidden="true"></i>
+            </button>
+          
+            <div class="blog-rules-panel" id="blogRulesPanel" role="region" aria-hidden="true">
+              <div class="blog-rules-panel__inner">
+                <div class="blog-rules-body">
+          
+                  <!-- Left column -->
+                  <div class="blog-rules-group">
+          
+                    <p class="blog-rules-group__title">What's welcome</p>
+                    <ul class="blog-rules-list">
+                      <li>Financial tips, strategies, and personal wins</li>
+                      <li>Market commentary and honest takes</li>
+                      <li>Questions and discussions with the community</li>
+                      <li>Motivational content tied to growth and wealth</li>
+                      <li>Images that support your post — charts, screenshots, photos</li>
+                    </ul>
+          
+                    <p class="blog-rules-group__title">Liking &amp; earning</p>
+                    <ul class="blog-rules-list">
+                      <li>Earn <strong>₦100</strong> for every post you like</li>
+                      <li>Earn <strong>₦200</strong> each time someone likes your post</li>
+                      <li>A deposit is required to participate in like rewards</li>
+                      <li>One like per post — cannot be reversed once given</li>
+                      <li>A short cooldown applies between likes to ensure fair participation for everyone</li>
+                    </ul>
+          
+                  </div>
+          
+                  <!-- Right column -->
+                  <div class="blog-rules-group">
+          
+                    <p class="blog-rules-group__title">What's not allowed</p>
+                    <ul class="blog-rules-list blog-rules-list--no">
+                      <li>Spam, repetitive posts, or meaningless content</li>
+                      <li>Promoting external platforms or third-party referral links</li>
+                      <li>Personal attacks, insults, or harassment of any member</li>
+                      <li>Explicit, sexual, or violent content of any kind</li>
+                      <li>Sharing sensitive financial details publicly</li>
+                      <li>Misinformation or fabricated returns presented as fact</li>
+                      <li>Impersonating GrowthHaven staff or other members</li>
+                      <li>Coordinated or automated liking — rewards will be reversed and account action taken</li>
+                    </ul>
+          
+                    <p class="blog-rules-group__title">Good to know</p>
+                    <ul class="blog-rules-list blog-rules-list--info">
+                      <li>All activity on the feed is monitored</li>
+                      <li>Reported posts are reviewed and may be removed without notice</li>
+                      <li>Repeated violations result in posting or account restrictions</li>
+                      <li>Members must have an active deposit to post and earn rewards</li>
+                      <li>There is no set limit on posts per day — but rapid or automated posting will be detected and restricted</li>
+                    </ul>
+          
+                  </div>
+          
+                </div><!-- /.blog-rules-body -->
+              </div>
+            </div><!-- /.blog-rules-panel -->
+        </div><!-- /#blogRulesStrip -->
 
           <div class="blog-feed" id="blogFeed" role="list" aria-live="polite">
             <article class="blog-post blog-post--skeleton" aria-hidden="true">
@@ -1273,6 +1355,22 @@
           </div>
         </div>
       </section>
+
+      <!-- ══════════════════════════════════════════════════════
+           SECTION — music (shell only)
+           ══════════════════════════════════════════════════════ -->
+      <section id="section-music" class="dash-section hidden">
+        <div class="dash-section__coming flex-col-center">
+          <div class="dash-section__coming-icon flex-center">
+            <i data-lucide="music-4" style="width:24px;height:24px"></i>
+          </div>
+          <p class="dash-section__coming-title">Stream Music & Earn - Soon</p>
+          <span class="dash-section__coming-sub">
+            Stack up rewards while watching your favorite music videos. Stream the latest hits solo or share them with friends to boost your earnings together!
+          </span>
+        </div>
+      </section>
+
 
       <!-- ══════════════════════════════════════════════════════
            SECTION — Quests (shell only)
@@ -1718,17 +1816,19 @@
   </div>
 
   <!-- FLOATING TELEGRAM SUPPORT BUTTON -->
-  <a
-    class="tg-float-btn flex items-center gap-2"
-    id="tgFloatBtn"
-    href="https://t.me/growthhavensupport"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Contact support on Telegram"
-  >
-    <i data-lucide="send" style="width:18px;height:18px;flex-shrink:0;"></i>
-    <span class="tg-float-btn__label">Support</span>
-  </a>
+   <div class="floats flex flex-col">
+     <a
+       class="tg-float-btn flex items-center gap-2"
+       id="tgFloatBtn"
+       href="https://t.me/growthhavensupport"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Contact support on Telegram"
+     >
+       <i data-lucide="send" style="width:18px;height:18px;flex-shrink:0;"></i>
+       <span class="tg-float-btn__label">Support</span>
+     </a>
+   </div>
 
   <!-- DASHBOARD LOADER — visible by default, hidden by JS after all data resolves -->
   <div class="dash-loader" id="dashLoader" aria-hidden="true">

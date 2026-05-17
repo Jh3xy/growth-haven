@@ -181,6 +181,7 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   margin-top: 0.75rem;
   border-radius: 6px;
   overflow: hidden;
+  min-height: 10px;
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-card);
 }
@@ -664,5 +665,186 @@ html[data-theme='light']  .dash-welcome-card__greeting {
 
   .blog-post {
     padding: 0.9rem;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   COMMUNITY / POSTING GUIDELINES STRIP
+   ───────────────────────────────────────────────────────────── */
+
+.blog-rules-strip {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-card);
+  overflow: hidden;
+}
+
+/* ── Trigger row ─────────────────────────────────────────── */
+
+.blog-rules-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.875rem;
+  color: var(--text-secondary);
+  background: none;
+  border: 0;
+  font-family: var(--ff-primary);
+  font-size: 0.75rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    color var(--transition-global),
+    background-color var(--transition-global);
+}
+
+.blog-rules-trigger:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-card-muted);
+}
+
+.blog-rules-trigger:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: -2px;
+}
+
+/* The shield icon gets the brand colour */
+.blog-rules-trigger__icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--brand-primary);
+}
+
+.blog-rules-trigger__label {
+  flex: 1;
+}
+
+/* Dot hint — subtle "info" signal in the closed state */
+.blog-rules-trigger__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--brand-primary);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.blog-rules-strip.is-open .blog-rules-trigger__dot {
+  display: none;
+}
+
+.blog-rules-chevron {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  transition: transform 0.24s var(--spring);
+}
+
+.blog-rules-strip.is-open .blog-rules-chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Collapsible panel — grid-row trick, no JS height calc ── */
+
+.blog-rules-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s var(--spring);
+}
+
+.blog-rules-strip.is-open .blog-rules-panel {
+  grid-template-rows: 1fr;
+}
+
+.blog-rules-panel__inner {
+  overflow: hidden;
+}
+
+/* ── Rules body ──────────────────────────────────────────── */
+
+.blog-rules-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5rem;
+  padding: 0.875rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.blog-rules-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-rules-group__title {
+  margin: 0 0 0.4rem;
+  padding-top: 0.625rem;
+  font-size: 0.67rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-primary);
+}
+
+.blog-rules-group__title:first-child {
+  padding-top: 0;
+}
+
+/* ── Rule lists ──────────────────────────────────────────── */
+
+.blog-rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.blog-rules-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Allowed: green dot */
+.blog-rules-list li::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--brand-primary);
+  flex-shrink: 0;
+  margin-top: 0.48em;
+}
+
+/* Not-allowed: red dot */
+.blog-rules-list--no li::before {
+  background-color: var(--status-error);
+}
+
+/* Neutral / info: muted dot */
+.blog-rules-list--info li::before {
+  background-color: var(--text-tertiary);
+}
+
+/* Emphasised values inside list items */
+.blog-rules-list strong {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  .blog-rules-body {
+    grid-template-columns: 1fr;
   }
 }

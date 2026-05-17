@@ -83,6 +83,8 @@ function showToast(message, type = 'success') {
   window.setTimeout(() => toast.remove(), 2600);
 }
 
+
+
 async function loadAuthor() {
   const { data: member, error } = await supabase
     .from('members')
@@ -130,6 +132,26 @@ async function loadAuthor() {
   }
 
 }
+
+
+function initGuidelinesStrips() {
+  document.querySelectorAll(".blog-rules-strip").forEach((strip) => {
+    const trigger = strip.querySelector(".blog-rules-trigger");
+    const panel = strip.querySelector(".blog-rules-panel");
+    if (!trigger || !panel) return;
+
+    trigger.addEventListener("click", () => {
+      const isOpen = strip.classList.toggle("is-open");
+
+      // ARIA state
+      strip.setAttribute("aria-expanded", String(isOpen));
+      panel.setAttribute("aria-hidden", String(!isOpen));
+    });
+  });
+}
+
+// Call immediately
+initGuidelinesStrips();
 
 
 /**

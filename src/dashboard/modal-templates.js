@@ -244,13 +244,15 @@ export const MODAL_TEMPLATES = {
     }[status] || 'txn-row__status--completed';
 
     return {
-      title: 'Transaction Detail',
+      title: "Transaction Detail",
       body: `
         <div class="modal-receipt">
 
-          <div class="modal-receipt__icon" style="${isIn
-            ? ''
-            : 'background:var(--status-error-bg);border-color:var(--status-error-border);color:var(--status-error-text);'}">
+          <div class="modal-receipt__icon" style="${
+            isIn
+              ? ""
+              : "background:var(--status-error-bg);border-color:var(--status-error-border);color:var(--status-error-text);"
+          }">
             <i data-lucide="${icon}"></i>
           </div>
 
@@ -264,7 +266,7 @@ export const MODAL_TEMPLATES = {
             <div class="modal-receipt__row">
               <span class="modal-receipt__key">Type</span>
               <span class="modal-receipt__val" style="text-transform:capitalize;">
-                ${txn.type.replace(/_/g, ' ')}
+                ${txn.type.replace(/_/g, " ")}
               </span>
             </div>
             <div class="modal-receipt__divider"></div>
@@ -279,22 +281,28 @@ export const MODAL_TEMPLATES = {
 
             <div class="modal-receipt__row">
               <span class="modal-receipt__key">Date</span>
-              <span class="modal-receipt__val">${formatDate(txn.created_at)}</span>
+              <span class="modal-receipt__val">${formatDate(txn.created_at).split("T")[0]}</span>
             </div>
 
-            ${txn.reference ? `
+            ${
+              txn.reference
+                ? `
             <div class="modal-receipt__divider"></div>
             <div class="modal-receipt__row">
               <span class="modal-receipt__key">Reference</span>
-              <span class="modal-receipt__val">${txn.reference.slice(2, 10)}</span>
+              <span class="modal-receipt__val">${txn.reference}</span>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
 
           </div>
 
-          ${txn.reference
-            ? `<p class="modal-receipt__ref">ref: ${txn.reference}</p>`
-            : ''}
+          ${
+            txn.reference
+              ? `<p class="modal-receipt__ref">ref: ${txn.reference}</p>`
+              : ""
+          }
 
           <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
 
