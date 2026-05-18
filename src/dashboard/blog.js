@@ -1,6 +1,7 @@
 
 
 import { getInitials, formatDate, initImagePreviewOverlay } from '../assets/js/utils.js';
+import { renderPostContent } from '../assets/js/post-content-renderer.js';
 
 const POSTS_PER_PAGE = 20;
 
@@ -155,7 +156,7 @@ function createPostElement(post, { onLike }) {
   `;
 
   article.querySelector('.blog-post__name').textContent = fullName;
-  article.querySelector('.blog-post__content').textContent = post.content || '';
+  renderPostContent(article.querySelector('.blog-post__content'), post.content);
   setupReadMore(article);
   article.querySelector('.blog-like-btn')?.addEventListener('click', (event) => {
     onLike?.({

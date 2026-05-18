@@ -6,6 +6,7 @@ import './view-post.css';
 
 import { supabase } from "../assets/js/supabase.js";
 import { getInitials, initImagePreviewOverlay } from "../assets/js/utils.js";
+import { renderPostContent } from "../assets/js/post-content-renderer.js";
 
 // ── DOM Refs ─────────────────────────────────────────────────────────
 const vpMain  = document.getElementById('vpMain');
@@ -137,16 +138,22 @@ function renderPost(post) {
   if (vpAvatar)     vpAvatar.textContent    = getInitials(firstName, lastName) || 'GH';
   if (vpAuthorName) vpAuthorName.textContent = fullName;
   if (vpContent) {
-    vpContent.innerHTML =
-      `
-      <p class="post-content blog-post__content">
-        ${post.content || ''}
-      </p>
-      <button class="blog-read-more hidden" type="button" aria-expanded="false">Read more</button>
-        ` || "";
+    vpContent.classList.add("blog-post__content");
+    renderPostContent(vpContent, post.content);
+
+    const existingReadMore = vpContent.nextElementSibling;
+    if (existingReadMore?.classList.contains("blog-read-more")) {
+      existingReadMore.remove();
+    }
+
+    const readMoreButton = document.createElement("button");
+    readMoreButton.className = "blog-read-more hidden";
+    readMoreButton.type = "button";
+    readMoreButton.setAttribute("aria-expanded", "false");
+    readMoreButton.textContent = "Read more";
+    vpContent.after(readMoreButton);
   }
-  const article = document.querySelector(".vp-post__content");
-  setupReadMore(article);
+  setupReadMore(vpPost);
 
   if (vpTime) {
     vpTime.textContent = formatRelativeTime(post.created_at);

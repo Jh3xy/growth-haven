@@ -313,6 +313,25 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   overflow-wrap: anywhere;
 }
 
+.blog-post__hashtag {
+  color: inherit;
+  font-weight: var(--fw-bold);
+}
+
+.blog-post__link {
+  color: var(--brand-primary);
+  font-weight: var(--fw-semibold);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  overflow-wrap: anywhere;
+}
+
+.blog-post__link:hover,
+.blog-post__link:focus-visible {
+  color: var(--brand-primary-hover);
+}
+
 .blog-post--has-media .blog-post__content {
   --blog-content-collapsed-height: 5.15rem;
 }
