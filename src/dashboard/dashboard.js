@@ -17,9 +17,11 @@ document.body.style.overflow = 'hidden';
 // ── Modal & Profile system ──
 import './modal.css';
 import '../assets/styles/profile.css';
+import "../assets/styles/music.css";
 
 import posthog from 'posthog-js';
 import { openModal } from './modal.js';
+import { initMusicSection } from './player.js'
 import { initProfile } from './profile.js';
 import { initBlogSection } from "./blog.js";
 import { initCasinoSection } from './casino.js';
@@ -110,6 +112,16 @@ const carouselConfigs = {
   },
   profile: {
     id: "profileCarousel",
+    images: [
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
+  },
+  music: {
+    id: "musicCarousel",
     images: [
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -898,6 +910,19 @@ casinoObserver.observe(sportsSection, {
   attributeFilter: ["class"],
 });
  
+const musicSection = document.getElementById("section-music");
+const musicObserver = new MutationObserver(() => {
+  if (!musicSection.classList.contains("hidden")) {
+    initMusicSection();
+  }
+});
+musicObserver.observe(musicSection, {
+  attributes: true,
+  attributeFilter: ["class"],
+});
+
+
+
 // ── Sidebar sign-out button ──
 const sidebarSignoutBtn = document.getElementById('sidebarSignoutBtn');
 sidebarSignoutBtn?.addEventListener('click', async () => {
