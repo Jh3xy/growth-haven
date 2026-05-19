@@ -5,7 +5,7 @@
  * music.css — GrowthHaven Music Section
  * src/assets/styles/music.css
  */
- 
+
 :root {
   --music-mini-h: 72px;
 }
@@ -367,6 +367,7 @@
   padding: 0 1rem;
   max-width: 1200px;
   margin: 0 auto;
+  justify-content: space-around;
 }
 
 .music-mini-player__thumb {
@@ -464,7 +465,7 @@ body.music-expanded-open { overflow: hidden; }
 }
 
 .music-expanded-player.is-open {
-  transform: translateY(10%);   /* 10% gap reveals backdrop behind */
+  transform: translateY(5%);   /* 10% gap reveals backdrop behind */
 }
 
 /* Header */
@@ -481,7 +482,8 @@ body.music-expanded-open { overflow: hidden; }
   width: 40px;
   height: 40px;
   border: none;
-  background: transparent;
+  border-radius: 50%;
+  background: var(--surface-card-muted);
   color: var(--text-primary);
   cursor: pointer;
   display: flex;
@@ -493,7 +495,7 @@ body.music-expanded-open { overflow: hidden; }
   font-size: var(--fs-caption, 0.75rem);
   color: var(--text-secondary);
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
 }
 
 .music-expanded-player__spacer { width: 40px; }
@@ -515,7 +517,7 @@ body.music-expanded-open { overflow: hidden; }
 /* YouTube embed — pointer-events:none blocks YT native controls */
 .music-yt-wrap {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 12;
   background: #000;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -535,6 +537,7 @@ body.music-expanded-open { overflow: hidden; }
 .music-expanded-player__meta {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
 }
 
@@ -543,7 +546,8 @@ body.music-expanded-open { overflow: hidden; }
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
+  max-width: 210px;
 }
 
 .music-expanded-player__title {
@@ -580,12 +584,10 @@ body.music-expanded-open { overflow: hidden; }
 .music-seek-track-wrap { flex: 1; }
 
 .music-seek-bar {
-  -webkit-appearance: none;
-  appearance: none;
   width: 100%;
   height: 4px;
   border-radius: 2px;
-  background: var(--border-color);
+  background: var(--brand-primary-soft);
   outline: none;
   cursor: pointer;
 }
@@ -629,7 +631,7 @@ body.music-expanded-open { overflow: hidden; }
   .music-mini-player__info { display: none; }
 
   .music-expanded-player__title { font-size: 1rem; }
-  .music-expanded-player.is-open { transform: translateY(5%); }
+  .music-expanded-player.is-open { transform: translateY(15%); }
 }
 
 @media (min-width: 768px) {
