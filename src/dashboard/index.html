@@ -1368,8 +1368,8 @@
             <div class="dash-carousel-header__content">
               <div class="dash-section-header">
                 <div class="txn-header">
-                  <h2 class="txn-header__title">Music</h2>
-                  <p class="txn-header__sub">Stream your favourites. Discover what's new.</p>
+                  <h2 class="txn-header__title">Stream & Earn</h2>
+                  <p class="txn-header__sub">Find your favourite videos, Discover what's new.</p>
                 </div>
               </div>
             </div>
@@ -1455,98 +1455,6 @@
           </div><!-- /#musicSongsGrid -->
  
         </div><!-- /.dash-section__inner -->
- 
-        <!-- ── MINI PLAYER
-             position:fixed — always in DOM, slides up via transform on first play.
-             Does NOT use .hidden (that's display:none in utils.css) — uses is-visible class instead.
-        ── -->
-        <div class="music-mini-player" id="musicMiniPlayer" aria-live="polite" aria-label="Now playing bar">
-          <div class="music-mini-player__bar">
-            <img class="music-mini-player__thumb" id="miniThumb" src="" alt="" />
-            <div class="music-mini-player__info">
-              <span class="music-mini-player__title"  id="miniTitle"></span>
-              <span class="music-mini-player__artist" id="miniArtist"></span>
-            </div>
-            <div class="music-mini-player__controls">
-              <button class="music-ctrl-btn" id="miniPrevBtn"       aria-label="Previous track" type="button">
-                <i data-lucide="skip-back"    style="width:16px;height:16px"></i>
-              </button>
-              <button class="music-ctrl-btn music-ctrl-btn--primary" id="miniPlayPauseBtn" aria-label="Play or pause" type="button">
-                <i data-lucide="play"         style="width:18px;height:18px"></i>
-              </button>
-              <button class="music-ctrl-btn" id="miniNextBtn"       aria-label="Next track" type="button">
-                <i data-lucide="skip-forward" style="width:16px;height:16px"></i>
-              </button>
-            </div>
-            <button class="music-mini-player__expand" id="miniExpandBtn" aria-label="Expand player" type="button">
-              <i data-lucide="chevron-up" style="width:16px;height:16px"></i>
-            </button>
-          </div>
-        </div><!-- /#musicMiniPlayer -->
- 
-        <!-- ── EXPANDED PLAYER
-             position:fixed fullscreen, slides up via transform when is-open class added.
-        ── -->
-        <div class="music-expanded-player" id="musicExpandedPlayer" role="dialog" aria-modal="true" aria-label="Now playing">
- 
-          <div class="music-expanded-player__header">
-            <button class="music-expanded-player__close" id="expandedCloseBtn" aria-label="Collapse player" type="button">
-              <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-            </button>
-            <span class="music-expanded-player__heading">Now Playing</span>
-            <div class="music-expanded-player__spacer"></div>
-          </div>
- 
-          <div class="music-expanded-player__body">
- 
-            <!-- YouTube IFrame API replaces this div on first play -->
-            <div class="music-yt-wrap">
-              <div id="ytPlayer"></div>
-            </div>
- 
-            <!-- Track info + like -->
-            <div class="music-expanded-player__meta">
-              <div class="music-expanded-player__meta-text">
-                <span class="music-expanded-player__title"  id="expandedTitle"></span>
-                <span class="music-expanded-player__artist" id="expandedArtist"></span>
-              </div>
-              <button class="music-like-btn" id="expandedLikeBtn" aria-label="Like this track" type="button">
-                <i data-lucide="heart" style="width:20px;height:20px"></i>
-              </button>
-            </div>
- 
-            <!-- Seek bar -->
-            <div class="music-seek-row">
-              <span class="music-seek-time" id="seekCurrentTime">0:00</span>
-              <div class="music-seek-track-wrap">
-                <input
-                  class="music-seek-bar"
-                  id="musicSeekBar"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value="0"
-                  aria-label="Seek position"
-                />
-              </div>
-              <span class="music-seek-time" id="seekTotalTime">0:00</span>
-            </div>
- 
-            <!-- Playback controls -->
-            <div class="music-expanded-controls">
-              <button class="music-ctrl-btn" id="expandedPrevBtn" aria-label="Previous track" type="button">
-                <i data-lucide="skip-back"    style="width:22px;height:22px"></i>
-              </button>
-              <button class="music-ctrl-btn music-ctrl-btn--lg" id="expandedPlayPauseBtn" aria-label="Play or pause" type="button">
-                <i data-lucide="play"         style="width:26px;height:26px"></i>
-              </button>
-              <button class="music-ctrl-btn" id="expandedNextBtn" aria-label="Next track" type="button">
-                <i data-lucide="skip-forward" style="width:22px;height:22px"></i>
-              </button>
-            </div>
- 
-          </div><!-- /.music-expanded-player__body -->
-        </div><!-- /#musicExpandedPlayer -->
  
       </section><!-- /#section-music -->
 
@@ -1928,6 +1836,85 @@
 
     </main><!-- /dash-main -->
   </div><!-- /dash-shell -->
+
+  <!-- MUSIC PLAYER: fixed to the viewport bottom, outside dashboard sections -->
+  <div class="music-mini-player" id="musicMiniPlayer" aria-live="polite" aria-label="Now playing bar">
+    <div class="music-mini-player__bar">
+      <img class="music-mini-player__thumb" id="miniThumb" src="" alt="" />
+      <div class="music-mini-player__info">
+        <span class="music-mini-player__title"  id="miniTitle"></span>
+        <span class="music-mini-player__artist" id="miniArtist"></span>
+      </div>
+      <div class="music-mini-player__controls">
+        <button class="music-ctrl-btn" id="miniPrevBtn" aria-label="Previous track" type="button">
+          <i data-lucide="skip-back" style="width:16px;height:16px"></i>
+        </button>
+        <button class="music-ctrl-btn music-ctrl-btn--primary" id="miniPlayPauseBtn" aria-label="Play or pause" type="button">
+          <i data-lucide="play" style="width:18px;height:18px"></i>
+        </button>
+        <button class="music-ctrl-btn" id="miniNextBtn" aria-label="Next track" type="button">
+          <i data-lucide="skip-forward" style="width:16px;height:16px"></i>
+        </button>
+      </div>
+      <button class="music-mini-player__expand" id="miniExpandBtn" aria-label="Expand player" type="button">
+        <i data-lucide="chevron-up" style="width:16px;height:16px"></i>
+      </button>
+    </div>
+  </div><!-- /#musicMiniPlayer -->
+
+  <div class="music-expanded-player" id="musicExpandedPlayer" role="dialog" aria-modal="true" aria-label="Now playing">
+    <div class="music-expanded-player__header">
+      <button class="music-expanded-player__close" id="expandedCloseBtn" aria-label="Collapse player" type="button">
+        <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
+      </button>
+      <span class="music-expanded-player__heading">Now Playing</span>
+      <div class="music-expanded-player__spacer"></div>
+    </div>
+
+    <div class="music-expanded-player__body">
+      <div class="music-yt-wrap">
+        <div id="ytPlayer"></div>
+      </div>
+
+      <div class="music-expanded-player__meta">
+        <div class="music-expanded-player__meta-text">
+          <span class="music-expanded-player__title" id="expandedTitle"></span>
+          <span class="music-expanded-player__artist" id="expandedArtist"></span>
+        </div>
+        <button class="music-like-btn" id="expandedLikeBtn" aria-label="Like this track" type="button">
+          <i data-lucide="heart" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+
+      <div class="music-seek-row">
+        <span class="music-seek-time" id="seekCurrentTime">0:00</span>
+        <div class="music-seek-track-wrap">
+          <input
+            class="music-seek-bar"
+            id="musicSeekBar"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            aria-label="Seek position"
+          />
+        </div>
+        <span class="music-seek-time" id="seekTotalTime">0:00</span>
+      </div>
+
+      <div class="music-expanded-controls">
+        <button class="music-ctrl-btn" id="expandedPrevBtn" aria-label="Previous track" type="button">
+          <i data-lucide="skip-back" style="width:22px;height:22px"></i>
+        </button>
+        <button class="music-ctrl-btn music-ctrl-btn--lg" id="expandedPlayPauseBtn" aria-label="Play or pause" type="button">
+          <i data-lucide="play" style="width:26px;height:26px"></i>
+        </button>
+        <button class="music-ctrl-btn" id="expandedNextBtn" aria-label="Next track" type="button">
+          <i data-lucide="skip-forward" style="width:22px;height:22px"></i>
+        </button>
+      </div>
+    </div>
+  </div><!-- /#musicExpandedPlayer -->
 
   <!-- MODAL SHELL -->
   <div class="modal-shell" id="modalShell" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">

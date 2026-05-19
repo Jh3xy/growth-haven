@@ -3,6 +3,7 @@
 /* main css module */
 html {
   scrollbar-gutter: stable;
+  background-color: var(--surface-background);
 }
 
 [data-lucide] {
