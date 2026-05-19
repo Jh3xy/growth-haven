@@ -2,32 +2,32 @@
 
 /**
  * music.js — GrowthHaven Music Section
- * Place at: src/dashboard/music.js
- *
- * Export called once when #section-music becomes visible.
- * Wired via MutationObserver in dashboard.js (same pattern as casino.js).
+ * src/dashboard/music.js
  */
 
 import { supabase } from '../assets/js/supabase.js'
 
-let initialized = false
+let initialized  = false
+const PAGE_SIZE  = 25
 
-// ─── PLAYER STATE ─────────────────────────────────────────────────
+// ─── STATE ────────────────────────────────────────────────────────
 
 const state = {
-  allSongs:      [],      // full catalog from Supabase
-  filteredSongs: [],      // current view after filter/search
-  queue:         [],      // snapshot of filteredSongs at time of play
-  currentIndex:  0,
-  currentTrack:  null,
-  playing:       false,
-  expanded:      false,
-  ytReady:       false,
-  player:        null,    // YT.Player instance
-  likedSongs:    new Set(),
-  seekInterval:  null,
-  pendingPlayToken: 0,
+  allSongs:     [],
+  filteredSongs:[],
+  queue:        [],
+  currentIndex: 0,
+  currentTrack: null,
+  playing:      false,
+  expanded:     false,
+  ytReady:      false,
+  player:       null,
+  likedSongs:   new Set(),
+  seekInterval: null,
+  displayCount: PAGE_SIZE,
 }
+
+let loadingCardEl = null
 
 
 // ─── INIT ─────────────────────────────────────────────────────────
@@ -45,6 +45,8 @@ export async function initMusicSection() {
   initSearch()
   initMiniPlayer()
   initExpandedPlayer()
+  initLoadMore()
+  initKeyboardShortcuts()
   renderSongs(state.allSongs)
 }
 
@@ -52,23 +54,18 @@ export async function initMusicSection() {
 // ─── YOUTUBE IFRAME API ───────────────────────────────────────────
 
 function loadYouTubeAPI() {
-  // Already loaded by a previous init call
-  if (window.YT?.Player) {
-    state.ytReady = true
-    return
-  }
+  if (window.YT?.Player) { state.ytReady = true; return }
 
-  // Set the global callback BEFORE injecting the script tag
+  // Must be on window BEFORE the script tag fires
   window.onYouTubeIframeAPIReady = () => {
     state.ytReady = true
-    console.log('[music] YouTube IFrame API ready')
+    console.log('[music] YT API ready')
   }
 
-  // Don't inject twice if another section already added it
   if (document.querySelector('script[src*="youtube.com/iframe_api"]')) return
 
   const tag = document.createElement('script')
-  tag.src = 'https://www.youtube.com/iframe_api'
+  tag.src   = 'https://www.youtube.com/iframe_api'
   document.head.appendChild(tag)
 }
 
@@ -82,10 +79,7 @@ async function fetchCatalog() {
     .eq('embeddable', true)
     .order('last_refreshed', { ascending: false })
 
-  if (error) {
-    console.error('[music] fetchCatalog:', error)
-    return
-  }
+  if (error) { console.error('[music] fetchCatalog:', error); return }
 
   state.allSongs      = data || []
   state.filteredSongs = state.allSongs
@@ -101,10 +95,7 @@ async function fetchLikedSongs() {
     .select('video_id')
     .eq('user_id', user.id)
 
-  if (error) {
-    console.error('[music] fetchLikedSongs:', error)
-    return
-  }
+  if (error) { console.error('[music] fetchLikedSongs:', error); return }
 
   state.likedSongs = new Set((data || []).map(s => s.video_id))
 }
@@ -113,16 +104,15 @@ async function fetchLikedSongs() {
 // ─── FILTER TABS ──────────────────────────────────────────────────
 
 function initFilterTabs() {
-  const tabs = document.querySelectorAll('#musicFilterTabs .music-filter-tab')
-
-  tabs.forEach(tab => {
+  document.querySelectorAll('#musicFilterTabs .music-filter-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(t => {
+      document.querySelectorAll('#musicFilterTabs .music-filter-tab').forEach(t => {
         t.classList.remove('is-active')
         t.setAttribute('aria-selected', 'false')
       })
       tab.classList.add('is-active')
       tab.setAttribute('aria-selected', 'true')
+      state.displayCount = PAGE_SIZE   // reset pagination on filter change
       applyFilters()
     })
   })
@@ -134,22 +124,22 @@ function initFilterTabs() {
 function initSearch() {
   const input = document.getElementById('musicSearch')
   if (!input) return
-
   let debounce
   input.addEventListener('input', () => {
     clearTimeout(debounce)
-    debounce = setTimeout(applyFilters, 280)
+    debounce = setTimeout(() => {
+      state.displayCount = PAGE_SIZE   // reset pagination on search
+      applyFilters()
+    }, 280)
   })
 }
 
 
-// ─── SHARED FILTER LOGIC ──────────────────────────────────────────
-// Tab filters first, search query narrows within that result.
+// ─── FILTER LOGIC ─────────────────────────────────────────────────
 
 function applyFilters() {
-  const activeTab   = document.querySelector('#musicFilterTabs .music-filter-tab.is-active')
-  const filter      = activeTab?.dataset.filter || 'all'
-  const query       = document.getElementById('musicSearch')?.value.toLowerCase().trim() || ''
+  const filter = document.querySelector('#musicFilterTabs .music-filter-tab.is-active')?.dataset.filter || 'all'
+  const query  = document.getElementById('musicSearch')?.value.toLowerCase().trim() || ''
 
   let results = state.allSongs
 
@@ -175,34 +165,32 @@ function applyFilters() {
 // ─── RENDER SONGS ─────────────────────────────────────────────────
 
 function renderSongs(songs) {
-  const grid  = document.getElementById('musicSongsGrid')
-  const empty = document.getElementById('musicGridEmpty')
+  const grid     = document.getElementById('musicSongsGrid')
+  const empty    = document.getElementById('musicGridEmpty')
+  const loadMore = document.getElementById('musicLoadMore')
   if (!grid) return
 
   if (!songs.length) {
     grid.innerHTML = ''
     empty?.classList.remove('hidden')
+    loadMore?.classList.add('hidden')
     return
   }
 
   empty?.classList.add('hidden')
 
-  grid.innerHTML = songs.map((song, i) => {
-    const videoId = getTrackVideoId(song)
-    const liked   = state.likedSongs.has(videoId)
-    const artist  = escHtml(getTrackArtist(song))
-    const title   = escHtml(getTrackTitle(song))
-    const thumb   = escHtml(getTrackThumb(song))
+  // Client-side pagination — all data already fetched, just slice for display
+  const displayed = songs.slice(0, state.displayCount)
+
+  grid.innerHTML = displayed.map((song, i) => {
+    const liked  = state.likedSongs.has(song.video_id)
+    const artist = escHtml(song.artist || 'Unknown Artist')
+    const title  = escHtml(song.title  || 'Untitled')
 
     return `
       <div class="music-song-card" role="listitem">
         <div class="music-song-card__thumb-wrap">
-          <img
-            class="music-song-card__thumb"
-            src="${thumb}"
-            alt="${title}"
-            loading="lazy"
-          />
+          <img class="music-song-card__thumb" src="${song.thumbnail || ''}" alt="${title}" loading="lazy" />
           <button class="music-song-card__play-overlay" data-index="${i}" aria-label="Play ${title}" type="button">
             <i data-lucide="play" style="width:22px;height:22px"></i>
           </button>
@@ -212,15 +200,10 @@ function renderSongs(songs) {
           <span class="music-song-card__title">${title}</span>
         </div>
         <div class="music-song-card__actions">
-          <button class="music-song-card__play-btn" data-index="${i}" aria-label="Play ${title}" type="button">
+          <button class="music-song-card__play-btn" data-index="${i}" aria-label="Play" type="button">
             <i data-lucide="play" style="width:13px;height:13px"></i>
           </button>
-          <button
-            class="music-song-card__like-btn ${liked ? 'is-liked' : ''}"
-            data-video-id="${escHtml(videoId)}"
-            aria-label="${liked ? 'Unlike' : 'Like'} ${title}"
-            type="button"
-          >
+          <button class="music-song-card__like-btn ${liked ? 'is-liked' : ''}" data-video-id="${song.video_id}" aria-label="${liked ? 'Unlike' : 'Like'}" type="button">
             <i data-lucide="heart" style="width:13px;height:13px"></i>
           </button>
         </div>
@@ -228,9 +211,9 @@ function renderSongs(songs) {
     `
   }).join('')
 
-  if (window.lucide) lucide.createIcons({ nodes: [grid] })
+  window.lucide?.createIcons({ nodes: [grid] })
 
-  // Delegated listeners — one each for play and like
+  // Play buttons (thumbnail overlay + action row button share [data-index])
   grid.querySelectorAll('[data-index]').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation()
@@ -238,11 +221,27 @@ function renderSongs(songs) {
     })
   })
 
+  // Like buttons
   grid.querySelectorAll('.music-song-card__like-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation()
       toggleLike(btn.dataset.videoId, btn)
     })
+  })
+
+  // Show / hide the load-more button
+  if (loadMore) {
+    loadMore.classList.toggle('hidden', songs.length <= state.displayCount)
+  }
+}
+
+
+// ─── LOAD MORE ────────────────────────────────────────────────────
+
+function initLoadMore() {
+  document.getElementById('musicLoadMore')?.addEventListener('click', () => {
+    state.displayCount += PAGE_SIZE
+    renderSongs(state.filteredSongs)
   })
 }
 
@@ -252,55 +251,36 @@ function renderSongs(songs) {
 function playTrack(index) {
   const track = state.filteredSongs[index]
   if (!track) return
-  const videoId = getTrackVideoId(track)
-  if (!videoId) {
-    console.warn('[music] Cannot play track without video_id:', track)
-    return
-  }
 
-  // Snapshot the current filtered list as the queue
   state.queue        = [...state.filteredSongs]
   state.currentIndex = index
   state.currentTrack = track
-  const playToken    = ++state.pendingPlayToken
 
+  setCardLoading(index)
   updateMiniPlayer(track)
-  updateExpandedPlayer(track)
-  resetSeekUI()
   showMiniPlayer()
-  logPlayHistory(videoId)
+  if (state.expanded) updateExpandedPlayer(track)
+  logPlayHistory(track.video_id)
 
   if (!state.player) {
-    // YT API may still be loading — poll until ready
     const tryCreate = () => {
-      if (playToken !== state.pendingPlayToken) return
       if (!state.ytReady) { setTimeout(tryCreate, 100); return }
-      const currentVideoId = getTrackVideoId(state.currentTrack)
-      if (!currentVideoId) return
 
       state.player = new YT.Player('ytPlayer', {
-        height: '100%',
-        width:  '100%',
-        videoId: currentVideoId,
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          modestbranding: 1,
-          playsinline: 1,
-          rel: 0,
-        },
+        height:   '100%',
+        width:    '100%',
+        videoId:  track.video_id,
+        playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1 },
         events: {
-          onReady:       e => { e.target.playVideo(); state.playing = true; syncPlayIcons() },
+          onReady:       e  => { e.target.playVideo(); state.playing = true; syncPlayIcons() },
           onStateChange: onPlayerStateChange,
+          onError:       onPlayerError,
         },
       })
     }
     tryCreate()
   } else {
-    state.player.loadVideoById(videoId)
+    state.player.loadVideoById(track.video_id)
     state.playing = true
     syncPlayIcons()
   }
@@ -315,6 +295,7 @@ function onPlayerStateChange(event) {
       state.playing = true
       syncPlayIcons()
       startSeekUpdater()
+      clearCardLoading()   // remove spinner once video actually starts
       break
     case YT.PlayerState.PAUSED:
       state.playing = false
@@ -324,41 +305,61 @@ function onPlayerStateChange(event) {
   }
 }
 
+// Auto-skip unavailable / embed-blocked videos
+function onPlayerError(event) {
+  console.warn('[music] Video error code:', event.data, '— skipping')
+  clearCardLoading()
+  playNext()
+}
+
+
+// ─── LOADING STATE ────────────────────────────────────────────────
+
+function setCardLoading(index) {
+  clearCardLoading()
+  const cards   = document.querySelectorAll('#musicSongsGrid .music-song-card:not(.music-song-card--skeleton)')
+  loadingCardEl = cards[index] || null
+  loadingCardEl?.classList.add('is-loading')
+}
+
+function clearCardLoading() {
+  loadingCardEl?.classList.remove('is-loading')
+  loadingCardEl = null
+}
+
 
 // ─── MINI PLAYER ──────────────────────────────────────────────────
 
 function initMiniPlayer() {
-  document.getElementById('miniPrevBtn')?.addEventListener('click', playPrevious)
+  document.getElementById('miniPrevBtn')?.addEventListener('click',      playPrevious)
   document.getElementById('miniPlayPauseBtn')?.addEventListener('click', togglePlayPause)
-  document.getElementById('miniNextBtn')?.addEventListener('click', playNext)
-  document.getElementById('miniExpandBtn')?.addEventListener('click', openExpandedPlayer)
+  document.getElementById('miniNextBtn')?.addEventListener('click',      playNext)
+  document.getElementById('miniExpandBtn')?.addEventListener('click',    openExpandedPlayer)
 }
 
 function showMiniPlayer() {
   document.getElementById('musicMiniPlayer')?.classList.add('is-visible')
-  document.body.classList.add('music-player-active') // shifts .floats up in CSS
+  document.body.classList.add('music-player-active')
 }
 
 function updateMiniPlayer(track) {
   const thumb  = document.getElementById('miniThumb')
   const title  = document.getElementById('miniTitle')
   const artist = document.getElementById('miniArtist')
-  if (thumb) {
-    thumb.src = getTrackThumb(track)
-    thumb.alt = getTrackTitle(track)
-  }
-  if (title)  title.textContent  = getTrackTitle(track)
-  if (artist) artist.textContent = getTrackArtist(track)
+  if (thumb)  thumb.src         = track.thumbnail || ''
+  if (title)  title.textContent  = track.title     || ''
+  if (artist) artist.textContent = track.artist    || 'Unknown Artist'
 }
 
 
 // ─── EXPANDED PLAYER ──────────────────────────────────────────────
 
 function initExpandedPlayer() {
-  document.getElementById('expandedCloseBtn')?.addEventListener('click', closeExpandedPlayer)
-  document.getElementById('expandedPrevBtn')?.addEventListener('click', playPrevious)
-  document.getElementById('expandedPlayPauseBtn')?.addEventListener('click', togglePlayPause)
-  document.getElementById('expandedNextBtn')?.addEventListener('click', playNext)
+  document.getElementById('expandedCloseBtn')?.addEventListener('click',      closeExpandedPlayer)
+  document.getElementById('expandedPrevBtn')?.addEventListener('click',       playPrevious)
+  document.getElementById('expandedPlayPauseBtn')?.addEventListener('click',  togglePlayPause)
+  document.getElementById('expandedNextBtn')?.addEventListener('click',       playNext)
+  document.getElementById('musicExpandedBackdrop')?.addEventListener('click', closeExpandedPlayer)
 
   document.getElementById('expandedLikeBtn')?.addEventListener('click', () => {
     if (state.currentTrack) {
@@ -378,6 +379,8 @@ function initExpandedPlayer() {
 function openExpandedPlayer() {
   state.expanded = true
   document.getElementById('musicExpandedPlayer')?.classList.add('is-open')
+  document.getElementById('musicExpandedBackdrop')?.classList.add('is-visible')
+  document.body.classList.add('music-expanded-open')   // body scroll lock
   if (state.currentTrack) updateExpandedPlayer(state.currentTrack)
   startSeekUpdater()
 }
@@ -385,6 +388,8 @@ function openExpandedPlayer() {
 function closeExpandedPlayer() {
   state.expanded = false
   document.getElementById('musicExpandedPlayer')?.classList.remove('is-open')
+  document.getElementById('musicExpandedBackdrop')?.classList.remove('is-visible')
+  document.body.classList.remove('music-expanded-open')
   stopSeekUpdater()
 }
 
@@ -392,10 +397,9 @@ function updateExpandedPlayer(track) {
   const title   = document.getElementById('expandedTitle')
   const artist  = document.getElementById('expandedArtist')
   const likeBtn = document.getElementById('expandedLikeBtn')
-  const videoId = getTrackVideoId(track)
-  if (title)   title.textContent  = getTrackTitle(track)
-  if (artist)  artist.textContent = getTrackArtist(track)
-  if (likeBtn) likeBtn.classList.toggle('is-liked', state.likedSongs.has(videoId))
+  if (title)   title.textContent  = track.title  || ''
+  if (artist)  artist.textContent = track.artist || 'Unknown Artist'
+  if (likeBtn) likeBtn.classList.toggle('is-liked', state.likedSongs.has(track.video_id))
 }
 
 
@@ -424,15 +428,6 @@ function stopSeekUpdater() {
   state.seekInterval = null
 }
 
-function resetSeekUI() {
-  const seekBar = document.getElementById('musicSeekBar')
-  const curEl = document.getElementById('seekCurrentTime')
-  const durEl = document.getElementById('seekTotalTime')
-  if (seekBar) seekBar.value = 0
-  if (curEl) curEl.textContent = '0:00'
-  if (durEl) durEl.textContent = '0:00'
-}
-
 
 // ─── CONTROLS ─────────────────────────────────────────────────────
 
@@ -444,29 +439,65 @@ function togglePlayPause() {
 function playNext() {
   if (!state.queue.length) return
   const next = (state.currentIndex + 1) % state.queue.length
-  state.filteredSongs = state.queue  // restore queue as active view
+  state.filteredSongs = state.queue
   playTrack(next)
 }
 
 function playPrevious() {
   if (!state.queue.length) return
-  const prev = state.currentIndex === 0
-    ? state.queue.length - 1
-    : state.currentIndex - 1
+  const prev = state.currentIndex === 0 ? state.queue.length - 1 : state.currentIndex - 1
   state.filteredSongs = state.queue
   playTrack(prev)
 }
 
+/**
+ * syncPlayIcons
+ * Lucide replaces <i> tags with <svg> on first render, so btn.querySelector('i')
+ * returns null on subsequent calls. Fix: re-inject the <i> tag fresh each time,
+ * then call createIcons to re-render it.
+ */
 function syncPlayIcons() {
   const icon = state.playing ? 'pause' : 'play'
 
-  ;[
-    document.getElementById('miniPlayPauseBtn'),
-    document.getElementById('expandedPlayPauseBtn'),
-  ].forEach(btn => {
-    if (!btn) return
-    btn.querySelector('i')?.setAttribute('data-lucide', icon)
-    if (window.lucide) lucide.createIcons({ nodes: [btn] })
+  const miniBtn     = document.getElementById('miniPlayPauseBtn')
+  const expandedBtn = document.getElementById('expandedPlayPauseBtn')
+
+  if (miniBtn) {
+    miniBtn.innerHTML = `<i data-lucide="${icon}" style="width:18px;height:18px"></i>`
+    window.lucide?.createIcons({ nodes: [miniBtn] })
+  }
+  if (expandedBtn) {
+    expandedBtn.innerHTML = `<i data-lucide="${icon}" style="width:26px;height:26px"></i>`
+    window.lucide?.createIcons({ nodes: [expandedBtn] })
+  }
+}
+
+
+// ─── KEYBOARD SHORTCUTS ───────────────────────────────────────────
+
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', e => {
+    if (!state.currentTrack) return
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return
+
+    switch (e.key) {
+      case ' ':
+      case 'Spacebar':
+        e.preventDefault()
+        togglePlayPause()
+        break
+      case 'ArrowRight':
+        e.preventDefault()
+        playNext()
+        break
+      case 'ArrowLeft':
+        e.preventDefault()
+        playPrevious()
+        break
+      case 'Escape':
+        if (state.expanded) closeExpandedPlayer()
+        break
+    }
   })
 }
 
@@ -474,47 +505,53 @@ function syncPlayIcons() {
 // ─── LIKE / UNLIKE ────────────────────────────────────────────────
 
 async function toggleLike(videoId, btn) {
-  if (!videoId) return
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
 
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+  const isLiked = state.likedSongs.has(videoId)
 
-    const isLiked = state.likedSongs.has(videoId)
+  if (isLiked) {
+    const { error } = await supabase
+      .from('liked_songs')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('video_id', videoId)
 
-    if (isLiked) {
-      const { error } = await supabase
-        .from('liked_songs')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('video_id', videoId)
-
-      if (error) throw error
+    if (!error) {
       state.likedSongs.delete(videoId)
-      syncLikeButtons(videoId, false, btn)
-    } else {
-      const track = state.allSongs.find(s => getTrackVideoId(s) === videoId)
-      if (!track) return
-
-      const { error } = await supabase
-        .from('liked_songs')
-        .insert({
-          user_id: user.id,
-          video_id: videoId,
-          track_metadata: {
-            title:     getTrackTitle(track),
-            artist:    getTrackArtist(track),
-            thumbnail: getTrackThumb(track),
-            duration:  track.duration || track.duration_seconds || null,
-          },
-        })
-
-      if (error) throw error
-      state.likedSongs.add(videoId)
-      syncLikeButtons(videoId, true, btn)
+      document.querySelectorAll(`.music-song-card__like-btn[data-video-id="${videoId}"]`)
+        .forEach(b => b.classList.remove('is-liked'))
+      btn?.classList.remove('is-liked')
     }
-  } catch (error) {
-    console.error('[music] toggleLike:', error)
+  } else {
+    const track = state.allSongs.find(s => s.video_id === videoId)
+    if (!track) return
+
+    const { error } = await supabase
+      .from('liked_songs')
+      .insert({
+        user_id:  user.id,
+        video_id: videoId,
+        track_metadata: {
+          title:     track.title,
+          artist:    track.artist,
+          thumbnail: track.thumbnail,
+          duration:  track.duration,
+        },
+      })
+
+    if (!error) {
+      state.likedSongs.add(videoId)
+      document.querySelectorAll(`.music-song-card__like-btn[data-video-id="${videoId}"]`)
+        .forEach(b => b.classList.add('is-liked'))
+      btn?.classList.add('is-liked')
+    }
+  }
+
+  // Re-sync expanded like button if this track is playing
+  if (state.currentTrack?.video_id === videoId) {
+    document.getElementById('expandedLikeBtn')
+      ?.classList.toggle('is-liked', state.likedSongs.has(videoId))
   }
 }
 
@@ -526,56 +563,18 @@ let _historyTimer = null
 async function logPlayHistory(videoId) {
   clearTimeout(_historyTimer)
   _historyTimer = setTimeout(async () => {
-    if (getTrackVideoId(state.currentTrack) !== videoId) return
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { error } = await supabase.from('play_history').insert({ user_id: user.id, video_id: videoId })
-      if (error) throw error
-    } catch (error) {
-      console.error('[music] logPlayHistory:', error)
-    }
-  }, 5000) // log after 5 seconds of actual play
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('play_history').insert({ user_id: user.id, video_id: videoId })
+  }, 5000)
 }
 
 
-// ─── UTILITIES ────────────────────────────────────────────────────
+// ─── UTILS ────────────────────────────────────────────────────────
 
 function fmtTime(sec) {
   if (!sec || isNaN(sec)) return '0:00'
-  const m = Math.floor(sec / 60)
-  const s = Math.floor(sec % 60)
-  return `${m}:${String(s).padStart(2, '0')}`
-}
-
-function getTrackTitle(track) {
-  return track?.title || track?.name || track?.song_title || 'Untitled'
-}
-
-function getTrackArtist(track) {
-  return track?.artist || track?.artist_name || track?.channel_title || 'Unknown Artist'
-}
-
-function getTrackThumb(track) {
-  return track?.thumbnail || track?.thumbnail_url || track?.image || track?.artwork_url || ''
-}
-
-function getTrackVideoId(track) {
-  return track?.video_id || track?.youtube_id || track?.youtube_video_id || ''
-}
-
-function syncLikeButtons(videoId, liked, btn) {
-  document.querySelectorAll(`.music-song-card__like-btn[data-video-id="${attrSelectorEscape(videoId)}"]`)
-    .forEach(b => b.classList.toggle('is-liked', liked))
-  btn?.classList.toggle('is-liked', liked)
-
-  if (getTrackVideoId(state.currentTrack) === videoId) {
-    document.getElementById('expandedLikeBtn')?.classList.toggle('is-liked', liked)
-  }
-}
-
-function attrSelectorEscape(value) {
-  return String(value).replace(/["\\]/g, '\\$&')
+  return `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`
 }
 
 function escHtml(str) {
@@ -585,5 +584,4 @@ function escHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-
 
