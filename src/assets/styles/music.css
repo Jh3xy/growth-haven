@@ -102,7 +102,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
   gap: 1.2rem;
-  padding-bottom: calc(var(--music-mini-h) + 2rem);
+}
+#musicLoadMore{
+  margin-bottom: calc(var(--music-mini-h) + 1rem);
 }
 
 /* ─── SONG CARD ──────────────────────────────────────────────────── */
@@ -517,7 +519,7 @@ body.music-expanded-open { overflow: hidden; }
 /* YouTube embed — pointer-events:none blocks YT native controls */
 .music-yt-wrap {
   width: 100%;
-  aspect-ratio: 16 / 12;
+  aspect-ratio: 16 / 9;
   background: #000;
   border-radius: var(--radius-md);
   overflow: hidden;
