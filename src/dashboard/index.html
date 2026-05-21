@@ -116,8 +116,8 @@
           <span>Transactions</span>
         </button>
         <button id="nav-games-casino" class="dash-nav-link flex items-center gap-3 hidden" data-nav="sports" type="button">
-          <i data-lucide="trophy" style="width:16px;height:16px"></i>
-          <span>Games &amp; Casino</span>
+          <i data-lucide="gamepad-2" style="width:16px;height:16px"></i>
+          <span>Arcade</span>
         </button>
         <button class="dash-nav-link flex items-center gap-3" data-nav="profile" type="button">
           <i data-lucide="user" style="width:16px;height:16px"></i>
@@ -217,11 +217,11 @@
               <span class="quick-action-tile__label">Blog</span>
             </button>
 
-            <button class="quick-action-tile" type="button" data-nav="music">
+            <button class="quick-action-tile is-new" type="button" data-nav="music">
               <span class="quick-action-tile__icon">
                 <i data-lucide="music-2" style="width:20px;height:20px"></i>
               </span>
-              <span class="quick-action-tile__label">Music</span>
+              <span class="quick-action-tile__label">Stream 2 Earn</span>
             </button>
         
             <button class="quick-action-tile hidden" id="quick-link-quest" type="button" data-nav="quest">
@@ -240,9 +240,9 @@
         
             <button class="quick-action-tile hidden" id="quick-link-games" type="button" data-nav="sports">
               <span class="quick-action-tile__icon">
-                <i data-lucide="trophy" style="width:20px;height:20px"></i>
+                <i data-lucide="gamepad-2" style="width:20px;height:20px"></i>
               </span>
-              <span class="quick-action-tile__label">Games</span>
+              <span class="quick-action-tile__label">Arcade</span>
             </button>
         
             <button class="quick-action-tile" type="button" data-nav="support">
@@ -1738,11 +1738,22 @@
     <section id="section-support" class="dash-section hidden">
       <div class="dash-section__inner flex-col">
 
-        <!-- Heading -->
+        <div class="dash-carousel-header" id="supportCarousel">
+          <div class="dash-carousel-header__content">
+            <div class="dash-section-header">
+              <div class="txn-header">
+                <h2 class="txn-header__title support-header__title">Support</h2>
+                <p class="txn-header__sub support-header__sub">Answers to common questions. <br> For anything else, reach us on Telegram.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Heading
         <div class="support-header">
           <h2 class="support-header__title">Support</h2>
           <p class="support-header__sub">Answers to common questions. For anything else, reach us on Telegram.</p>
-        </div>
+        </div> -->
 
         <!-- FAQ Accordion -->
         <div class="support-faq" id="supportFaq">
@@ -1889,7 +1900,6 @@
       </div>
 
       <div class="music-seek-row">
-        <span class="music-seek-time" id="seekCurrentTime">0:00</span>
         <div class="music-seek-track-wrap">
           <input
             class="music-seek-bar"
@@ -1901,7 +1911,10 @@
             aria-label="Seek position"
           />
         </div>
-        <span class="music-seek-time" id="seekTotalTime">0:00</span>
+        <div class="music-meta-data">
+          <span class="music-seek-time" id="seekCurrentTime">0:00</span>
+          <span class="music-seek-time" id="seekTotalTime">0:00</span>
+        </div>
       </div>
 
       <div class="music-expanded-controls">

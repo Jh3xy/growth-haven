@@ -8,7 +8,7 @@
 import { supabase } from '../assets/js/supabase.js'
 
 let initialized  = false
-const PAGE_SIZE  = 25
+const PAGE_SIZE  = 26
 
 // ─── STATE ────────────────────────────────────────────────────────
 

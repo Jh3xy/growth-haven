@@ -758,9 +758,27 @@ html[data-theme='dark'] .dash-ref-row:not(.skeleton-row):hover {
     transform 0.15s var(--spring);
 }
 
+.quick-action-tile.is-new{
+  position: relative;
+}
+
+.quick-action-tile.is-new::after{
+  content: 'New!';
+  position: absolute;
+  top: -6px;
+  right: -2px;
+  background-color: var(--brand-primary);
+  color: var(--surface-background);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  padding: 1px 5px;
+}
+
 .quick-action-tile-alt {
   flex-direction: row;
   margin-bottom: 1rem;
+  font-size: 12px;
 }
 
 .quick-action-tile-alt .quick-action-tile__label{

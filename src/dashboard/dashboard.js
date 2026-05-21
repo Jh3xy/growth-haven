@@ -63,6 +63,7 @@ const carouselConfigs = {
   transact: {
     id: "transactionsCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
@@ -73,6 +74,7 @@ const carouselConfigs = {
   invest: {
     id: "investmentsCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
@@ -83,6 +85,7 @@ const carouselConfigs = {
   blog: {
     id: "blogCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
@@ -93,6 +96,7 @@ const carouselConfigs = {
   home: {
     id: "homeCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
@@ -103,6 +107,7 @@ const carouselConfigs = {
   sports: {
     id: "casinoCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
@@ -113,6 +118,7 @@ const carouselConfigs = {
   profile: {
     id: "profileCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
@@ -123,6 +129,18 @@ const carouselConfigs = {
   music: {
     id: "musicCarousel",
     images: [
+      "/assets/other/db-banner-06.png",
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
+  },
+  support: {
+    id: "supportCarousel",
+    images: [
+      "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
       "/assets/other/db-banner-03.jpg",
