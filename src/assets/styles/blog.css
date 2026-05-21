@@ -181,7 +181,8 @@ html[data-theme='light']  .dash-welcome-card__greeting {
   margin-top: 0.75rem;
   border-radius: 6px;
   overflow: hidden;
-  min-height: 10px;
+  min-height: 20px;
+  width: 100%;
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-card);
 }
@@ -446,38 +447,33 @@ html[data-theme='light']  .dash-welcome-card__greeting {
 
 .blog-toast {
   position: fixed;
-  bottom: 7rem;
-  right: -5rem;
+  bottom: 1.5rem;
+  left: 50%;
   transform: translateX(-50%);
-  z-index: 200;
-  max-width: calc(100vw - 2.5rem);
-  width: max-content;
-  padding: 0.75rem 1.125rem;
-  background-color: var(--surface-card);
-  border: var(--border-width) solid var(--border-subtle);
-  border-radius: 999px;
-  font-family: var(--ff-primary);
+  background-color: var(--text-primary);
+  color: var(--surface-background);
   font-size: 0.8125rem;
   font-weight: var(--fw-medium);
-  color: var(--text-primary);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.22),
-    0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 0.625rem 1.125rem;
+  border-radius: var(--radius-md);
   white-space: nowrap;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 240ms ease;
+  max-width: calc(100vw - 2.5rem);
+  text-align: center;
   animation: toast-slide-up 0.28s var(--spring) both;
   transition: opacity 0.24s ease;
 }
  
 .blog-toast--success {
-  border-color: var(--status-success-border);
-  color: var(--status-success-text);
+  background-color: var(--status-success);
   /* background-color: var(--status-success-bg); */
 }
  
 .blog-toast--warning {
-  border-color: var(--status-warning-border);
-  color: var(--status-warning-text);
-  /* background-color: var(--status-warning-bg); */
+  background-color: var(--status-warning);
 }
  
 @keyframes toast-slide-up {
