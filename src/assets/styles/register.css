@@ -308,6 +308,12 @@ a { color: inherit; text-decoration: none; }
 #regForm .form-field__input{
   width: 100%;
 }
+.form-field__input:disabled,
+.form-field__input:disabled > *{
+  opacity: .7;
+  pointer-events: none;
+  cursor: none;
+}
 
 
 /* ============================================================

@@ -63,6 +63,8 @@ const SIMULATED_OTP = '123456';
 
   // Uppercase to match the auto-uppercase listener already on the input
   input.value = ref.toUpperCase();
+  // disable input to prevent accidental ref code removal
+  input.disabled = true;
   console.log(ref);
 })();
 (
