@@ -211,6 +211,7 @@
 
 .music-song-card__artist {
   font-size: 0.75rem;
+  max-width: 58%;
   font-weight: var(--fw-regular);
   color: var(--text-secondary);
   white-space: nowrap;

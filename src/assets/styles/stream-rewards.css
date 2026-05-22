@@ -1,0 +1,534 @@
+
+
+/**
+ * stream-rewards.css — GrowthHaven Stream Reward System
+ * src/assets/styles/stream-rewards.css
+ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED TOKEN OVERRIDES
+   (Reward-specific colours not in variables.css)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --reward-active:        var(--brand-primary);               /* #22C55E */
+  --reward-active-soft:   var(--brand-primary-soft);
+  --reward-active-glow:   hsla(142, 71%, 45%, 0.35);
+
+  --reward-paused:        var(--status-warning);              /* #F59E0B */
+  --reward-paused-soft:   var(--status-warning-bg);
+  --reward-paused-text:   var(--status-warning-text);
+
+  --reward-earned:        var(--status-success);              /* #22C55E */
+  --reward-earned-soft:   var(--status-success-bg);
+  --reward-earned-text:   var(--status-success-text);
+
+  --reward-capped:        var(--text-tertiary);               /* #9CA3AF */
+  --reward-capped-soft:   var(--surface-card-muted);
+
+  --reward-strip-h:       3px;
+  --reward-strip-radius:  0 0 2px 2px;   /* matches card bottom corners */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   1. SONG CARD — REWARD STRIP
+   Sits flush at the bottom of .music-song-card__thumb-wrap
+   ═══════════════════════════════════════════════════════════════ */
+
+.music-reward-strip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--reward-strip-h);
+  border-radius: var(--reward-strip-radius);
+  overflow: hidden;                     /* clips the inner fill */
+  z-index: 4;                           /* above thumb, below overlay */
+  pointer-events: none;
+}
+
+/* The fill bar inside — width driven by JS via --progress custom prop */
+.music-reward-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: var(--progress, 0%);
+  border-radius: inherit;
+  transition: width 1s linear, background-color 0.3s ease;
+}
+
+
+/* ── idle ───────────────────────────────────────────────────── */
+/* Nothing visible — strip exists in DOM but is transparent */
+.music-reward-strip[data-reward-state="idle"] {
+  opacity: 0;
+}
+
+
+/* ── active ─────────────────────────────────────────────────── */
+/* Green fill advancing left-to-right with a live pulse glow */
+.music-reward-strip[data-reward-state="active"] {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.12);    /* dim track behind the fill */
+}
+
+.music-reward-strip[data-reward-state="active"]::before {
+  background: var(--reward-active);
+  box-shadow: 0 0 6px var(--reward-active-glow);
+  animation: reward-pulse 2s ease-in-out infinite;
+}
+
+@keyframes reward-pulse {
+  0%, 100% { box-shadow: 0 0 4px var(--reward-active-glow); }
+  50%       { box-shadow: 0 0 10px var(--reward-active-glow); }
+}
+
+
+/* ── paused ─────────────────────────────────────────────────── */
+/* Amber — progress frozen, no animation */
+.music-reward-strip[data-reward-state="paused"] {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.music-reward-strip[data-reward-state="paused"]::before {
+  background: var(--reward-paused);
+  box-shadow: none;
+  /* width stays locked at wherever --progress was when paused */
+  transition: background-color 0.3s ease;
+}
+
+
+/* ── earned ─────────────────────────────────────────────────── */
+/* Solid green full-width — reward collected, strip stays permanently */
+.music-reward-strip[data-reward-state="earned"] {
+  opacity: 1;
+  background: transparent;
+  /* override height briefly to 4px for the pop */
+  animation: reward-earn-pop 0.5s var(--spring) forwards;
+}
+
+.music-reward-strip[data-reward-state="earned"]::before {
+  width: 100%;
+  background: var(--reward-earned);
+  box-shadow: 0 0 8px var(--reward-active-glow);
+  transition: width 0.4s var(--spring), background-color 0.3s ease;
+}
+
+@keyframes reward-earn-pop {
+  0%   { height: var(--reward-strip-h); }
+  40%  { height: 5px; }
+  100% { height: var(--reward-strip-h); }
+}
+
+
+/* ── capped ─────────────────────────────────────────────────── */
+/* Grey full-width — daily limit hit, no more earning possible */
+.music-reward-strip[data-reward-state="capped"] {
+  opacity: 1;
+  background: transparent;
+}
+
+.music-reward-strip[data-reward-state="capped"]::before {
+  width: 100%;
+  background: var(--reward-capped);
+  box-shadow: none;
+}
+
+
+/* ── already_earned_today ────────────────────────────────────── */
+/* Solid green full-width — same as earned but set on page load, no animation */
+.music-reward-strip[data-reward-state="already_earned_today"] {
+  opacity: 1;
+  background: transparent;
+}
+
+.music-reward-strip[data-reward-state="already_earned_today"]::before {
+  width: 100%;
+  background: var(--reward-earned);
+  box-shadow: none;
+}
+
+
+/* ── corner badge for earned / already_earned_today ─────────── */
+/* A small ✓ check in the top-right of the thumbnail */
+.music-reward-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  background: var(--reward-earned);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s var(--spring);
+}
+
+/* Icon inside — injected by JS as an SVG or unicode */
+.music-reward-check::after {
+  content: '✓';
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+/* Visible when earned or already earned */
+.music-song-card[data-reward-state="earned"] .music-reward-check,
+.music-song-card[data-reward-state="already_earned_today"] .music-reward-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Entrance animation — only for newly earned (added by JS class) */
+.music-song-card[data-reward-state="earned"] .music-reward-check {
+  animation: check-pop 0.4s var(--spring) 0.3s both;
+}
+
+@keyframes check-pop {
+  0%   { transform: scale(0); opacity: 0; }
+  70%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* ── floating earn toast on the card ────────────────────────── */
+/* "+₦100" floats up from the card thumbnail on reward completion */
+.music-earn-float {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.72);
+  color: var(--reward-earned);
+  font-size: 0.8125rem;
+  font-weight: var(--fw-semibold);
+  font-family: var(--ff-primary);
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  animation: earn-float-up 2.2s var(--spring) forwards;
+}
+
+@keyframes earn-float-up {
+  0%   { opacity: 0; transform: translate(-50%, -30%); }
+  15%  { opacity: 1; }
+  70%  { opacity: 1; transform: translate(-50%, -90%); }
+  100% { opacity: 0; transform: translate(-50%, -110%); }
+}
+
+/* Dark mode: strip track bg */
+html[data-theme='dark'] .music-reward-strip[data-reward-state="active"],
+html[data-theme='dark'] .music-reward-strip[data-reward-state="paused"] {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   2. MINI PLAYER — REWARD PILL
+   Injected inside .music-mini-player__info
+   Shows status text + coloured dot during playback
+   ═══════════════════════════════════════════════════════════════ */
+
+.music-reward-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 8px 0 6px;
+  border-radius: 999px;
+  font-size: 0.6875rem;           /* 11px */
+  font-weight: var(--fw-semibold);
+  font-family: var(--ff-primary);
+  white-space: nowrap;
+  margin-top: 4px;
+  align-self: flex-start;
+  border: 1px solid transparent;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.2s ease;
+}
+
+/* The dot */
+.music-reward-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 0.25s ease;
+}
+
+
+/* ── idle ── hidden */
+.music-reward-pill[data-reward-state="idle"] {
+  display: none;
+}
+
+
+/* ── active ── green pulsing */
+.music-reward-pill[data-reward-state="active"] {
+  background: var(--reward-active-soft);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary-ring);
+}
+
+.music-reward-pill[data-reward-state="active"] .music-reward-pill__dot {
+  background: var(--reward-active);
+  animation: dot-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.7; }
+}
+
+
+/* ── paused ── amber static */
+.music-reward-pill[data-reward-state="paused"] {
+  background: var(--reward-paused-soft);
+  color: var(--reward-paused-text);
+  border-color: var(--status-warning-border);
+}
+
+.music-reward-pill[data-reward-state="paused"] .music-reward-pill__dot {
+  background: var(--reward-paused);
+}
+
+
+/* ── earned ── green success, shown briefly then fades */
+.music-reward-pill[data-reward-state="earned"] {
+  background: var(--reward-earned-soft);
+  color: var(--reward-earned-text);
+  border-color: var(--status-success-border);
+  animation: pill-earn-flash 3.5s ease forwards;
+}
+
+.music-reward-pill[data-reward-state="earned"] .music-reward-pill__dot {
+  background: var(--reward-earned);
+}
+
+@keyframes pill-earn-flash {
+  0%   { opacity: 1; transform: scale(1); }
+  10%  { transform: scale(1.05); }
+  20%  { transform: scale(1); }
+  80%  { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+
+/* ── capped ── grey, locked */
+.music-reward-pill[data-reward-state="capped"] {
+  background: var(--reward-capped-soft);
+  color: var(--text-tertiary);
+  border-color: var(--border-subtle);
+}
+
+.music-reward-pill[data-reward-state="capped"] .music-reward-pill__dot {
+  background: var(--reward-capped);
+}
+
+
+/* ── already_earned_today ── same as earned styling, static */
+.music-reward-pill[data-reward-state="already_earned_today"] {
+  background: var(--reward-earned-soft);
+  color: var(--reward-earned-text);
+  border-color: var(--status-success-border);
+}
+
+.music-reward-pill[data-reward-state="already_earned_today"] .music-reward-pill__dot {
+  background: var(--reward-earned);
+}
+
+
+/* ── mobile: info area is hidden on < 480px, pill stays accessible ── */
+/*
+  On mobile the whole .music-mini-player__info block is display:none.
+  So the pill naturally disappears too. No extra rule needed.
+  The expanded player tracker (surface 3) covers the user in that case.
+*/
+
+
+/* ═══════════════════════════════════════════════════════════════
+   3. EXPANDED PLAYER — REWARD TRACKER ROW
+   Injected between .music-expanded-player__meta and .music-seek-row
+   Shows live elapsed / required countdown in text form
+   ═══════════════════════════════════════════════════════════════ */
+
+.music-reward-tracker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    opacity 0.2s ease;
+}
+
+/* Left: dot + label */
+.music-reward-tracker__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.music-reward-tracker__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color 0.25s ease;
+}
+
+.music-reward-tracker__label {
+  font-size: 0.8125rem;       /* 13px */
+  font-weight: var(--fw-medium);
+  font-family: var(--ff-primary);
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right: time counter */
+.music-reward-tracker__time {
+  font-size: 0.8125rem;
+  font-weight: var(--fw-semibold);
+  font-family: var(--ff-primary);
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+
+/* ── idle ── */
+.music-reward-tracker[data-reward-state="idle"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ── active ── */
+.music-reward-tracker[data-reward-state="active"] {
+  background: var(--reward-active-soft);
+  border-color: var(--brand-primary-ring);
+  color: var(--brand-primary);
+  opacity: 1;
+}
+
+.music-reward-tracker[data-reward-state="active"] .music-reward-tracker__dot {
+  background: var(--reward-active);
+  animation: dot-pulse 1.4s ease-in-out infinite;
+}
+
+
+/* ── paused ── */
+.music-reward-tracker[data-reward-state="paused"] {
+  background: var(--reward-paused-soft);
+  border-color: var(--status-warning-border);
+  color: var(--reward-paused-text);
+  opacity: 1;
+}
+
+.music-reward-tracker[data-reward-state="paused"] .music-reward-tracker__dot {
+  background: var(--reward-paused);
+}
+
+
+/* ── earned ── */
+.music-reward-tracker[data-reward-state="earned"] {
+  background: var(--reward-earned-soft);
+  border-color: var(--status-success-border);
+  color: var(--reward-earned-text);
+  opacity: 1;
+}
+
+.music-reward-tracker[data-reward-state="earned"] .music-reward-tracker__dot {
+  background: var(--reward-earned);
+}
+
+/* Small sparkle animation on earn to draw the eye */
+.music-reward-tracker[data-reward-state="earned"] .music-reward-tracker__label {
+  animation: tracker-earn 0.5s var(--spring);
+}
+
+@keyframes tracker-earn {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(3px); }
+  60%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+
+/* ── capped ── */
+.music-reward-tracker[data-reward-state="capped"] {
+  background: var(--reward-capped-soft);
+  border-color: var(--border-subtle);
+  color: var(--text-tertiary);
+  opacity: 1;
+}
+
+.music-reward-tracker[data-reward-state="capped"] .music-reward-tracker__dot {
+  background: var(--reward-capped);
+}
+
+
+/* ── already_earned_today ── */
+.music-reward-tracker[data-reward-state="already_earned_today"] {
+  background: var(--reward-earned-soft);
+  border-color: var(--status-success-border);
+  color: var(--reward-earned-text);
+  opacity: 1;
+}
+
+.music-reward-tracker[data-reward-state="already_earned_today"] .music-reward-tracker__dot {
+  background: var(--reward-earned);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .music-reward-strip,
+  .music-reward-strip::before,
+  .music-reward-check,
+  .music-earn-float,
+  .music-reward-pill,
+  .music-reward-pill__dot,
+  .music-reward-tracker,
+  .music-reward-tracker__label {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Keep the fill transition for strip since it's functional, not decorative */
+  .music-reward-strip::before {
+    transition: width 1s linear !important;
+  }
+}
+
+
+

@@ -13,19 +13,29 @@ const PAGE_SIZE  = 26
 // ─── STATE ────────────────────────────────────────────────────────
 
 const state = {
-  allSongs:     [],
-  filteredSongs:[],
-  queue:        [],
+  allSongs: [],
+  filteredSongs: [],
+  queue: [],
   currentIndex: 0,
   currentTrack: null,
-  playing:      false,
-  expanded:     false,
-  ytReady:      false,
-  player:       null,
-  likedSongs:   new Set(),
+  playing: false,
+  expanded: false,
+  ytReady: false,
+  player: null,
+  likedSongs: new Set(),
   seekInterval: null,
   displayCount: PAGE_SIZE,
-}
+
+  // — NEW: stream reward keys —
+  rewardStatusLoaded: false, // true once get_stream_user_status has resolved
+  rewardedSongs: new Set(), // video_ids fully rewarded today (from DB)
+  isCapped: false, // daily earnings cap reached
+  todayEarnings: 0, // numeric total earned today (informational)
+  rewardSession: null, // { session_id, started_at, required_seconds, videoId }
+  rewardTimer: null, // setInterval ref for the local tracking ticker
+  rewardElapsed: 0, // local seconds counter (UI only — server is truth)
+  rewardState: "idle", // current active-track reward state string
+};
 
 let loadingCardEl = null
 
@@ -186,29 +196,33 @@ function renderSongs(songs) {
     const liked  = state.likedSongs.has(song.video_id)
     const artist = escHtml(song.artist || 'Unknown Artist')
     const title  = escHtml(song.title  || 'Untitled')
+    const duration = fmtTime(song.duration || 'null');
 
     return `
       <div class="music-song-card" role="listitem">
         <div class="music-song-card__thumb-wrap">
-          <img class="music-song-card__thumb" src="${song.thumbnail || ''}" alt="${title}" loading="lazy" />
+          <img class="music-song-card__thumb" src="${song.thumbnail || ""}" alt="${title}" loading="lazy" />
           <button class="music-song-card__play-overlay" data-index="${i}" aria-label="Play ${title}" type="button">
             <i data-lucide="play" style="width:22px;height:22px"></i>
           </button>
         </div>
         <div class="music-song-card__info">
-          <span class="music-song-card__artist">${artist}</span>
+          <div class="flex-between">
+            <span class="music-song-card__artist">${artist}</span>
+            <span class="music-song-card__artist">${duration}</span>
+          </div>
           <span class="music-song-card__title">${title}</span>
         </div>
         <div class="music-song-card__actions">
           <button class="music-song-card__play-btn" data-index="${i}" aria-label="Play" type="button">
             <i data-lucide="play" style="width:13px;height:13px"></i>
           </button>
-          <button class="music-song-card__like-btn ${liked ? 'is-liked' : ''}" data-video-id="${song.video_id}" aria-label="${liked ? 'Unlike' : 'Like'}" type="button">
+          <button class="music-song-card__like-btn ${liked ? "is-liked" : ""}" data-video-id="${song.video_id}" aria-label="${liked ? "Unlike" : "Like"}" type="button">
             <i data-lucide="heart" style="width:13px;height:13px"></i>
           </button>
         </div>
       </div>
-    `
+    `;
   }).join('')
 
   window.lucide?.createIcons({ nodes: [grid] })

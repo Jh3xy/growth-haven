@@ -1055,13 +1055,7 @@ function showToast(message, type = 'info') {
   }, 3200);
 }
 
-
-// ─── STUB ACTIVE PLAN DATA ────────────────────────────────────────
-// Replace this with a real Supabase query when the schema is ready.
-// Shape:
-//   { amount, durationDays, startDate (ISO string),
-//     dailyRate, accruedEarnings, claimedToday (bool),
-//     claimableAmount }
+window.showToast = showToast;
 
 
 
