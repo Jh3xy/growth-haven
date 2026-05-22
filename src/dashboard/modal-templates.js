@@ -231,7 +231,7 @@ export const MODAL_TEMPLATES = {
       vault_fund: "shield",
       daily_claim: "sun",
       blog_like_reward: "thumbs-up",
-      blog_post_reward: "thumbs-up",
+      blog_post_reward: "message-circle-heart",
       stream_rewards: "music",
       early_exit: "door-open",
       referral_bonus: "users",

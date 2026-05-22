@@ -531,4 +531,141 @@ html[data-theme='dark'] .music-reward-strip[data-reward-state="paused"] {
 }
 
 
+.music-yt-wrap {
+  position: relative;
+}
+ 
+/* Override the previous tracker row layout entirely */
+.music-reward-tracker {
+  position: absolute;
+  bottom: -2px;
+  left: -9px;
+  right: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  padding-left: 1rem;
+  border-radius: 999px;
+  width: auto;
+  max-width: calc(100% - 20px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 0.75rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  z-index: 6;
+  transition: opacity 0.25s ease, transform 0.25s var(--spring);
+}
+ 
+/* idle: completely out of the way */
+.music-reward-tracker[data-reward-state="idle"] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+}
+ 
+/* visible states: slide up into place */
+.music-reward-tracker[data-reward-state="active"],
+.music-reward-tracker[data-reward-state="paused"],
+.music-reward-tracker[data-reward-state="earned"],
+.music-reward-tracker[data-reward-state="capped"],
+.music-reward-tracker[data-reward-state="already_earned_today"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+ 
+/* active: semi-transparent dark bg + green text — readable on any video frame */
+.music-reward-tracker[data-reward-state="active"] {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: var(--reward-active);
+}
+ 
+/* paused: dark bg + amber */
+.music-reward-tracker[data-reward-state="paused"] {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: var(--reward-paused);
+}
+ 
+/* earned: brief green flash then fades — user's eye catches it, then it's gone */
+.music-reward-tracker[data-reward-state="earned"] {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: var(--reward-earned);
+}
+ 
+/* capped */
+.music-reward-tracker[data-reward-state="capped"] {
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(156, 163, 175, 0.25);
+  color: var(--reward-capped);
+}
+ 
+/* already earned */
+.music-reward-tracker[data-reward-state="already_earned_today"] {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: var(--reward-earned);
+}
+ 
+/* Flatten the left/right layout — just dot + label + time in a row */
+.music-reward-tracker__left {
+  display: contents;                  /* children participate in the flex row directly */
+}
+ 
+.music-reward-tracker__dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+}
+ 
+.music-reward-tracker__time {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+ 
+/* Separator between label and time */
+.music-reward-tracker__time:not(:empty)::before {
+  content: '·';
+  margin-right: 5px;
+  opacity: 0.5;
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   MINI PLAYER — STATUS DOT ON THUMBNAIL
+   Single 8px dot in the top-right corner of the mini player thumb.
+   No text, no pill, no layout impact.
+   ═══════════════════════════════════════════════════════════════ */
+
+
+.music-mini-player__bar {
+  position: relative;
+}
+ 
+/* ── Mini player dot (real element, not ::after) ── */
+.music-mini-reward-dot {
+  position: absolute;
+  top: 17px;
+  left: 22px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.25);
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.25s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.music-mini-player[data-reward-state="active"]    .music-mini-reward-dot { background: var(--reward-active);  opacity: 1; animation: dot-pulse 1.4s ease-in-out infinite; }
+.music-mini-player[data-reward-state="paused"]    .music-mini-reward-dot { background: var(--reward-paused);  opacity: 1; }
+.music-mini-player[data-reward-state="earned"]    .music-mini-reward-dot,
+.music-mini-player[data-reward-state="already_earned_today"] .music-mini-reward-dot { background: var(--reward-earned); opacity: 1; }
+.music-mini-player[data-reward-state="capped"]    .music-mini-reward-dot { background: var(--reward-capped);  opacity: 1; }
+
+
 

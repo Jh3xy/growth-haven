@@ -679,28 +679,38 @@ async function initStreamRewards() {
  */
 function injectMiniPill() {
   // Guard: don't inject twice (e.g. if initMusicSection somehow fires again)
-  if (document.getElementById('rewardPill')) return
- 
+  if (document.getElementById("rewardPill")) return;
+
   // The mini player info area sits alongside the thumb and controls.
   // We locate it by finding the parent of the known #miniTitle element.
-  const miniTitle = document.getElementById('miniTitle')
-  if (!miniTitle) return
- 
-  const infoWrap = miniTitle.closest('.music-mini-player__info') || miniTitle.parentElement
-  if (!infoWrap) return
- 
-  const pill = document.createElement('div')
-  pill.id               = 'rewardPill'
-  pill.className        = 'music-reward-pill'
-  pill.dataset.rewardState = 'idle'
-  pill.setAttribute('aria-live', 'polite')
-  pill.setAttribute('aria-label', 'Reward status')
+  const miniTitle = document.getElementById("miniTitle");
+  if (!miniTitle) return;
+
+  const infoWrap =
+    miniTitle.closest(".music-mini-player__info") || miniTitle.parentElement;
+  if (!infoWrap) return;
+
+  const pill = document.createElement("div");
+  pill.id = "rewardPill";
+  pill.className = "music-reward-pill";
+  pill.dataset.rewardState = "idle";
+  pill.setAttribute("aria-live", "polite");
+  pill.setAttribute("aria-label", "Reward status");
   pill.innerHTML = `
     <span class="music-reward-pill__dot"></span>
     <span class="music-reward-pill__label"></span>
-  `
- 
-  infoWrap.appendChild(pill)
+  `;
+
+  infoWrap.appendChild(pill);
+
+  // Dot on the thumbnail corner — injected into top-row since #miniThumb is an img
+  const topRow = miniTitle.closest(".music-mini-player__bar");
+  if (topRow && !document.getElementById("miniRewardDot")) {
+    const dot = document.createElement("span");
+    dot.id = "miniRewardDot";
+    dot.className = "music-mini-reward-dot";
+    topRow.appendChild(dot);
+  }
 }
 
 
@@ -716,29 +726,27 @@ function injectMiniPill() {
  * can use insertAdjacentElement on that instead.
  */
 function injectExpandedTracker() {
-  if (document.getElementById('rewardTracker')) return
- 
-  const expandedArtist = document.getElementById('expandedArtist')
-  if (!expandedArtist) return
- 
-  const tracker = document.createElement('div')
-  tracker.id               = 'rewardTracker'
-  tracker.className        = 'music-reward-tracker'
-  tracker.dataset.rewardState = 'idle'
-  tracker.setAttribute('aria-live', 'polite')
-  tracker.setAttribute('aria-label', 'Stream reward progress')
+  if (document.getElementById("rewardTracker")) return;
+
+  const tracker = document.createElement("div");
+  tracker.id = "rewardTracker";
+  tracker.className = "music-reward-tracker";
+  tracker.dataset.rewardState = "idle";
+  tracker.setAttribute("aria-live", "polite");
+  tracker.setAttribute("aria-label", "Stream reward progress");
   tracker.innerHTML = `
     <div class="music-reward-tracker__left">
       <span class="music-reward-tracker__dot"></span>
       <span class="music-reward-tracker__label"></span>
     </div>
     <span class="music-reward-tracker__time" id="rewardTrackerTime"></span>
-  `
- 
-  // Insert between artist line and the seek bar row
-  expandedArtist.insertAdjacentElement('afterend', tracker)
+  `;
+
+  const videoWrap = document.querySelector(".music-yt-wrap");
+  if (!videoWrap) return;
+  videoWrap.appendChild(tracker);
 }
- 
+
 /**
  * applyInitialCardStates
  *
@@ -1252,6 +1260,8 @@ function setMiniPillState(status) {
   if (!pill) return
  
   pill.dataset.rewardState = status
+  const miniPlayer = document.getElementById("musicMiniPlayer");
+  if (miniPlayer) miniPlayer.dataset.rewardState = status;
  
   const label = pill.querySelector('.music-reward-pill__label')
   if (label) label.textContent = PILL_LABELS[status] ?? ''

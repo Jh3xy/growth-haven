@@ -635,17 +635,30 @@ function renderActivity(data) {
   }
  
   const iconMap = {
-    deposit:        'arrow-down-to-line',
-    withdrawal:     'arrow-up-right',
-    vault_fund:     'shield',
-    daily_claim:    'sun',
-    like: 'thumbs-up',
-    early_exit: 'door-open',
-    referral_bonus: 'users',
-    vault_maturity: 'lock-open',
+    deposit: "arrow-down-to-line",
+    withdrawal: "arrow-up-right",
+    vault_fund: "shield",
+    daily_claim: "sun",
+    blog_like_reward: "thumbs-up",
+    blog_post_reward: "message-circle-heart",
+    stream_rewards: "music",
+    early_exit: "door-open",
+    referral_bonus: "users",
+    vault_maturity: "lock-open",
   };
  
-  const inboundTypes = new Set(['deposit', 'like', 'blog_like_reward', 'blog_post_reward', 'mines_win', 'daily_claim', 'early_exit', 'referral_bonus', 'vault_maturity']);
+  const inboundTypes = new Set([
+    "deposit",
+    "like",
+    "blog_like_reward",
+    "stream_rewards",
+    "blog_post_reward",
+    "mines_win",
+    "daily_claim",
+    "early_exit",
+    "referral_bonus",
+    "vault_maturity",
+  ]);
  
   data.forEach(item => {
     const icon = iconMap[item.type] || "bell-dot";
