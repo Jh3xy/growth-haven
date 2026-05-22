@@ -793,6 +793,7 @@ body.music-expanded-open { overflow: hidden; }
 }
 
 .music-expanded-player__title {
+  max-width: 70%;
   font-size: 1.5rem;         /* 24px */
   font-weight: var(--fw-semibold);
   color: var(--text-primary);

@@ -10,6 +10,7 @@ import '../assets/styles/dashboard.css'
 import '../assets/styles/support.css';
 import '../assets/styles/blog.css';
 import '../assets/styles/casino.css';
+import "../assets/styles/stream-rewards.css";
 
 // Lock scroll immediately — loader is visible from first paint
 document.body.style.overflow = 'hidden';

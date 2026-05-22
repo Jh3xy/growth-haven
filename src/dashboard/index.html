@@ -95,17 +95,25 @@
           <i data-lucide="home" style="width:16px;height:16px"></i>
           <span>Home</span>
         </button>
+        <button class="dash-nav-link flex items-center gap-3" data-nav="profile" type="button">
+          <i data-lucide="user" style="width:16px;height:16px"></i>
+          <span>Profile</span>
+        </button>
         <button id="nav-blog-btn" class="dash-nav-link flex items-center gap-3 hidden" data-nav="blog" type="button">
           <i data-lucide="message-circle-heart" style="width:16px;height:16px"></i>
           <span>Blog</span>
+        </button>
+        <button id="nav-quest-btn" class="dash-nav-link flex items-center gap-3 hidden" data-nav="quest" type="button">
+          <i data-lucide="award" style="width:16px;height:16px"></i>
+          <span>Quests</span>
         </button>
         <button class="dash-nav-link flex items-center gap-3" data-nav="music" type="button">
           <i data-lucide="music-2" style="width:16px;height:16px"></i>
           <span>Stream 2 Earn</span>
         </button>
-        <button id="nav-quest-btn" class="dash-nav-link flex items-center gap-3 hidden" data-nav="quest" type="button">
-          <i data-lucide="award" style="width:16px;height:16px"></i>
-          <span>Quests</span>
+        <button id="nav-games-casino" class="dash-nav-link flex items-center gap-3 hidden" data-nav="sports" type="button">
+          <i data-lucide="gamepad-2" style="width:16px;height:16px"></i>
+          <span>Arcade</span>
         </button>
         <!-- <button class="dash-nav-link flex items-center gap-3" data-nav="invest" type="button">
           <i data-lucide="sprout" style="width:16px;height:16px"></i>
@@ -114,14 +122,6 @@
         <button class="dash-nav-link flex items-center gap-3" data-nav="transact" type="button">
           <i data-lucide="arrow-left-right" style="width:16px;height:16px"></i>
           <span>Transactions</span>
-        </button>
-        <button id="nav-games-casino" class="dash-nav-link flex items-center gap-3 hidden" data-nav="sports" type="button">
-          <i data-lucide="gamepad-2" style="width:16px;height:16px"></i>
-          <span>Arcade</span>
-        </button>
-        <button class="dash-nav-link flex items-center gap-3" data-nav="profile" type="button">
-          <i data-lucide="user" style="width:16px;height:16px"></i>
-          <span>Profile</span>
         </button>
       </nav>
 
@@ -1514,11 +1514,13 @@
           <button class="txn-filter-tab is-active" role="tab" aria-selected="true"
                   data-filter="all">All</button>
           <button class="txn-filter-tab" role="tab" aria-selected="false"
+                  data-filter="blog">Blog rewards</button>
+          <button class="txn-filter-tab" role="tab" aria-selected="false"
+                  data-filter="stream">Stream rewards</button>
+          <button class="txn-filter-tab" role="tab" aria-selected="false"
                   data-filter="deposit">Deposits</button>
           <button class="txn-filter-tab" role="tab" aria-selected="false"
                   data-filter="withdrawal">Withdrawals</button>
-          <button class="txn-filter-tab" role="tab" aria-selected="false"
-                  data-filter="blog">Blog rewards</button>
           <button class="txn-filter-tab" role="tab" aria-selected="false"
                   data-filter="vault">Vault</button>
           <button class="txn-filter-tab" role="tab" aria-selected="false"

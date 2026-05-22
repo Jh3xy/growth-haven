@@ -20,12 +20,14 @@ const FILTER_GROUPS = {
   vault: ["vault_fund", "vault_maturity", "early_exit"],
   earnings: ["daily_claim", "referral_bonus"],
   blog: ["blog_like_reward", "blog_post_reward"],
+  stream: ["stream_rewards"],
 };
 
 const INBOUND_TYPES = new Set([
   "deposit",
   "like",
   "blog_like_reward",
+  "stream_rewards",
   "blog_post_reward",
   "mines_win",
   "daily_claim",
@@ -39,7 +41,9 @@ const ICON_MAP = {
   withdrawal: "arrow-up-right",
   vault_fund: "shield",
   daily_claim: "sun",
-  like: "thumbs-up",
+  blog_like_reward: "thumbs-up",
+  blog_post_reward: "thumbs-up",
+  stream_rewards: "music",
   early_exit: "door-open",
   referral_bonus: "users",
   vault_maturity: "lock-open",
