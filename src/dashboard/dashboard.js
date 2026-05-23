@@ -234,7 +234,7 @@ if (user) {
   // Wiat for flags and then check
   posthog.onFeatureFlags(() => {
     if (posthog.isFeatureEnabled('casino-beta-flag')) {
-      console.log('🎰 Casino access granted');
+      // console.log('🎰 Casino access granted');
       // Show your casino UI element here
       document.getElementById('nav-games-casino').classList.remove('hidden');
       document.getElementById('quick-link-games').classList.remove('hidden');
@@ -242,7 +242,7 @@ if (user) {
     if (posthog.isFeatureEnabled("blog-access")) {
       document.getElementById('nav-blog-btn').classList.remove('hidden');
       document.getElementById('quick-link-blog').classList.remove('hidden');
-      console.log("📰 Blog access granted");
+      // console.log("📰 Blog access granted");
     }
     if (posthog.isFeatureEnabled('quests') ) {
       document.getElementById("nav-quest-btn").classList.remove("hidden");

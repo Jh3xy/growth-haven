@@ -2,12 +2,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // ─── CONFIG ────────────────────────────────────────────────────
-// To add or remove admins, edit this array. No other changes needed.
 const BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN') ?? ''
 
 const ADMIN_CHAT_IDS = [
   '8141089809',      // Admin 1 
-  '8565740927', // Admin 2 — Jhey
+  '8565740927',      // Admin 2 — Jhey
 ]
 
 const SUPABASE_URL        = Deno.env.get('SUPABASE_URL') ?? ''
@@ -23,7 +22,7 @@ Deno.serve(async (req) => {
       return new Response('No record in payload', { status: 400 })
     }
 
-    // Fetch the member's name — webhook only gives us user_id
+    // Fetch the member's name
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
     const { data: member } = await supabase
@@ -36,34 +35,34 @@ Deno.serve(async (req) => {
       ? `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim()
       : 'Unknown User'
 
-    const roleLabel  = record.role === 'promoter' ? 'Promoter ' : 'Standard User'
-    const amount     = Number(record.amount).toLocaleString('en-NG', {
-      minimumFractionDigits: 2,
-    })
-    const bank       = record.bank        ?? '—'
-    const accName    = record.account_name   ?? '—'
-    const accNumber  = record.account_number ?? '—'
-    const timestamp  = new Date(record.created_at).toLocaleString('en-GB', {
-      timeZone:    'Africa/Lagos',
-      day:         'numeric',
-      month:       'short',
-      year:        'numeric',
-      hour:        '2-digit',
-      minute:      '2-digit',
+    const title     = record.title || '(No title)'
+    const content   = record.content || ''
+    
+    // Preview: first 150 chars of content
+    const preview   = content.length > 150 
+      ? content.substring(0, 150) + '...'
+      : content
+
+    const timestamp = new Date(record.created_at).toLocaleString('en-GB', {
+      timeZone: 'Africa/Lagos',
+      day:      'numeric',
+      month:    'short',
+      year:     'numeric',
+      hour:     '2-digit',
+      minute:   '2-digit',
     })
 
     // ─── MESSAGE ─────────────────────────────────────────────────
     const message = [
-      `💸 *New Withdrawal Request*`,
+      `📝 *New Post Published*`,
       ``,
-      `👤 *Name:* ${fullName}`,
-      `🏷️ *Role:* ${roleLabel}`,
-      `💰 *Amount:* ₦${amount}`,
-      `🏦 *Bank:* ${bank}`,
-      `📋 *Account:* ${accName} · ${accNumber}`,
-      `🕐 *Time:* ${timestamp}`,
+      `👤 *Author:* ${fullName}`,
+      `📌 *Title:* ${title}`,
       ``,
-      `_Review in the admin dashboard._`,
+      `*Preview:*`,
+      preview,
+      ``,
+      `🕐 *Posted:* ${timestamp}`,
     ].join('\n')
 
     // ─── SEND TO ALL ADMINS ───────────────────────────────────────
@@ -79,8 +78,19 @@ Deno.serve(async (req) => {
             inline_keyboard: [
               [
                 {
-                  text: "Open Admin Dashboard",
-                  url: "https://growth-havenmvp.vercel.app/src/admin/" 
+                  text: 'View Post',
+                  url: `https://growth-havenmvp.vercel.app/src/view-post/?id=${record.id}`
+                },
+                {
+                  text: 'Delete Post',
+                  callback_data: `delete_post:${record.id}`
+                }
+              ],
+              [
+                {
+                  // Separate row so it can't be fat-fingered alongside Delete Post
+                  text: '⚠️ Delete Member',
+                  callback_data: `delete_member:${record.user_id}`
                 }
               ]
             ]
@@ -103,7 +113,7 @@ Deno.serve(async (req) => {
     })
 
   } catch (err) {
-    console.error('[notify-withdrawal] Unhandled error:', err)
+    console.error('[notify-post] Unhandled error:', err)
     return new Response(JSON.stringify({ error: String(err) }), {
       status:  500,
       headers: { 'Content-Type': 'application/json' },

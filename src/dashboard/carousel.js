@@ -148,7 +148,7 @@ export function initCarouselHeader(containerId, images) {
   startAutoPlay();
 
   console.log(
-    `[carousel] Initialized "${containerId}" with ${images.length} slides`,
+    // `[carousel] Initialized "${containerId}" with ${images.length} slides`,
   );
 
   // Cleanup
