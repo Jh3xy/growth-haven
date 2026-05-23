@@ -869,3 +869,228 @@ html[data-theme='light']  .dash-welcome-card__greeting {
     grid-template-columns: 1fr;
   }
 }
+
+
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   1. POST CARD — POSITION CONTEXT
+   ═══════════════════════════════════════════════════════════════ */
+.blog-post {
+  position: relative;
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   2. IMAGE SKELETON + FADE-IN
+   ═══════════════════════════════════════════════════════════════ */
+.blog-post__media {
+  min-height: 0;
+}
+ 
+/* Skeleton state — stamped by setupMediaLoading() via JS */
+.blog-post__media.is-loading {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(
+    90deg,
+    var(--border-subtle)      25%,
+    var(--surface-card-muted) 50%,
+    var(--border-subtle)      75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+ 
+/* Hide the img itself while the parent is in loading state */
+.blog-post__media.is-loading img {
+  opacity: 0;
+  position: absolute; 
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+ 
+/* Once JS removes .is-loading, img fades in */
+.blog-post__media:not(.is-loading) img {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  display: block;
+  width: 100%;
+}
+ 
+/* Ensure the wrapper is a positioning context for the hidden img */
+.blog-post__media.is-loading {
+  position: relative;
+  overflow: hidden;
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   3. THREE-DOT MENU BUTTON
+   ═══════════════════════════════════════════════════════════════ */
+ 
+.blog-post__menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+ 
+.blog-post__menu-btn {
+  width: 28px;
+  height: 28px;
+  min-height: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  /* opacity: 0; */
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+ 
+/* Show on post hover or when the dropdown is open */
+.blog-post__menu-btn[aria-expanded="true"] {
+  opacity: 1;
+}
+ 
+.blog-post__menu-btn:hover {
+  background-color: var(--surface-card-muted);
+  color: var(--text-secondary);
+}
+ 
+.blog-post__menu-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  opacity: 1;
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   4. DROPDOWN PANEL
+   ═══════════════════════════════════════════════════════════════ */
+ 
+.blog-post__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 140px;
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  z-index: 50;
+ 
+  /* Hidden by default */
+  opacity: 0;
+  transform: translateY(-4px) scale(0.97);
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.18s var(--spring);
+}
+ 
+/* Visible when JS adds .is-open */
+.blog-post__dropdown.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+ 
+html[data-theme='dark'] .blog-post__dropdown {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.28),
+    0 1px 4px rgba(0, 0, 0, 0.14);
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   5. DROPDOWN ITEMS
+   ═══════════════════════════════════════════════════════════════ */
+ 
+.blog-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.875rem;
+  font-family: var(--ff-primary);
+  font-size: 0.8125rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  min-height: unset;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+ 
+.blog-dropdown-item:hover {
+  background-color: var(--surface-card-muted);
+  color: var(--text-primary);
+}
+ 
+.blog-dropdown-item [data-lucide] {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: color 0.15s ease;
+}
+ 
+.blog-dropdown-item:hover [data-lucide] {
+  color: var(--text-secondary);
+}
+ 
+/* Delete item — red on hover */
+.blog-dropdown-item--delete:hover {
+  background-color: var(--status-error-bg);
+  color: var(--status-error-text);
+}
+ 
+.blog-dropdown-item--delete:hover [data-lucide] {
+  color: var(--status-error-text);
+}
+ 
+/* Thin divider between Share and Delete */
+.blog-dropdown-item--delete {
+  border-top: 1px solid var(--border-subtle);
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   6. MOBILE — always show the menu button (no hover on touch)
+   ═══════════════════════════════════════════════════════════════ */
+ 
+@media (hover: none) {
+  .blog-post__menu-btn {
+    opacity: 1;
+  }
+}
+ 
+ 
+/* ═══════════════════════════════════════════════════════════════
+   7. REDUCED MOTION
+   ═══════════════════════════════════════════════════════════════ */
+ 
+@media (prefers-reduced-motion: reduce) {
+  .blog-post__dropdown {
+    transition: none;
+  }
+ 
+  .blog-post__media:not(.is-loading) img {
+    transition: none;
+  }
+}

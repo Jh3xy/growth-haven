@@ -102,19 +102,51 @@ function renderAvatarContent(avatarUrl, fullName, initials) {
   // onerror hides the broken img and lets the CSS :not([data-fallback]) fallback
 }
 
-function createPostElement(post, { onLike }) {
+function createPostElement(post, { onLike, onDelete, currentUserId } = {}) {
   const author = normalizeAuthor(post.author || post.members);
-  const firstName = author.first_name || '';
-  const lastName = author.last_name || '';
-  const fullName = `${firstName} ${lastName}`.trim() || 'GrowthHaven Member';
+  const firstName = author.first_name || "";
+  const lastName = author.last_name || "";
+  const fullName = `${firstName} ${lastName}`.trim() || "GrowthHaven Member";
   const initials = getInitials(firstName, lastName);
 
-  const article = document.createElement('article');
-  article.className = 'blog-post';
-  article.setAttribute('role', 'listitem');
+  // Only show delete if the current user owns this post
+  const canDelete = Boolean(currentUserId && post.user_id === currentUserId);
+
+  const article = document.createElement("article");
+  article.className = "blog-post";
+  article.setAttribute("role", "listitem");
   article.dataset.postId = post.id;
 
   article.innerHTML = `
+  <!-- Three-dot context menu — top-right of the card -->
+    <div class="blog-post__menu">
+      <button
+        class="blog-post__menu-btn"
+        type="button"
+        aria-label="Post options"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i data-lucide="more-vertical" style="width:15px;height:15px"></i>
+      </button>
+      <div class="blog-post__dropdown" role="menu" aria-hidden="true">
+        <button class="blog-dropdown-item blog-dropdown-item--share" role="menuitem" type="button">
+          <i data-lucide="external-link" style="width:13px;height:13px"></i>
+          <span>Share</span>
+        </button>
+        ${
+          canDelete
+            ? `
+        <button class="blog-dropdown-item blog-dropdown-item--delete" role="menuitem" type="button">
+          <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+          <span>Delete</span>
+        </button>
+        `
+            : ""
+        }
+      </div>
+    </div>
+
     <div class="blog-post__topline">
       <div class="blog-post-content">
         <span class="blog-post__avatar" aria-hidden="true" data-initials="${initials}">${renderAvatarContent(author.avatar_url, fullName, initials)}</span>
@@ -155,20 +187,64 @@ function createPostElement(post, { onLike }) {
     </div>
   `;
 
-  article.querySelector('.blog-post__name').textContent = fullName;
-  renderPostContent(article.querySelector('.blog-post__content'), post.content);
+  article.querySelector(".blog-post__name").textContent = fullName;
+  renderPostContent(article.querySelector(".blog-post__content"), post.content);
   setupReadMore(article);
-  article.querySelector('.blog-like-btn')?.addEventListener('click', (event) => {
-    onLike?.({
-      post,
-      article,
-      button: event.currentTarget,
+  // ── Image skeleton ──
+  setupMediaLoading(article);
+
+  article
+    .querySelector(".blog-like-btn")
+    ?.addEventListener("click", (event) => {
+      onLike?.({
+        post,
+        article,
+        button: event.currentTarget,
+      });
+    });
+
+  article.querySelector(".blog-share-btn")?.addEventListener("click", () => {
+    handleShare(post);
+  });
+
+  // ── Inline share button (actions row) ──
+  article
+    .querySelector(".blog-share-btn")
+    ?.addEventListener("click", () => handleShare(post));
+
+  // ── Three-dot menu wiring ──
+  const menuBtn = article.querySelector(".blog-post__menu-btn");
+  const dropdown = article.querySelector(".blog-post__dropdown");
+  const dropShare = article.querySelector(".blog-dropdown-item--share");
+  const dropDelete = article.querySelector(".blog-dropdown-item--delete");
+
+  menuBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle("is-open");
+    menuBtn.setAttribute("aria-expanded", String(isOpen));
+    dropdown.setAttribute("aria-hidden", String(!isOpen));
+
+    // Close any other open dropdowns in the feed
+    document.querySelectorAll(".blog-post__dropdown.is-open").forEach((d) => {
+      if (d !== dropdown) {
+        d.classList.remove("is-open");
+        d.setAttribute("aria-hidden", "true");
+        d.previousElementSibling?.setAttribute("aria-expanded", "false");
+      }
     });
   });
 
-  article.querySelector('.blog-share-btn')?.addEventListener('click', () => {
-    handleShare(post)
-  })
+  dropShare?.addEventListener("click", () => {
+    dropdown.classList.remove("is-open");
+    menuBtn?.setAttribute("aria-expanded", "false");
+    handleShare(post);
+  });
+
+  dropDelete?.addEventListener("click", () => {
+    dropdown.classList.remove("is-open");
+    menuBtn?.setAttribute("aria-expanded", "false");
+    onDelete?.({ post, article });
+  });
 
   return article;
 }
@@ -206,6 +282,34 @@ function setupReadMore(article) {
     button.textContent = expanded ? 'Show less' : 'Read more';
     button.setAttribute('aria-expanded', String(expanded));
   });
+}
+
+function setupMediaLoading(article) {
+  const mediaDiv = article.querySelector('.blog-post__media');
+  if (!mediaDiv) return;
+ 
+  const img = mediaDiv.querySelector('img');
+  if (!img) return;
+ 
+  // Mark as loading — CSS reads this class for the skeleton state
+  mediaDiv.classList.add('is-loading');
+ 
+  // Already cached and painted — remove skeleton immediately
+  if (img.complete && img.naturalWidth > 0) {
+    mediaDiv.classList.remove('is-loading');
+    return;
+  }
+ 
+  img.addEventListener('load', () => {
+    mediaDiv.classList.remove('is-loading');
+  }, { once: true });
+ 
+  img.addEventListener('error', () => {
+    // Image failed — remove the entire block cleanly rather than
+    // leaving a broken skeleton in the feed
+    mediaDiv.remove();
+    article.classList.remove('blog-post--has-media');
+  }, { once: true });
 }
 
 export function initBlogSection({ user, supabase, openDeposit }) {
@@ -354,6 +458,64 @@ export function initBlogSection({ user, supabase, openDeposit }) {
     loadMoreBtn.classList.add('hidden');
   }
 
+  async function handleDelete({ post, article }) {
+    // Dim the post immediately — gives instant feedback
+    article.style.opacity = "0.45";
+    article.style.pointerEvents = "none";
+
+    const { error } = await supabase
+      .from("posts") // ← adjust table name if yours differs
+      .delete()
+      .eq("id", post.id)
+      .eq("user_id", user.id); // server-side safety guard
+
+    if (error) {
+      // Restore the post — something went wrong
+      article.style.opacity = "";
+      article.style.pointerEvents = "";
+      showBlogToast("Could not delete post. Try again.", "warning");
+      console.error("[blog] Delete error:", error);
+      return;
+    }
+
+    // Animate collapse then remove from DOM
+    const height = article.offsetHeight;
+    article.style.height = height + "px";
+    article.style.overflow = "hidden";
+    article.style.transition =
+      "opacity 0.25s ease, height 0.3s var(--spring), padding 0.3s ease, margin 0.3s ease";
+
+    requestAnimationFrame(() => {
+      article.style.opacity = "0";
+      article.style.height = "0";
+      article.style.paddingTop = "0";
+      article.style.paddingBottom = "0";
+      article.style.marginBottom = "0";
+      article.style.borderWidth = "0";
+
+      article.addEventListener(
+        "transitionend",
+        () => {
+          article.remove();
+          showBlogToast("Post deleted.", "success");
+        },
+        { once: true },
+      );
+    });
+  }
+
+  document.addEventListener(
+    "click",
+    () => {
+      document.querySelectorAll(".blog-post__dropdown.is-open").forEach((d) => {
+        d.classList.remove("is-open");
+        d.setAttribute("aria-hidden", "true");
+        d.previousElementSibling?.setAttribute("aria-expanded", "false");
+      });
+    },
+    true,
+  ); 
+
   async function loadPosts() {
     if (loading || !hasMore ) {
       //posts load regardless; gate overlay covers them visually
@@ -406,7 +568,11 @@ export function initBlogSection({ user, supabase, openDeposit }) {
     }
 
     posts.forEach((post) => {
-      feed.appendChild(createPostElement(post, { onLike: handleLike }));
+      feed.appendChild(createPostElement(post, {
+        onLike: handleLike,     
+        onDelete: handleDelete,
+        currentUserId: user.id,
+      }));
     });
 
     if (window.lucide) window.lucide.createIcons();
