@@ -5,6 +5,50 @@ html {
   scrollbar-gutter: stable;
   background-color: var(--surface-background);
 }
+/* ==========================================================================
+   GLOBAL CUSTOM SCROLLBAR SYSTEM (Veridian Premium SaaS Theme)
+   ========================================================================== */
+
+/* ─── 1. Firefox Support ────────────────────────────────────────────────── */
+html, * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-tertiary) transparent;
+}
+
+/* ─── 2. WebKit Support (Chrome, Safari, Edge, mobile browsers) ────────── */
+
+
+::-webkit-scrollbar {
+  width: 6px; 
+  height: 6px; 
+}
+
+/* The background track — keeping it transparent ensures it never 
+   creates an ugly contrasting block next to your surface cards */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+/* The draggable handle */
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong); 
+  border-radius: 100px;    
+}
+
+/* Interactive state */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brand-primary);  
+}
+
+/* Active drag state */
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--brand-primary-hover);
+}
+
+/* ─── 3. Edge Case: Corner handling ────────────────────────────────────── */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
 
 [data-lucide] {
  width: 15px;

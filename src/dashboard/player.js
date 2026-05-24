@@ -7,6 +7,7 @@
 
 import { supabase } from '../assets/js/supabase.js'
 
+let hasAccess = false;
 let initialized  = false
 const PAGE_SIZE  = 26
 
@@ -42,9 +43,10 @@ let loadingCardEl = null
 
 // ─── INIT ─────────────────────────────────────────────────────────
 
-export async function initMusicSection() {
+export async function initMusicSection(user) {
   if (initialized) return;
   initialized = true;
+  await checkAccess(user);
 
   console.log("[music] Initializing...");
 
@@ -60,6 +62,29 @@ export async function initMusicSection() {
   renderSongs(state.allSongs);
   // Reward system initialises AFTER first render so cards exist in the DOM.
   await initStreamRewards();
+}
+
+
+// gate user utility function
+
+const section = document.getElementById("overlayWrap");
+async function checkAccess(user) {
+  const { data, error } = await supabase
+    .from("members")
+    .select("has_deposited")
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    console.error("[player] Failed to check deposit gate:", error);
+    return false;
+  }
+
+  hasAccess = Boolean(data?.has_deposited);
+  // console.log(hasAccess)
+  section.classList.toggle("is-gated", !hasAccess);
+  document.body.style.overflow = hasAccess ? "hidden" : "";
+  return hasAccess;
 }
 
 

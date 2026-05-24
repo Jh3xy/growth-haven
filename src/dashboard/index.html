@@ -1354,6 +1354,7 @@
             </div>
           </div>
         </div>
+      
       </section>
 
          
@@ -1361,7 +1362,7 @@
            SECTION — MUSIC
            ══════════════════════════════════════════════════════ -->
       <section id="section-music" class="dash-section hidden">
-        <div class="dash-section__inner flex-col">
+        <div class="dash-section__inner flex-col" id="overlayWrap">
  
           <!-- Carousel header -->
           <div class="dash-carousel-header" id="musicCarousel">
@@ -1464,6 +1465,23 @@
           <button class="blog-load-more hidden" id="musicLoadMore" type="button">
             Load more
           </button>
+
+          <!-- Reuse blog gate for stream gating -->
+           <div class="blog-gate-overlay" id="blogGateOverlay" aria-hidden="true">
+            <div class="blog-gate-card">
+              <div class="blog-gate-icon">
+                <i data-lucide="user-lock" style="width:28px;height:28px"></i>
+              </div>
+              <h3 class="blog-gate-title">Get Paid to Listen</h3>
+              <p class="blog-gate-text">
+                Deposit to unlock the streaming library. Start discovering new music and earn ₦100 for every track you listen to.
+              </p>
+              <button class="blog-gate-cta" id="blogGateDepositBtn" type="button">
+                <i data-lucide="arrow-down-to-line" style="width:16px;height:16px"></i>
+                Unlock Music Library
+              </button>
+            </div>
+          </div>
         </div><!-- /.dash-section__inner -->
  
       </section><!-- /#section-music -->

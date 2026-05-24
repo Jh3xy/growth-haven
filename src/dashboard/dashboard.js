@@ -10,6 +10,7 @@ import '../assets/styles/dashboard.css'
 import '../assets/styles/support.css';
 import '../assets/styles/blog.css';
 import '../assets/styles/casino.css';
+import "../assets/styles/quest.css";
 import "../assets/styles/stream-rewards.css";
 
 // Lock scroll immediately — loader is visible from first paint
@@ -23,6 +24,7 @@ import "../assets/styles/music.css";
 import posthog from 'posthog-js';
 import { openModal } from './modal.js';
 import { initMusicSection } from './player.js'
+import { initQuestSection } from "./quest.js";
 import { initProfile } from './profile.js';
 import { initBlogSection } from "./blog.js";
 import { initCasinoSection } from './casino.js';
@@ -945,7 +947,7 @@ casinoObserver.observe(sportsSection, {
 const musicSection = document.getElementById("section-music");
 const musicObserver = new MutationObserver(() => {
   if (!musicSection.classList.contains("hidden")) {
-    initMusicSection();
+    initMusicSection(user);
   }
 });
 musicObserver.observe(musicSection, {
