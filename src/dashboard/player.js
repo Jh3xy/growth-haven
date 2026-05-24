@@ -83,7 +83,7 @@ async function checkAccess(user) {
   hasAccess = Boolean(data?.has_deposited);
   // console.log(hasAccess)
   section.classList.toggle("is-gated", !hasAccess);
-  document.body.style.overflow = hasAccess ? "hidden" : "";
+  document.body.style.overflow = hasAccess ? "" : "hidden";
   return hasAccess;
 }
 
