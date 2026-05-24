@@ -1,0 +1,456 @@
+/* ================================================================
+   quest.css — GrowthHaven Quest System
+   Extract to: src/assets/styles/quest.css
+   Import in dashboard.js: import '../assets/styles/quest.css';
+   ================================================================ */
+
+
+/* ─── FILTER TABS ────────────────────────────────────────────────── */
+
+.quest-filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 0.125rem;
+}
+.quest-filter-tabs::-webkit-scrollbar { display: none; }
+
+.quest-filter-tab {
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: var(--border-width) solid var(--border-subtle);
+  background: transparent;
+  font-family: var(--ff-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: unset;
+  transition: var(--transition-global);
+}
+.quest-filter-tab:hover:not(.is-active) {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+.quest-filter-tab.is-active {
+  background-color: var(--brand-primary-soft);
+  border-color: var(--brand-primary-ring);
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+
+/* ─── SUMMARY STRIP ──────────────────────────────────────────────── */
+
+.quest-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  min-height: 24px;
+}
+.quest-summary__count {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  font-weight: var(--fw-medium);
+}
+.quest-summary__ready {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--status-success-text);
+  background-color: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  border-radius: var(--radius-md);
+  padding: 0.2rem 0.625rem;
+}
+
+
+/* ─── QUEST GRID ──────────────────────────────────────────────────── */
+
+.quest-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+/* ─── QUEST CARD ──────────────────────────────────────────────────── */
+
+.quest-card {
+  gap: 0.875rem;
+  transition:
+    border-color var(--transition-global),
+    box-shadow var(--transition-global),
+    opacity var(--transition-global);
+}
+
+/* Ready-to-claim: subtle green ring + glow */
+.quest-card[data-status="completed"] {
+  border-color: var(--brand-primary-ring);
+  box-shadow: 0 0 0 1px var(--brand-primary-ring), var(--shadow-low);
+}
+
+/* Claimed: dimmed so it visually recedes without disappearing */
+.quest-card[data-status="claimed"] {
+  opacity: 0.6;
+}
+.quest-card[data-status="claimed"]:hover {
+  opacity: 0.75;
+}
+
+
+/* ─── CARD HEADER ────────────────────────────────────────────────── */
+
+.quest-card__header {
+  align-items: flex-start;
+}
+
+.quest-card__icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: var(--brand-primary-soft);
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-primary-ring);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-global);
+}
+.quest-card[data-status="claimed"] .quest-card__icon {
+  background-color: var(--status-success-bg);
+  color: var(--status-success-text);
+  border-color: var(--status-success-border);
+}
+
+.quest-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.quest-card__title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  letter-spacing: var(--ls-tight);
+  line-height: 1.2;
+}
+.quest-card__sub {
+  font-size: 0.625rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+
+/* ─── STATUS BADGE ───────────────────────────────────────────────── */
+
+.quest-status-badge {
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.quest-status-badge--available {
+  background-color: var(--surface-background);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+.quest-status-badge--in_progress {
+  background-color: var(--status-info-bg);
+  color: var(--status-info-text);
+  border-color: var(--status-info-border);
+}
+.quest-status-badge--completed {
+  background-color: var(--status-success-bg);
+  color: var(--status-success-text);
+  border-color: var(--status-success-border);
+  animation: quest-badge-pulse 1.8s ease infinite;
+}
+.quest-status-badge--claimed {
+  background-color: var(--status-success-bg);
+  color: var(--status-success-text);
+  border-color: var(--status-success-border);
+  opacity: 0.7;
+}
+
+@keyframes quest-badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%       { box-shadow: 0 0 0 3px var(--status-success-border); }
+}
+
+
+/* ─── DESCRIPTION ────────────────────────────────────────────────── */
+
+.quest-card__desc {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+
+/* ─── PROGRESS BAR ───────────────────────────────────────────────── */
+
+.quest-card__progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.quest-card__progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.quest-card__progress-label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+}
+.quest-card__progress-pct {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--brand-primary);
+}
+.quest-card__progress-track {
+  height: 5px;
+  background-color: var(--border-subtle);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.quest-card__progress-fill {
+  height: 100%;
+  background-color: var(--brand-primary);
+  border-radius: 999px;
+  transition: width 0.55s var(--spring);
+  min-width: 2px; /* visible even at near-zero */
+}
+
+
+/* ─── CARD FOOTER ────────────────────────────────────────────────── */
+
+.quest-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.quest-card__reward-label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.quest-card__reward-label [data-lucide] {
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+
+/* ─── CLAIM BUTTON ───────────────────────────────────────────────── */
+
+.quest-claim-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: 36px;
+  padding: 0 1.125rem;
+  font-family: var(--ff-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  min-height: unset;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background-color var(--transition-global),
+    transform 0.15s var(--spring),
+    box-shadow var(--transition-global),
+    opacity var(--transition-global);
+}
+
+/* Active, claimable state */
+.quest-claim-btn--claimable {
+  background-color: var(--brand-primary);
+  color: var(--text-on-brand);
+  border: none;
+  box-shadow: 0 4px 14px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.28);
+  animation: quest-claim-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.quest-claim-btn--claimable:hover {
+  background-color: var(--brand-primary-hover);
+  transform: translateY(-1px);
+  animation: none;
+}
+.quest-claim-btn--claimable:active {
+  transform: scale(0.96);
+}
+
+@keyframes quest-claim-glow {
+  0%, 100% {
+    box-shadow: 0 4px 14px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.28);
+  }
+  50% {
+    box-shadow:
+      0 4px 18px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.48),
+      0 0 0 3px hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.12);
+  }
+}
+
+/* Not yet earned */
+.quest-claim-btn--locked {
+  background: transparent;
+  color: var(--text-secondary);
+  border: var(--border-width) solid var(--border-subtle);
+  cursor: not-allowed;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* Disabled while async is in-flight */
+.quest-claim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  animation: none;
+}
+
+
+/* ─── CLAIMED BADGE ──────────────────────────────────────────────── */
+
+.quest-claimed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--status-success-text);
+  background-color: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  border-radius: var(--radius-md);
+  padding: 0.3rem 0.75rem;
+  flex-shrink: 0;
+}
+
+
+/* ─── TELEGRAM QUEST ROW ─────────────────────────────────────────── */
+
+.quest-tg-row {
+  flex-shrink: 0;
+}
+.quest-tg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 36px;
+  padding: 0 0.875rem;
+  font-family: var(--ff-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--transition-global);
+}
+.quest-tg-link:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+
+/* ─── EMPTY STATE ────────────────────────────────────────────────── */
+
+.quest-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 1.5rem;
+  border: var(--border-width) dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.quest-empty__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--surface-card);
+  border: var(--border-width) solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.quest-empty__title {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+.quest-empty__sub {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 280px;
+  margin: 0;
+}
+
+
+/* ─── SKELETON ───────────────────────────────────────────────────── */
+
+.quest-skeleton {
+  min-height: 130px;
+  border-radius: var(--radius-lg);
+}
+
+
+/* ─── DARK MODE ──────────────────────────────────────────────────── */
+
+html[data-theme='dark'] .quest-card[data-status="completed"] {
+  box-shadow: 0 0 0 1px var(--brand-primary-ring), var(--shadow-low);
+}
+html[data-theme='dark'] .quest-filter-tab.is-active {
+  background-color: var(--brand-primary-soft);
+}
+
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .quest-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+  .quest-claim-btn,
+  .quest-tg-row {
+    width: 100%;
+    justify-content: center;
+  }
+  .quest-tg-link {
+    flex: 1;
+    justify-content: center;
+  }
+}

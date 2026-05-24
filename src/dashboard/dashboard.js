@@ -20,11 +20,11 @@ document.body.style.overflow = 'hidden';
 import './modal.css';
 import '../assets/styles/profile.css';
 import "../assets/styles/music.css";
-
+    
 import posthog from 'posthog-js';
 import { openModal } from './modal.js';
 import { initMusicSection } from './player.js'
-import { initQuestSection } from "./quest.js";
+// import { initQuestSection } from "./quest.js";
 import { initProfile } from './profile.js';
 import { initBlogSection } from "./blog.js";
 import { initCasinoSection } from './casino.js';
