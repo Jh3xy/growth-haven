@@ -1488,19 +1488,58 @@
 
 
       <!-- ══════════════════════════════════════════════════════
-           SECTION — Quests (shell only)
-           ══════════════════════════════════════════════════════ -->
-      <section id="section-quest" class="dash-section hidden">
-        <div class="dash-section__coming flex-col-center">
-          <div class="dash-section__coming-icon flex-center">
-            <i data-lucide="award" style="width:24px;height:24px"></i>
+        SECTION — QUESTS
+     ══════════════════════════════════════════════════════ -->
+    <section id="section-quest" class="dash-section hidden">
+      <div class="dash-section__inner flex-col">
+
+        <!-- Carousel header (same pattern as every other section) -->
+        <div class="dash-carousel-header" id="questCarousel">
+          <div class="dash-carousel-header__content">
+            <div class="dash-section-header">
+              <div class="txn-header">
+                <h2 class="txn-header__title">Quests</h2>
+                <p class="txn-header__sub">Complete missions. Earn wallet credits instantly.</p>
+              </div>
+            </div>
           </div>
-          <p class="dash-section__coming-title">Quests</p>
-          <span class="dash-section__coming-sub">
-            Grab extra cash by completing small missions. Do them yourself or invite your friends along for the ride to stack up those bonuses!
-          </span>
         </div>
-      </section>
+
+        <!-- Filter tabs -->
+        <div class="quest-filter-tabs" id="questFilterTabs" role="tablist" aria-label="Filter quests by category">
+          <button class="quest-filter-tab is-active" role="tab" aria-selected="true"
+                  data-filter="all" type="button">All</button>
+          <button class="quest-filter-tab" role="tab" aria-selected="false"
+                  data-filter="daily" type="button">Daily</button>
+          <button class="quest-filter-tab" role="tab" aria-selected="false"
+                  data-filter="retention" type="button">Streaks</button>
+          <button class="quest-filter-tab" role="tab" aria-selected="false"
+                  data-filter="onboarding" type="button">Onboarding</button>
+          <button class="quest-filter-tab" role="tab" aria-selected="false"
+                  data-filter="feature" type="button">Feature</button>
+        </div>
+
+        <!-- Summary strip — populated by JS -->
+        <div class="quest-summary" id="questSummary" aria-live="polite"></div>
+
+        <!-- Quest list — skeletons shown until JS resolves -->
+        <div class="quest-grid" id="questList" role="list" aria-label="Quest list">
+          <div class="quest-skeleton dash-card skeleton" aria-hidden="true"></div>
+          <div class="quest-skeleton dash-card skeleton" aria-hidden="true"></div>
+          <div class="quest-skeleton dash-card skeleton" aria-hidden="true"></div>
+        </div>
+
+        <!-- Empty state — hidden until JS confirms no results for active tab -->
+        <div class="quest-empty hidden" id="questEmpty">
+          <div class="quest-empty__icon flex-center">
+            <i data-lucide="award" style="width:22px;height:22px"></i>
+          </div>
+          <p class="quest-empty__title">Nothing here yet</p>
+          <p class="quest-empty__sub">Check another tab or come back tomorrow for fresh daily quests.</p>
+        </div>
+
+      </div>
+    </section>
 
 
       <!-- ══════════════════════════════════════════════════════

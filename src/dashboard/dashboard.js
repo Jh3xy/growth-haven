@@ -66,6 +66,7 @@ const carouselConfigs = {
   transact: {
     id: "transactionsCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -77,6 +78,7 @@ const carouselConfigs = {
   invest: {
     id: "investmentsCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -88,6 +90,7 @@ const carouselConfigs = {
   blog: {
     id: "blogCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -99,6 +102,7 @@ const carouselConfigs = {
   home: {
     id: "homeCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -110,6 +114,7 @@ const carouselConfigs = {
   sports: {
     id: "casinoCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -121,6 +126,7 @@ const carouselConfigs = {
   profile: {
     id: "profileCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -132,6 +138,7 @@ const carouselConfigs = {
   music: {
     id: "musicCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -143,6 +150,19 @@ const carouselConfigs = {
   support: {
     id: "supportCarousel",
     images: [
+      "/assets/other/db-banner-07.png",
+      "/assets/other/db-banner-06.png",
+      "/assets/other/db-banner-01.jpg",
+      "/assets/other/db-banner-02.jpg",
+      "/assets/other/db-banner-03.jpg",
+      "/assets/other/db-banner-04.jpg",
+      "/assets/other/db-banner-05.jpg",
+    ],
+  },
+  quest: {
+    id: "questCarousel",
+    images: [
+      "/assets/other/db-banner-07.png",
       "/assets/other/db-banner-06.png",
       "/assets/other/db-banner-01.jpg",
       "/assets/other/db-banner-02.jpg",
@@ -228,8 +248,34 @@ if (!session) {
 
 const user = session.user;
 
-if (user) {
+async function checkPWAInstallation(userId) {
+  // Check if launched from Home Screen (PWA Standalone mode)
+  const isStandalone = 
+    window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone === true; // iOS Safari fallback
 
+  if (isStandalone) {
+    try {
+      // Trigger a database update to complete their PWA quest
+      // const { error } = await supabase
+      //   .from('user_quests') // adjust to your actual table schema
+      //   .update({ progress: 1, status: 'completed' })
+      //   .eq('user_id', userId)
+      //   .eq('rule_key', 'pwa_install')
+      //   .eq('status', 'available'); // only update if not already claimed/done
+
+      if (!error) {
+        console.log("PWA Install Quest marked as completed!");
+      }
+    } catch (err) {
+      console.error("Error updating PWA quest status:", err);
+    }
+  }
+}
+
+
+if (user) {
+  
   // Identify user on PostHog
   posthog.identify(user.id);
 
@@ -253,6 +299,9 @@ if (user) {
       console.log("🎮 Quest access granted");
     }
   });
+
+  // Check PWA installation once the user session is authenticated
+  checkPWAInstallation(user.id);
 }
 
 // ─── PERSONALISE ─────────────────────────────────────────────
@@ -951,6 +1000,17 @@ const musicObserver = new MutationObserver(() => {
   }
 });
 musicObserver.observe(musicSection, {
+  attributes: true,
+  attributeFilter: ["class"],
+});
+
+const questSection = document.getElementById("section-quest");
+const questObserver = new MutationObserver(() => {
+  if (!questSection.classList.contains("hidden")) {
+    initQuestSection();
+  }
+});
+questObserver.observe(questSection, {
   attributes: true,
   attributeFilter: ["class"],
 });

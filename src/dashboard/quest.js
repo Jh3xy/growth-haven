@@ -213,28 +213,37 @@ function renderQuestCard(quest) {
   }
 
   card.innerHTML = `
-    <div class="quest-card__header flex-between">
-      <div class="flex items-center gap-3">
+    <!-- Top Row: Icon, Information, & Right-Side CTA -->
+    <div class="quest-card__main-row">
+      <div class="quest-card__left">
+        <!-- Icon -->
         <div class="quest-card__icon flex-center" aria-hidden="true">
           <i data-lucide="${quest.icon_name}" style="width:16px;height:16px"></i>
         </div>
+        <!-- Meta Details -->
         <div class="quest-card__meta">
-          <span class="quest-card__title">${quest.title}</span>
-          <span class="quest-card__sub">${catLabel} · ${typeLabel}</span>
+          <div class="quest-card__title-row">
+            <span class="quest-card__title">${quest.title}</span>
+            <span class="quest-card__sub-pill">${catLabel}</span>
+          </div>
+          <p class="quest-card__desc">${quest.description}</p>
         </div>
       </div>
-      <span class="quest-status-badge quest-status-badge--${quest.status}" aria-label="Status: ${getStatusLabel(quest.status)}">
-        ${getStatusLabel(quest.status)}
-      </span>
+      
+      <!-- Right CTA Area (Maintains footer class for handleClaim compatibility) -->
+      <div class="quest-card__footer">
+        ${ctaHtml}
+      </div>
     </div>
 
-    <p class="quest-card__desc">${quest.description}</p>
-
-    ${showProgress ? `
+    <!-- Bottom Row: Spanning Progress Bar -->
+    ${
+      showProgress
+        ? `
     <div class="quest-card__progress-wrap" role="progressbar"
          aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"
          aria-label="${progressLabel}">
-      <div class="quest-card__progress-meta flex-between">
+      <div class="quest-card__progress-meta">
         <span class="quest-card__progress-label">${progressLabel}</span>
         <span class="quest-card__progress-pct">${Math.round(pct)}%</span>
       </div>
@@ -242,17 +251,11 @@ function renderQuestCard(quest) {
         <div class="quest-card__progress-fill" style="width:${pct}%"></div>
       </div>
     </div>
-    ` : ''}
-
-    <div class="quest-card__footer flex-between items-center">
-      <span class="quest-card__reward-label flex items-center gap-1">
-        <i data-lucide="circle-dollar-sign" style="width:12px;height:12px" aria-hidden="true"></i>
-        ₦${rewardFormatted}
-      </span>
-      ${ctaHtml}
-    </div>
+    `
+        : ""
+    }
   `;
-
+  
   // Wire all claim buttons in this card (telegram quest has one, others have one)
   card.querySelectorAll('.quest-claim-btn[data-quest-id]').forEach(btn => {
     btn.addEventListener('click', () => {
