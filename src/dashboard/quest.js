@@ -59,13 +59,13 @@ export async function initQuestSection() {
 // ─── DATA ─────────────────────────────────────────────────────────
 
 async function loadQuests() {
-  const { data, error } = await supabase.rpc('get_user_quests');
+  const { data, error } = await supabase.rpc("get_user_quests");
 
   clearSkeletons();
 
   if (error) {
-    console.error('[quests] Load error:', error);
-    showQuestEmpty('Could not load quests. Please refresh the page.');
+    console.error("[quests] Load error:", error);
+    showQuestEmpty("Could not load quests. Please refresh the page.");
     return;
   }
 
@@ -73,10 +73,53 @@ async function loadQuests() {
   allQuests = (data || []).sort(
     (a, b) =>
       (STATUS_SORT[a.status] ?? 2) - (STATUS_SORT[b.status] ?? 2) ||
-      a.sort_order - b.sort_order
+      a.sort_order - b.sort_order,
   );
 
+  // Check if standalone PWA launched; auto-completes quest if verified
+  await verifyAndCompletePwaQuest();
+
   renderQuests();
+}
+
+async function verifyAndCompletePwaQuest() {
+  const pwaQuest = allQuests.find((q) => q.rule_key === "install_app");
+  if (!pwaQuest) return;
+
+  // Nothing to update if already completed or claimed
+  if (pwaQuest.status === "completed" || pwaQuest.status === "claimed") {
+    return;
+  }
+
+  // Detect standalone mode
+  const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+
+  if (isStandalone) {
+    console.log("[PWA] Standalone launch verified. Auto-completing quest...");
+
+    // Optimistically update the local array so the user gets immediate feedback
+    pwaQuest.status = "completed";
+    pwaQuest.progress = pwaQuest.target_value;
+
+    // Persist to the database
+    const { error } = await supabase
+      .from("user_quests")
+      .update({
+        status: "completed",
+        progress: pwaQuest.target_value,
+        completed_at: new Date().toISOString(),
+      })
+      .eq("id", pwaQuest.user_quest_id);
+
+    if (error) {
+      console.error("[PWA] Failed to write progress to DB:", error);
+      // Revert local optimistic change if backend call failed
+      pwaQuest.status = "available";
+      pwaQuest.progress = 0;
+    }
+  }
 }
 
 // ─── FILTER TABS ──────────────────────────────────────────────────
@@ -147,31 +190,31 @@ function updateSummary(quests) {
 }
 
 function renderQuestCard(quest) {
-  const card = document.createElement('div');
-  card.className       = 'quest-card dash-card';
+  const card = document.createElement("div");
+  card.className = "quest-card dash-card";
   card.dataset.questId = quest.user_quest_id;
-  card.dataset.status  = quest.status;
+  card.dataset.status = quest.status;
 
-  const isClaimed     = quest.status === 'claimed';
-  const isCompletable = quest.status === 'completed';
-  const showProgress  = quest.target_value > 1 && !isClaimed;
-  const pct           = Math.min((quest.progress / quest.target_value) * 100, 100);
-  const catLabel      = CATEGORY_LABELS[quest.category] || quest.category;
-  const typeLabel     = quest.quest_type === 'daily'
-    ? 'Resets daily'
-    : quest.quest_type === 'weekly'
-      ? 'Resets weekly'
-      : 'One-time';
+  const isClaimed = quest.status === "claimed";
+  const isCompletable = quest.status === "completed";
+  const showProgress = quest.target_value > 1 && !isClaimed;
+  const pct = Math.min((quest.progress / quest.target_value) * 100, 100);
+  const catLabel = CATEGORY_LABELS[quest.category] || quest.category;
+  const typeLabel =
+    quest.quest_type === "daily"
+      ? "Resets daily"
+      : quest.quest_type === "weekly"
+        ? "Resets weekly"
+        : "One-time";
 
   const progressLabel = PROGRESS_TEXT[quest.rule_key]
     ? PROGRESS_TEXT[quest.rule_key](quest.progress, quest.target_value)
     : `${Math.floor(quest.progress)} / ${quest.target_value}`;
 
-  const rewardFormatted = Number(quest.reward_amount).toLocaleString('en-NG');
+  const rewardFormatted = Number(quest.reward_amount).toLocaleString("en-NG");
 
   // ── CTA area — three states ────────────────────────────────────
-
-  let ctaHtml = '';
+  let ctaHtml = "";
 
   if (isClaimed) {
     ctaHtml = `
@@ -180,8 +223,7 @@ function renderQuestCard(quest) {
         <span>Claimed</span>
       </div>
     `;
-  } else if (quest.rule_key === 'telegram_join') {
-    // Honor-system quest: show Join link + Claim side by side
+  } else if (quest.rule_key === "telegram_join") {
     ctaHtml = `
       <div class="quest-tg-row flex items-center gap-2">
         <a class="quest-tg-link flex items-center gap-1"
@@ -196,18 +238,29 @@ function renderQuestCard(quest) {
         </button>
       </div>
     `;
+  } else if (quest.rule_key === "install_app" && !isCompletable) {
+    // Render active CTA buttons with guides on how to install
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    ctaHtml = `
+      <button class="quest-claim-btn quest-pwa-guide-btn" data-quest-id="${quest.user_quest_id}" type="button">
+        ${isIOS ? "How to Install" : "Install App"}
+      </button>
+    `;
   } else {
     ctaHtml = `
       <button
-        class="quest-claim-btn ${isCompletable ? 'quest-claim-btn--claimable' : 'quest-claim-btn--locked'}"
+        class="quest-claim-btn ${isCompletable ? "quest-claim-btn--claimable" : "quest-claim-btn--locked"}"
         data-quest-id="${quest.user_quest_id}"
         type="button"
-        ${isCompletable ? '' : 'disabled'}
-        aria-label="${isCompletable ? `Claim ₦${rewardFormatted} reward` : 'Quest not yet complete'}"
+        ${isCompletable ? "" : "disabled"}
+        aria-label="${isCompletable ? `Claim ₦${rewardFormatted} reward` : "Quest not yet complete"}"
       >
-        ${isCompletable
-          ? `<i data-lucide="gift" style="width:13px;height:13px" aria-hidden="true"></i> Claim ₦${rewardFormatted}`
-          : `₦${rewardFormatted} reward`}
+        ${
+          isCompletable
+            ? `<i data-lucide="gift" style="width:13px;height:13px" aria-hidden="true"></i> Claim ₦${rewardFormatted}`
+            : `₦${rewardFormatted} reward`
+        }
       </button>
     `;
   }
@@ -230,7 +283,7 @@ function renderQuestCard(quest) {
         </div>
       </div>
       
-      <!-- Right CTA Area (Maintains footer class for handleClaim compatibility) -->
+      <!-- Right CTA Area -->
       <div class="quest-card__footer">
         ${ctaHtml}
       </div>
@@ -255,11 +308,51 @@ function renderQuestCard(quest) {
         : ""
     }
   `;
-  
-  // Wire all claim buttons in this card (telegram quest has one, others have one)
-  card.querySelectorAll('.quest-claim-btn[data-quest-id]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      handleClaim(quest.user_quest_id, card, quest.title, quest.reward_amount);
+
+  // Wire claim actions
+  card
+    .querySelectorAll(
+      ".quest-claim-btn[data-quest-id]:not(.quest-pwa-guide-btn)",
+    )
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        handleClaim(
+          quest.user_quest_id,
+          card,
+          quest.title,
+          quest.reward_amount,
+        );
+      });
+    });
+
+  // Wire active PWA install helper guide
+  card.querySelectorAll(".quest-pwa-guide-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isTelegram = /Telegram/i.test(navigator.userAgent);
+
+      if (isTelegram) {
+        showQuestToast(
+          "PWAs cannot be installed in Telegram. Please open GrowthHaven in Chrome or Safari.",
+          "warning",
+        );
+      } else if (isIOS) {
+        showQuestToast(
+          "Safari: Tap the 'Share' icon below, scroll down, and select 'Add to Home Screen'. Then launch it from your home screen!",
+          "info",
+        );
+      } else {
+        // Trigger Chrome native prompt if captured on dashboard.js
+        if (window.__ghTriggerAndroidInstall) {
+          window.__ghTriggerAndroidInstall();
+        } else {
+          showQuestToast(
+            "Chrome: Tap your browser's menu (three dots) on the top right, then select 'Install app'.",
+            "info",
+          );
+        }
+      }
     });
   });
 

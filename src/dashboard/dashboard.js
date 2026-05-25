@@ -50,6 +50,7 @@ const networkTimer = setTimeout(() => {
 }, 6000);
 
 
+let deferredPrompt = null;
 let isLoaded = false;
 // Track which carousels have been initialized
 const initializedCarousels = new Set();
@@ -248,31 +249,6 @@ if (!session) {
 
 const user = session.user;
 
-async function checkPWAInstallation(userId) {
-  // Check if launched from Home Screen (PWA Standalone mode)
-  const isStandalone = 
-    window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone === true; // iOS Safari fallback
-
-  if (isStandalone) {
-    try {
-      // Trigger a database update to complete their PWA quest
-      // const { error } = await supabase
-      //   .from('user_quests') // adjust to your actual table schema
-      //   .update({ progress: 1, status: 'completed' })
-      //   .eq('user_id', userId)
-      //   .eq('rule_key', 'pwa_install')
-      //   .eq('status', 'available'); // only update if not already claimed/done
-
-      if (!error) {
-        console.log("PWA Install Quest marked as completed!");
-      }
-    } catch (err) {
-      console.error("Error updating PWA quest status:", err);
-    }
-  }
-}
-
 
 if (user) {
   
@@ -299,10 +275,24 @@ if (user) {
       console.log("🎮 Quest access granted");
     }
   });
-
-  // Check PWA installation once the user session is authenticated
-  checkPWAInstallation(user.id);
 }
+
+// Inside dashboard.js, update your beforeinstallprompt handler:
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Make the function accessible globally so quest.js can trigger it on click
+  window.__ghTriggerAndroidInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('[PWA] Prompt accepted.');
+    }
+    deferredPrompt = null;
+  };
+});
 
 // ─── PERSONALISE ─────────────────────────────────────────────
 const firstName = user.user_metadata?.first_name || '';
