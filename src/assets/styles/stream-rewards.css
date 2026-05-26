@@ -538,15 +538,12 @@ html[data-theme='dark'] .music-reward-strip[data-reward-state="paused"] {
 /* Override the previous tracker row layout entirely */
 .music-reward-tracker {
   position: absolute;
-  bottom: -2px;
-  left: -9px;
+  top: -35px;
   right: auto;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 5px 10px;
-  padding-left: 1rem;
-  border-radius: 999px;
   width: auto;
   max-width: calc(100% - 20px);
   backdrop-filter: blur(8px);
