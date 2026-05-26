@@ -366,6 +366,7 @@ form.addEventListener("submit", async (event) => {
       }
     }
 
+    textarea.value = "";
     showToast("Post published.");
     window.setTimeout(() => {
       window.location.href = DASHBOARD_BLOG_URL;

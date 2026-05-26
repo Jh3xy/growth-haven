@@ -443,7 +443,6 @@ html[data-theme='dark'] .quest-filter-tab.is-active {
   }
   .quest-claim-btn,
   .quest-tg-row {
-    width: 100%;
     justify-content: center;
   }
   .quest-tg-link {
@@ -456,13 +455,14 @@ html[data-theme='dark'] .quest-filter-tab.is-active {
 
 /* Overrides vertical card padding for a list-item style */
 .quest-card {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.75rem !important;
-  padding: 1rem 1.25rem !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important; /* Keep everything strictly bounded */
+  display: flex ;
+  align-items: flex-start;
+  flex-direction: column ;
+  gap: 0.75rem ;
+  padding: 1rem 1.25rem ;
+  width: 100% ;
+  box-sizing: border-box ;
+  overflow: hidden ; /* Keep everything strictly bounded */
 }
 
 /* Horizontal Main Row container */

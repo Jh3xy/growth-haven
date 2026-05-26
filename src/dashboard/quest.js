@@ -309,11 +309,10 @@ function renderQuestCard(quest) {
         </div>
       </div>
       
-      <!-- Right CTA Area -->
+      </div>
       <div class="quest-card__footer">
         ${ctaHtml}
       </div>
-    </div>
 
     <!-- Bottom Row: Spanning Progress Bar -->
     ${
