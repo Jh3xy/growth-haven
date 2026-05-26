@@ -685,12 +685,14 @@ function renderActivity(data) {
     stream_rewards: "music",
     early_exit: "door-open",
     referral_bonus: "users",
+    quest_reward: "award",
     vault_maturity: "lock-open",
   };
  
   const inboundTypes = new Set([
     "deposit",
     "like",
+    "quest_reward",
     "blog_like_reward",
     "stream_rewards",
     "blog_post_reward",

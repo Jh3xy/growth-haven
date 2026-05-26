@@ -20,6 +20,7 @@ const FILTER_GROUPS = {
   vault: ["vault_fund", "vault_maturity", "early_exit"],
   earnings: ["daily_claim", "referral_bonus"],
   blog: ["blog_like_reward", "blog_post_reward"],
+  quest: ["quest_reward"],
   stream: ["stream_rewards"],
 };
 
@@ -31,6 +32,7 @@ const INBOUND_TYPES = new Set([
   "blog_post_reward",
   "mines_win",
   "daily_claim",
+  "quest_reward",
   "early_exit",
   "referral_bonus",
   "vault_maturity",
@@ -42,6 +44,7 @@ const ICON_MAP = {
   vault_fund: "shield",
   daily_claim: "sun",
   blog_like_reward: "thumbs-up",
+  quest_reward: "award",
   blog_post_reward: "message-circle-heart",
   stream_rewards: "music",
   early_exit: "door-open",

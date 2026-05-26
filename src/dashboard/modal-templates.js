@@ -219,6 +219,7 @@ export const MODAL_TEMPLATES = {
       "mines_win",
       "daily_claim",
       "early_exit",
+      "quest_reward",
       "referral_bonus",
       "vault_maturity",
     ].includes(txn.type);
@@ -235,6 +236,7 @@ export const MODAL_TEMPLATES = {
       stream_rewards: "music",
       early_exit: "door-open",
       referral_bonus: "users",
+      quest_reward: "award",
       vault_maturity: "lock-open",
     };
 
