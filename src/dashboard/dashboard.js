@@ -52,6 +52,50 @@ const networkTimer = setTimeout(() => {
 
 let deferredPrompt = null;
 let isLoaded = false;
+
+function isPwaStandalone() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+window.__ghPwaInstallState = {
+  canPrompt: false,
+  isStandalone: isPwaStandalone(),
+  lastOutcome: null,
+};
+
+window.__ghTriggerAndroidInstall = async () => {
+  if (!deferredPrompt) {
+    window.__ghPwaInstallState.canPrompt = false;
+    window.__ghPwaInstallState.lastOutcome = "unavailable";
+    return { outcome: "unavailable" };
+  }
+
+  try {
+    await deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    const outcome = choice?.outcome || "unknown";
+
+    window.__ghPwaInstallState.lastOutcome = outcome;
+    window.__ghPwaInstallState.canPrompt = false;
+    deferredPrompt = null;
+
+    if (outcome === "accepted") {
+      console.log("[PWA] Prompt accepted.");
+    }
+
+    return { outcome };
+  } catch (error) {
+    console.warn("[PWA] Install prompt failed:", error);
+    window.__ghPwaInstallState.lastOutcome = "error";
+    window.__ghPwaInstallState.canPrompt = false;
+    deferredPrompt = null;
+    return { outcome: "error", error };
+  }
+};
+
 // Track which carousels have been initialized
 const initializedCarousels = new Set();
 
@@ -277,21 +321,37 @@ if (user) {
   });
 }
 
-// Inside dashboard.js, update your beforeinstallprompt handler:
+function registerDashboardServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+      });
+      console.log("[PWA] Service worker registered:", registration.scope);
+    } catch (error) {
+      console.warn("[PWA] Service worker registration failed:", error);
+    }
+  });
+}
+
+registerDashboardServiceWorker();
+
+// Capture Chrome's install prompt so quest.js can trigger it from the quest card.
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  
-  // Make the function accessible globally so quest.js can trigger it on click
-  window.__ghTriggerAndroidInstall = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('[PWA] Prompt accepted.');
-    }
-    deferredPrompt = null;
-  };
+  window.__ghPwaInstallState.canPrompt = true;
+  window.__ghPwaInstallState.lastOutcome = null;
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  window.__ghPwaInstallState.canPrompt = false;
+  window.__ghPwaInstallState.isStandalone = true;
+  window.__ghPwaInstallState.lastOutcome = "installed";
+  console.log("[PWA] App installed.");
 });
 
 // ─── PERSONALISE ─────────────────────────────────────────────

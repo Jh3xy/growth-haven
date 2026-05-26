@@ -39,6 +39,28 @@ const PROGRESS_TEXT = {
 let initialized = false;
 let allQuests   = [];
 let activeTab   = 'all';
+let pwaInstallSheet = null;
+let pwaInstallSheetLastFocus = null;
+let pwaInstallBodyOverflow = "";
+let pwaInstallSheetKeyHandler = null;
+
+const IOS_INSTALL_STEPS = [
+  {
+    icon: "share",
+    title: "Tap Share",
+    body: "Use Safari's share button in the bottom toolbar.",
+  },
+  {
+    icon: "list-plus",
+    title: "Choose Add to Home Screen",
+    body: "Scroll through the actions and select Add to Home Screen.",
+  },
+  {
+    icon: "badge-check",
+    title: "Launch GrowthHaven",
+    body: "Open GrowthHaven from your home screen to unlock this quest.",
+  },
+];
 
 
 // ─── INIT ─────────────────────────────────────────────────────────
@@ -97,6 +119,10 @@ async function verifyAndCompletePwaQuest() {
     window.navigator.standalone === true;
 
   if (isStandalone) {
+    if (window.__ghPwaInstallState) {
+      window.__ghPwaInstallState.isStandalone = true;
+    }
+
     console.log("[PWA] Standalone launch verified. Auto-completing quest...");
 
     // Optimistically update the local array so the user gets immediate feedback
@@ -327,36 +353,170 @@ function renderQuestCard(quest) {
 
   // Wire active PWA install helper guide
   card.querySelectorAll(".quest-pwa-guide-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isTelegram = /Telegram/i.test(navigator.userAgent);
-
-      if (isTelegram) {
-        showQuestToast(
-          "PWAs cannot be installed in Telegram. Please open GrowthHaven in Chrome or Safari.",
-          "warning",
-        );
-      } else if (isIOS) {
-        showQuestToast(
-          "Safari: Tap the 'Share' icon below, scroll down, and select 'Add to Home Screen'. Then launch it from your home screen!",
-          "info",
-        );
-      } else {
-        // Trigger Chrome native prompt if captured on dashboard.js
-        if (window.__ghTriggerAndroidInstall) {
-          window.__ghTriggerAndroidInstall();
-        } else {
-          showQuestToast(
-            "Chrome: Tap your browser's menu (three dots) on the top right, then select 'Install app'.",
-            "info",
-          );
-        }
-      }
+    btn.addEventListener("click", async () => {
+      await handlePwaInstallClick(btn);
     });
   });
 
   return card;
+}
+
+async function handlePwaInstallClick(triggerBtn) {
+  if (isPwaStandalone()) {
+    showQuestToast("GrowthHaven is already running as an installed app.", "success");
+    return;
+  }
+
+  if (isInTelegramBrowser()) {
+    showQuestToast(
+      "PWAs cannot be installed inside Telegram. Open GrowthHaven in Chrome or Safari first.",
+      "warning",
+    );
+    return;
+  }
+
+  if (isIOSDevice()) {
+    openPwaInstallSheet(triggerBtn);
+    return;
+  }
+
+  if (typeof window.__ghTriggerAndroidInstall !== "function") {
+    showQuestToast(
+      "Open your browser menu and choose Install app or Add to Home screen.",
+      "info",
+    );
+    return;
+  }
+
+  triggerBtn.disabled = true;
+  const originalText = triggerBtn.textContent;
+  triggerBtn.textContent = "Opening...";
+
+  const result = await window.__ghTriggerAndroidInstall();
+
+  triggerBtn.disabled = false;
+  triggerBtn.textContent = originalText;
+
+  if (result?.outcome === "accepted") {
+    showQuestToast("Install started. Open GrowthHaven from your home screen to complete this quest.");
+  } else if (result?.outcome === "dismissed") {
+    showQuestToast("Install was dismissed. You can try again from this quest card.", "info");
+  } else if (result?.outcome === "error") {
+    showQuestToast("Could not open the install prompt. Use your browser menu to install GrowthHaven.", "warning");
+  } else {
+    showQuestToast(
+      "Chrome: open the menu, then choose Install app or Add to Home screen.",
+      "info",
+    );
+  }
+}
+
+function openPwaInstallSheet(triggerEl) {
+  closePwaInstallSheet({ restoreFocus: false });
+
+  pwaInstallSheetLastFocus = triggerEl || document.activeElement;
+  pwaInstallBodyOverflow = document.body.style.overflow;
+
+  const sheet = document.createElement("div");
+  sheet.className = "quest-pwa-sheet";
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-labelledby", "questPwaSheetTitle");
+  sheet.innerHTML = `
+    <div class="quest-pwa-sheet__backdrop" data-pwa-sheet-close></div>
+    <section class="quest-pwa-sheet__panel" role="document">
+      <div class="quest-pwa-sheet__handle" aria-hidden="true"></div>
+      <div class="quest-pwa-sheet__header">
+        <div class="quest-pwa-sheet__app-icon" aria-hidden="true">
+          <img src="/assets/pwa/icon.svg" alt="" />
+        </div>
+        <div class="quest-pwa-sheet__title-wrap">
+          <h2 class="quest-pwa-sheet__title" id="questPwaSheetTitle">Install GrowthHaven</h2>
+          <p class="quest-pwa-sheet__subtitle">Add the app to your Home Screen, then launch it there to complete this quest.</p>
+        </div>
+        <button class="quest-pwa-sheet__close" type="button" aria-label="Close" data-pwa-sheet-close>
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="quest-pwa-sheet__steps">
+        ${IOS_INSTALL_STEPS.map((step, index) => `
+          <div class="quest-pwa-sheet__step">
+            <div class="quest-pwa-sheet__step-icon" aria-hidden="true">
+              <i data-lucide="${step.icon}"></i>
+            </div>
+            <div class="quest-pwa-sheet__step-copy">
+              <span class="quest-pwa-sheet__step-kicker">Step ${index + 1}</span>
+              <p class="quest-pwa-sheet__step-title">${step.title}</p>
+              <p class="quest-pwa-sheet__step-body">${step.body}</p>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+      <button class="quest-pwa-sheet__done" type="button" data-pwa-sheet-close>
+        Got it
+      </button>
+    </section>
+  `;
+
+  document.body.appendChild(sheet);
+  document.body.style.overflow = "hidden";
+  pwaInstallSheet = sheet;
+
+  sheet.querySelectorAll("[data-pwa-sheet-close]").forEach((el) => {
+    el.addEventListener("click", () => closePwaInstallSheet());
+  });
+
+  pwaInstallSheetKeyHandler = (event) => {
+    if (event.key === "Escape") closePwaInstallSheet();
+  };
+  document.addEventListener("keydown", pwaInstallSheetKeyHandler);
+
+  requestAnimationFrame(() => {
+    sheet.classList.add("is-open");
+    sheet.querySelector(".quest-pwa-sheet__close")?.focus();
+  });
+
+  if (window.lucide) window.lucide.createIcons({ nodes: [sheet] });
+}
+
+function closePwaInstallSheet(options = {}) {
+  const { restoreFocus = true } = options;
+  const sheet = pwaInstallSheet;
+  if (!sheet) return;
+
+  sheet.classList.remove("is-open");
+  document.body.style.overflow = pwaInstallBodyOverflow;
+
+  if (pwaInstallSheetKeyHandler) {
+    document.removeEventListener("keydown", pwaInstallSheetKeyHandler);
+    pwaInstallSheetKeyHandler = null;
+  }
+
+  window.setTimeout(() => {
+    sheet.remove();
+    if (pwaInstallSheet === sheet) pwaInstallSheet = null;
+    if (restoreFocus) pwaInstallSheetLastFocus?.focus?.();
+  }, 260);
+}
+
+function isIOSDevice() {
+  const ua = navigator.userAgent || "";
+  const platform = navigator.platform || "";
+  return (
+    /iPad|iPhone|iPod/.test(ua) ||
+    (platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  ) && !window.MSStream;
+}
+
+function isInTelegramBrowser() {
+  return /Telegram/i.test(navigator.userAgent || "");
+}
+
+function isPwaStandalone() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
 }
 
 function getStatusLabel(status) {
