@@ -81,6 +81,12 @@ export async function initQuestSection() {
 // ─── DATA ─────────────────────────────────────────────────────────
 
 async function loadQuests() {
+  /**
+   * Ensure today's login is stamped BEFORE get_user_quests runs.
+   * Get_user_quests calculates streak progress live from user_login_days
+   */
+  await supabase.rpc("record_daily_login").catch(() => {});
+
   const { data, error } = await supabase.rpc("get_user_quests");
 
   clearSkeletons();
@@ -253,7 +259,7 @@ function renderQuestCard(quest) {
     ctaHtml = `
       <div class="quest-tg-row flex items-center gap-2">
         <a class="quest-tg-link flex items-center gap-1"
-           href="${TG_COMMUNITY_URL}" target="_blank" rel="noopener noreferrer"
+           href="${TG_COMMUNITY_URL}"
            aria-label="Open Telegram community">
           <i data-lucide="send" style="width:12px;height:12px" aria-hidden="true"></i>
           Join
