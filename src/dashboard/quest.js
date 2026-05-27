@@ -85,7 +85,7 @@ async function loadQuests() {
    * Ensure today's login is stamped BEFORE get_user_quests runs.
    * Get_user_quests calculates streak progress live from user_login_days
    */
-  const {streakError} = await supabase.rpc("record_daily_login");
+  const { error: streakError} = await supabase.rpc("record_daily_login");
     if (streakError) {
       console.warn("[quest]: Could not record streak", streakError);
       // Not fatal — we can still load quests, just streak progress may be inaccurate
