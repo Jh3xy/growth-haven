@@ -293,11 +293,14 @@ if (!session) {
 
 const user = session.user;
 
-// Record user daily login
-supabase.rpc('record_daily_login').catch(() => {
-  // Non-fatal. If this fails, streak won't count today but nothing breaks.
-  console.warn("[quest]: Could not record streak")
-});
+// Record user daily login (Fire and forget)
+(async () => {
+  const { error } = await supabase.rpc('record_daily_login');
+  if (error) {
+    // Non-fatal. If this fails, streak won't count today but nothing breaks.
+    console.warn("[quest]: Could not record streak", error);
+  }
+})();
 
 
 if (user) {
