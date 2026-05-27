@@ -1,0 +1,381 @@
+
+
+/* =============================================================
+   checkout.css
+   ============================================================= */
+
+/* ── Page shell ─────────────────────────────────────────────── */
+.checkout-body-root {
+  background: var(--surface-background);
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 0 40px;
+  font-family: var(--ff-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.co-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* The card-like container — mirrors Paystack's compact shell */
+.co-shell {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface-card);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-low);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* On very small screens it fills the viewport width */
+}
+
+@media (min-width: 480px) {
+  .checkout-body-root {
+    align-items: center;
+    padding: 40px 16px;
+  }
+
+  .co-shell {
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.co-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: var(--border-width) solid var(--border-subtle);
+  gap: 12px;
+}
+
+.co-header__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--brand-primary);
+  flex-shrink: 0;
+}
+
+.co-header__wordmark {
+  font-size: 0.9rem;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  letter-spacing: var(--ls-tight);
+}
+
+.co-header__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+}
+
+.co-header__ref {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  font-feature-settings: "tnum";
+}
+
+.co-header__pay-chip {
+  font-size: 0.8rem;
+  font-weight: var(--fw-semibold);
+  color: var(--brand-primary);
+  white-space: nowrap;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.co-body {
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Title ───────────────────────────────────────────────────── */
+.co-title {
+  font-size: 1rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.co-title__amount {
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.co-title__bank {
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+/* ── Details Card ────────────────────────────────────────────── */
+.co-card {
+  border: var(--border-width) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface-card);
+}
+
+.co-field {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.co-field__label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-tertiary);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+}
+
+.co-field__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.co-field__value {
+  font-size: 0.95rem;
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  min-height: 1.2em;
+}
+
+.co-field__value--mono {
+  font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+}
+
+.co-field-divider {
+  height: var(--border-width);
+  background: var(--border-subtle);
+}
+
+/* Copy button */
+.co-copy-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: background var(--transition-global), color var(--transition-global);
+}
+
+.co-copy-btn:hover:not(:disabled) {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+}
+
+.co-copy-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Dashed Divider with notches (Paystack signature detail) ─── */
+.co-dash-divider {
+  position: relative;
+  border-top: 2px dashed var(--border-subtle);
+  margin: 0 -20px; /* bleed to card edges */
+}
+
+.co-dash-divider__notch {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface-background);
+  border: var(--border-width) solid var(--border-subtle);
+}
+
+.co-dash-divider__notch--left  { left: -8px; }
+.co-dash-divider__notch--right { right: -8px; }
+
+/* ── Notice + Countdown ──────────────────────────────────────── */
+.co-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--surface-card-muted);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.co-notice__icon {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.co-notice__text {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.co-countdown {
+  font-weight: var(--fw-semibold);
+  color: var(--status-warning-text);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--transition-global);
+}
+
+/* Countdown urgency — JS adds .is-urgent when under 5 min */
+.co-countdown.is-urgent {
+  color: var(--status-error-text);
+}
+
+/* ── CTA Button ──────────────────────────────────────────────── */
+.co-cta-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--brand-primary);
+  color: var(--text-on-brand);
+  font-family: var(--ff-primary);
+  font-size: 0.95rem;
+  font-weight: var(--fw-semibold);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background var(--transition-global),
+    opacity var(--transition-global),
+    transform 100ms var(--spring);
+}
+
+.co-cta-btn:hover:not(:disabled) {
+  background: var(--brand-primary-hover);
+}
+
+.co-cta-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.co-cta-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Loading state — JS adds .is-loading while awaiting notify-deposit */
+.co-cta-btn.is-loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* ── Status Banner ────────────────────────────────────────────── */
+.co-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: var(--fw-medium);
+  /* Default: error style — JS can swap to success by toggling class */
+  background: var(--status-error-bg);
+  border: var(--border-width) solid var(--status-error-border);
+  color: var(--status-error-text);
+}
+
+.co-status-banner.is-success {
+  background: var(--status-success-bg);
+  border-color: var(--status-success-border);
+  color: var(--status-success-text);
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.co-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 20px 24px;
+}
+
+.co-footer__secure {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
+}
+
+.co-footer__secure i {
+  color: var(--brand-primary);
+}
+
+.co-footer__terms {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin: 0;
+}
+
+.co-footer__terms a {
+  color: var(--brand-primary);
+  text-decoration: none;
+}
+
+.co-footer__terms a:hover {
+  text-decoration: underline;
+}
+
+/* ── Skeleton shimmer ────────────────────────────────────────── */
+@keyframes co-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.co-skel {
+  display: inline-block;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--border-subtle) 25%,
+    var(--surface-card-muted) 50%,
+    var(--border-subtle) 75%
+  );
+  background-size: 800px 100%;
+  animation: co-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Sizes for each skeleton slot */
+.co-skel--ref    { width: 120px; height: 10px; }
+.co-skel--chip   { width: 64px;  height: 12px; }
+.co-skel--amount { width: 72px;  height: 16px; vertical-align: middle; }
+.co-skel--bank   { width: 96px;  height: 16px; vertical-align: middle; }
+.co-skel--value  { width: 100%;  height: 14px; max-width: 180px; }
+
+

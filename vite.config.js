@@ -17,6 +17,7 @@ export default defineConfig({
         dashboard: resolve(__dirname, "src/dashboard/index.html"),
         affiliate: resolve(__dirname, "src/affiliate/index.html"),
         post: resolve(__dirname, "src/post/index.html"),
+        checkout: resolve(__dirname, "src/checkout/index.html"),
         casino: resolve(__dirname, "src/casino/index.html"),
         mines: resolve(__dirname, "src/casino/mines/index.html"),
         dice: resolve(__dirname, "src/casino/dice/index.html"),
