@@ -38,6 +38,12 @@ import { initTransactions, resetTransactions } from './transactions.js';
 // In prod, change this to your actual domain.
 const REGISTER_URL = `${window.location.origin}/src/register/`;
 
+/**
+ * 'manual'   → process_deposit creates the record, redirect to checkout page
+ * 'merchant' → process_deposit creates the record, continue to payment gateway
+ * One-line switch when merchant mode goes live.
+ */
+const PAYMENT_METHOD = 'manual'
 
 
 // ─── STATE - Carousel ──────────────────────────────────────────────────
@@ -1923,15 +1929,34 @@ loadBlogSection = initBlogSection({
       walletBalance: currentWalletBalance,
       userName: `${firstName} ${lastName}`.trim(),
       userId: user.id,
+      onDepositSuccess: handleDepositSuccess, // ← new
     }),
 });
+
+/**
+ * Called by the deposit modal after process_deposit resolves successfully.
+ * @param {string} reference - The GH-DEP-XXXXXXXX reference returned by the RPC.
+ */
+function handleDepositSuccess(reference) {
+  if (PAYMENT_METHOD === 'manual') {
+    // Close the modal first so it doesn't linger behind the new page
+    // (openModal / closeModal pattern — adjust to whatever your modal exposes)
+    window.location.href = `/src/checkout/?ref=${encodeURIComponent(reference)}`
+    return
+  }
+ 
+  // MERCHANT MODE — wire payment gateway redirect here when ready
+  console.warn('[deposit] Merchant mode not yet implemented.')
+  showToast('Merchant mode not yet implemented.', 'warning');
+}
 
 // ─── DEPOSIT / WITHDRAW TRIGGERS ─────────────────────────────────
 depositBtn?.addEventListener('click', () => {
   openModal('deposit', {
-    walletBalance: currentWalletBalance,
-    userName:      `${firstName} ${lastName}`.trim(),
-    userId:        user.id,
+    walletBalance:      currentWalletBalance,
+    userName:           `${firstName} ${lastName}`.trim(),
+    userId:             user.id,
+    onDepositSuccess:   handleDepositSuccess,
   });
 });
 

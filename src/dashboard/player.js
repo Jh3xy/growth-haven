@@ -87,6 +87,12 @@ async function checkAccess(user) {
   return hasAccess;
 }
 
+const gateDepositBtn = document.getElementById("musicGateDepositBtn");
+const depositBtn = document.getElementById("depositBtn");
+gateDepositBtn?.addEventListener('click', () => {
+    depositBtn.click();
+  });
+
 
 // ─── YOUTUBE IFRAME API ───────────────────────────────────────────
 

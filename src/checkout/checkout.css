@@ -65,6 +65,10 @@
   flex-shrink: 0;
 }
 
+.checkout-logo{
+  color: var(--text-primary);
+}
+
 .co-header__wordmark {
   font-size: 0.9rem;
   font-weight: var(--fw-semibold);
@@ -307,6 +311,10 @@
   background: var(--status-error-bg);
   border: var(--border-width) solid var(--status-error-border);
   color: var(--status-error-text);
+}
+
+.co-status-banner[hidden] {
+  display: none;
 }
 
 .co-status-banner.is-success {

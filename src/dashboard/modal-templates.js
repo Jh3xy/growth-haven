@@ -424,6 +424,11 @@ function initDepositHandlers(data) {
 
     if (window.__ghResetTransactions) window.__ghResetTransactions();
 
+    if (typeof data?.onDepositSuccess === "function") {
+      data.onDepositSuccess(result.reference);
+      return;
+    }
+
     swapToReceipt(`
       <div class="modal-receipt">
         <div class="modal-receipt__icon">

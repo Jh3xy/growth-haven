@@ -14,6 +14,8 @@ console.log("[checkout]: Checkout page loaded");
 // ── Constants ─────────────────────────────────────────────────
 const SESSION_MINUTES = 30          // countdown duration
 const URGENT_THRESHOLD_SECONDS = 300 // go red under 5 min
+const EDGE_BASE = import.meta.env.VITE_SUPABASE_URL + "/functions/v1";
+const SUPPORT_TELEGRAM = 'growthhavensupport'
  
 // ── DOM refs ──────────────────────────────────────────────────
 const coCountdown   = document.getElementById('coCountdown')
@@ -23,6 +25,13 @@ const coCopyAmount  = document.getElementById('coCopyAmount')
 const coCopyRef     = document.getElementById('coCopyRef')
 const coStatusBanner = document.getElementById('coStatusBanner')
 const coStatusText   = document.getElementById('coStatusText')
+
+// ── Bank Config ──────────────────────────────────────────────────
+const BANK_DETAILS = {
+  bankName:      'Zenith Bank',    
+  accountNumber: '1234567890',  
+  accountName:   'GrowthHaven Ltd', 
+}
  
 // ── URL param ─────────────────────────────────────────────────
 /**
@@ -109,6 +118,153 @@ export function showStatus(message, isSuccess = false) {
 export function hideStatus() {
   if (coStatusBanner) coStatusBanner.hidden = true
 }
+
+function formatNaira(amount) {
+  return (
+    "₦" +
+    Number(amount).toLocaleString("en-NG", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
+}
+
+function populateFields(txn) {
+  const amount = formatNaira(txn.amount);
+
+  // Header
+  const coRef = document.getElementById("coRef");
+  const coPayChip = document.getElementById("coPayChip");
+  if (coRef) coRef.textContent = txn.reference; // truncated by CSS overflow
+  if (coPayChip) coPayChip.textContent = `Pay ${amount}`;
+
+  // Title
+  const coTitleAmount = document.getElementById("coTitleAmount");
+  const coTitleBank = document.getElementById("coTitleBank");
+  if (coTitleAmount) coTitleAmount.textContent = amount;
+  if (coTitleBank) coTitleBank.textContent = BANK_DETAILS.bankName;
+
+  // Card fields
+  const coBankName = document.getElementById("coBankName");
+  const coAccountNumber = document.getElementById("coAccountNumber");
+  const coAmountDisplay = document.getElementById("coAmountDisplay");
+  const coReference = document.getElementById("coReference");
+  if (coBankName) coBankName.textContent = BANK_DETAILS.bankName;
+  if (coAccountNumber) coAccountNumber.textContent = BANK_DETAILS.accountNumber;
+  if (coAmountDisplay) coAmountDisplay.textContent = amount;
+  if (coReference) coReference.textContent = txn.reference;
+
+  // Enable copy buttons now that there's real data to copy
+  if (coCopyAccount) coCopyAccount.disabled = false;
+  if (coCopyAmount) coCopyAmount.disabled = false;
+  if (coCopyRef) coCopyRef.disabled = false;
+
+  // Enable confirm button
+  if (coConfirmBtn) coConfirmBtn.disabled = false;
+}
+
+
+
+async function loadDeposit() {
+  const { data, error } = await supabase.rpc("get_deposit_by_reference", {
+    p_reference: depositRef,
+  });
+
+  if (error || !data || data.error) {
+    const reason =
+      data?.error ?? error?.message ?? "Unable to load deposit details.";
+    showStatus(reason, false);
+    // Leave skeletons in place so the page doesn't look broken —
+    // the banner makes the situation clear.
+    return;
+  }
+
+  // Guard: don't let a completed/failed deposit be re-submitted
+  if (data.status === "completed") {
+    showStatus(
+      "This deposit has already been approved and your wallet credited.",
+      true,
+    );
+    return;
+  }
+
+  if (data.status === "failed" || data.status === "reversed") {
+    showStatus(
+      "This deposit was rejected. Please start a new deposit from your dashboard.",
+      false,
+    );
+    return;
+  }
+
+  // status === 'pending' — good to go
+  populateFields(data);
+}
+
+// ─────────────────────────────────────────────────────────────
+// ADDITION 3 — Confirm button handler
+// INSERT: after the bindCopyButtons() function block,
+//         before the guardRef() function
+// ─────────────────────────────────────────────────────────────
+
+function bindConfirmButton() {
+  if (!coConfirmBtn) return;
+
+  coConfirmBtn.addEventListener("click", async () => {
+    coConfirmBtn.disabled = true;
+    coConfirmBtn.classList.add("is-loading");
+    coConfirmBtn.textContent = "Submitting…";
+    hideStatus();
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await fetch(`${EDGE_BASE}/notify-deposit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reference: depositRef }),
+      });
+
+      const result = await res.json().catch(() => ({}));
+
+      if (!res.ok || result?.error) {
+        throw new Error(result?.error ?? `Server error (${res.status})`);
+      }
+
+      // Success — payment submitted, waiting for admin
+      coConfirmBtn.classList.remove("is-loading");
+      coConfirmBtn.textContent = "Payment Submitted ✓";
+      showStatus(
+        "We have been notified. An admin will verify your transfer shortly and credit your wallet.",
+        true,
+      );
+      // Read the formatted amount already in the DOM
+      const submittedAmount = document.getElementById('coAmountDisplay')?.textContent?.trim() ?? ''
+ 
+      setTimeout(() => {
+        const message = encodeURIComponent(
+          `Hello GrowthHaven, I have completed a deposit of ${submittedAmount} to ${BANK_DETAILS.bankName} — Account: ${BANK_DETAILS.accountNumber}. Reference: ${depositRef}. Please kindly verify my payment and credit my wallet. Thank you.`
+        )
+
+        window.open(`https://t.me/${SUPPORT_TELEGRAM}?text=${message}`, '_blank')
+      }, 3000)
+
+    } catch (err) {
+      console.error("[checkout] notify-deposit failed:", err);
+      coConfirmBtn.disabled = false;
+      coConfirmBtn.classList.remove("is-loading");
+      coConfirmBtn.textContent = "I've Sent the Money";
+      showStatus(
+        "Could not notify our team. Please contact support with your reference: " +
+          depositRef,
+        false,
+      );
+    }
+  });
+}
  
 // ── Copy buttons ──────────────────────────────────────────────
 // Each button reads the live text from its corresponding field
@@ -184,10 +340,8 @@ async function init() {
   lucide.createIcons()
   startCountdown()
   bindCopyButtons()
- 
-  // Deposit flow will call its own init function from here.
-  // It will populate fields, enable copy buttons, and wire
-  // up the confirm button once the transaction is verified.
+  bindConfirmButton();
+  await loadDeposit();
 }
  
 init()
