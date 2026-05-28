@@ -72,6 +72,32 @@ function wireChips(inputId) {
   });
 }
 
+async function checkWithdrawalLock(userId) {
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("created_at")
+    .eq("user_id", userId)
+    .eq("type", "deposit")
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // No completed deposit on record — not locked, nothing to guard
+  if (error || !data) return { locked: false };
+
+  const elapsed = Date.now() - new Date(data.created_at).getTime();
+  const LOCK_PERIOD = 24 * 60 * 60 * 1000; // 24 hours in ms
+
+  if (elapsed >= LOCK_PERIOD) return { locked: false };
+
+  const remaining = LOCK_PERIOD - elapsed;
+  const hours = Math.floor(remaining / (1000 * 60 * 60));
+  const minutes = Math.ceil((remaining % (1000 * 60 * 60)) / (1000 * 60));
+
+  return { locked: true, hours, minutes };
+}
+
 // ─── RECEIPT SWAP ─────────────────────────────────────────────────
 
 function swapToReceipt(receiptHTML) {
@@ -112,10 +138,9 @@ async function writeTransaction({ userId, type, label, amount }) {
  */
 
 export const MODAL_TEMPLATES = {
-
   // ── DEPOSIT ──────────────────────────────────────────────────
   deposit: (data) => ({
-    title: 'Deposit Funds',
+    title: "Deposit Funds",
     body: `
       <p class="modal-balance-hint">
         Wallet balance: <span>${formatNaira(data.walletBalance ?? 0)}</span>
@@ -134,7 +159,7 @@ export const MODAL_TEMPLATES = {
         <span class="modal-field-error" id="modalDepositError"></span>
       </div>
           
-      ${renderChips('modalDepositAmount')}
+      ${renderChips("modalDepositAmount")}
 
       <button class="modal-submit-btn" id="modalDepositBtn" type="button">
         Proceed to Payment
@@ -145,8 +170,23 @@ export const MODAL_TEMPLATES = {
 
   // ── WITHDRAWAL ───────────────────────────────────────────────
   withdrawal: (data) => ({
-    title: 'Withdraw Funds',
+    title: "Withdraw Funds",
     body: `
+      <div class="modal-withdraw-lock" id="modalWithdrawLock" hidden>
+        <div class="modal-withdraw-lock__icon">
+          <i data-lucide="lock" style="width:14px;height:14px;"></i>
+        </div>
+        <div class="modal-withdraw-lock__content">
+          <p class="modal-withdraw-lock__title">Withdrawal Temporarily Unavailable</p>
+          <p class="modal-withdraw-lock__sub">
+            Your most recent deposit is within its 24-hour security hold period. 
+            This is a standard measure to protect your funds. 
+            Withdrawals will be available in 
+            <strong id="withdrawUnlockTime">--h --m</strong>.
+          </p>
+        </div>
+      </div>
+
       <p class="modal-balance-hint">
         Available: <span>${formatNaira(data.walletBalance ?? 0)}</span>
       </p>
@@ -164,7 +204,7 @@ export const MODAL_TEMPLATES = {
         <span class="modal-field-error" id="modalWithdrawError"></span>
       </div>
 
-      ${renderChips('modalWithdrawAmount')}
+      ${renderChips("modalWithdrawAmount")}
 
       <div class="modal-field">
         <label class="modal-label" for="modalWithdrawBank">Bank Name</label>
@@ -223,8 +263,8 @@ export const MODAL_TEMPLATES = {
       "referral_bonus",
       "vault_maturity",
     ].includes(txn.type);
-    const sign    = isIn ? '+' : '-';
-    const status  = txn.status || 'completed';
+    const sign = isIn ? "+" : "-";
+    const status = txn.status || "completed";
 
     const ICON_MAP = {
       deposit: "arrow-down-to-line",
@@ -240,13 +280,14 @@ export const MODAL_TEMPLATES = {
       vault_maturity: "lock-open",
     };
 
-    const icon = ICON_MAP[txn.type] || 'bell-dot';
+    const icon = ICON_MAP[txn.type] || "bell-dot";
 
-    const statusClass = {
-      completed: 'txn-row__status--completed',
-      pending:   'txn-row__status--pending',
-      failed:    'txn-row__status--failed',
-    }[status] || 'txn-row__status--completed';
+    const statusClass =
+      {
+        completed: "txn-row__status--completed",
+        pending: "txn-row__status--pending",
+        failed: "txn-row__status--failed",
+      }[status] || "txn-row__status--completed";
 
     return {
       title: "Transaction Detail",
@@ -318,7 +359,7 @@ export const MODAL_TEMPLATES = {
 
   // ── CHANGE PASSWORD ───────────────────────────────────────────
   change_password: () => ({
-    title: 'Change Password',
+    title: "Change Password",
     body: `
       <div class="modal-field">
         <label class="modal-label" for="modalCurrentPw">Current Password</label>
@@ -461,69 +502,130 @@ function initDepositHandlers(data) {
 
 // ── Withdrawal ───────────────────────────────────────────────────
 
-function initWithdrawHandlers(data) {
-  wireChips('modalWithdrawAmount');
+async function initWithdrawHandlers(data) {
+  wireChips("modalWithdrawAmount");
 
-  const btn       = document.getElementById('modalWithdrawBtn');
-  const amountEl  = document.getElementById('modalWithdrawAmount');
-  const bankEl    = document.getElementById('modalWithdrawBank');
-  const accNumEl  = document.getElementById('modalWithdrawAccNum');
-  const accNameEl = document.getElementById('modalWithdrawAccName');
-  const errorEl   = document.getElementById('modalWithdrawError');
+  // ── 24-hour deposit lock check ──────────────────────────────
+  const lock = await checkWithdrawalLock(data.userId);
+
+  if (lock.locked) {
+    const lockEl = document.getElementById("modalWithdrawLock");
+    const timeEl = document.getElementById("withdrawUnlockTime");
+
+    if (lockEl) {
+      lockEl.removeAttribute("hidden");
+      lockEl.style.display = "flex";
+    }
+    if (timeEl)
+      timeEl.textContent = `${lock.hours}h ${lock.minutes}m`;
+
+    // Disable all inputs and the chips
+    [
+      "modalWithdrawAmount",
+      "modalWithdrawBank",
+      "modalWithdrawAccNum",
+      "modalWithdrawAccName",
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = true;
+    });
+    document
+      .querySelectorAll("#modalChips .modal-chip")
+      .forEach((c) => (c.disabled = true));
+
+    const btn = document.getElementById("modalWithdrawBtn");
+    if (btn) {
+      btn.disabled = true;
+      // Update button text so it's clear — not just greyed out
+      btn.innerHTML =
+        '<i data-lucide="lock" style="width:16px;height:16px"></i> Withdrawal Locked';
+      if (window.lucide) lucide.createIcons({ nodes: [btn] });
+    }
+
+    return; // Skip wiring event listeners — everything is locked
+  }
+
+  const btn = document.getElementById("modalWithdrawBtn");
+  const amountEl = document.getElementById("modalWithdrawAmount");
+  const bankEl = document.getElementById("modalWithdrawBank");
+  const accNumEl = document.getElementById("modalWithdrawAccNum");
+  const accNameEl = document.getElementById("modalWithdrawAccName");
+  const errorEl = document.getElementById("modalWithdrawError");
 
   // Clear amount error on input
-  amountEl?.addEventListener('input', () => {
-    amountEl.classList.remove('is-error');
-    if (errorEl) errorEl.textContent = '';
+  amountEl?.addEventListener("input", () => {
+    amountEl.classList.remove("is-error");
+    if (errorEl) errorEl.textContent = "";
   });
 
   // Account number: digits only
-  accNumEl?.addEventListener('input', () => {
-    accNumEl.value = accNumEl.value.replace(/\D/g, '').slice(0, 10);
+  accNumEl?.addEventListener("input", () => {
+    accNumEl.value = accNumEl.value.replace(/\D/g, "").slice(0, 10);
   });
 
-  btn?.addEventListener('click', async () => {
-  const amount  = parseFloat(amountEl.value);
-  const bank    = bankEl.value.trim();
-  const accNum  = accNumEl.value.trim();
-  const accName = accNameEl.value.trim();
+  btn?.addEventListener("click", async () => {
+    const amount = parseFloat(amountEl.value);
+    const bank = bankEl.value.trim();
+    const accNum = accNumEl.value.trim();
+    const accName = accNameEl.value.trim();
 
-  // Client-side validation first (UX only — server re-validates)
-  if (!amountEl.value || isNaN(amount)) {
-    showFieldError(amountEl, errorEl, 'Please enter an amount.');
-    return;
-  }
-  if (amount < MIN_WITHDRAWAL) {
-    showFieldError(amountEl, errorEl, `Minimum withdrawal is ${formatNaira(MIN_WITHDRAWAL)}.`);
-    return;
-  }
-  if (!bank)              { bankEl.classList.add('is-error');   bankEl.focus();   return; }
-  if (accNum.length !== 10) { accNumEl.classList.add('is-error'); accNumEl.focus(); return; }
-  if (!accName)           { accNameEl.classList.add('is-error'); accNameEl.focus(); return; }
+    // Client-side validation first (UX only — server re-validates)
+    if (!amountEl.value || isNaN(amount)) {
+      showFieldError(amountEl, errorEl, "Please enter an amount.");
+      return;
+    }
+    if (amount < MIN_WITHDRAWAL) {
+      showFieldError(
+        amountEl,
+        errorEl,
+        `Minimum withdrawal is ${formatNaira(MIN_WITHDRAWAL)}.`,
+      );
+      return;
+    }
+    if (!bank) {
+      bankEl.classList.add("is-error");
+      bankEl.focus();
+      return;
+    }
+    if (accNum.length !== 10) {
+      accNumEl.classList.add("is-error");
+      accNumEl.focus();
+      return;
+    }
+    if (!accName) {
+      accNameEl.classList.add("is-error");
+      accNameEl.focus();
+      return;
+    }
 
-  btn.disabled    = true;
-  btn.textContent = 'Submitting...';
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
 
-  const { data: result, error } = await supabase.rpc('process_withdrawal', {
-    p_amount:     amount,
-    p_bank:       bank,
-    p_acc_number: accNum,
-    p_acc_name:   accName,
-  });
+    const { data: result, error } = await supabase.rpc("process_withdrawal", {
+      p_amount: amount,
+      p_bank: bank,
+      p_acc_number: accNum,
+      p_acc_name: accName,
+    });
 
-  if (error || result?.error) {
-    btn.disabled    = false;
-    btn.textContent = 'Request Withdrawal';
-    showFieldError(amountEl, errorEl, result?.error || 'Something went wrong. Try again.');
-    return;
-  }
+    if (error || result?.error) {
+      btn.disabled = false;
+      btn.textContent = "Request Withdrawal";
+      showFieldError(
+        amountEl,
+        errorEl,
+        result?.error || "Something went wrong. Try again.",
+      );
+      return;
+    }
 
-  if (window.__ghResetTransactions) window.__ghResetTransactions();
+    if (window.__ghResetTransactions) window.__ghResetTransactions();
 
-  // Update wallet balance in home card without reload
-  if (window.__ghUpdateWalletBalance) window.__ghUpdateWalletBalance(result.remaining_balance);
+    // Update wallet balance in home card without reload
+    if (window.__ghUpdateWalletBalance)
+      window.__ghUpdateWalletBalance(result.remaining_balance);
 
-  swapToReceipt(`
+    swapToReceipt(`
     <div class="modal-receipt">
       <div class="modal-receipt__icon">
         <i data-lucide="check"></i>
@@ -560,7 +662,7 @@ function initWithdrawHandlers(data) {
       <button class="modal-done-btn" id="modalDoneBtn" type="button">Done</button>
     </div>
   `);
-});
+  });
 }
 
 
