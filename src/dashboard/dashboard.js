@@ -43,10 +43,10 @@ const REGISTER_URL = `${window.location.origin}/src/register/`;
  * 'merchant' → process_deposit creates the record, continue to payment gateway
  * One-line switch when merchant mode goes live.
  */
-const PAYMENT_METHOD = 'manual'
+const PAYMENT_METHOD = "manual";
 
 
-// ─── STATE - Carousel ──────────────────────────────────────────────────
+// ─── STATE - Carousel ──────────────────────────────────────────────~────
 
 // Start loading timer immediately
 const networkTimer = setTimeout(() => {
@@ -973,7 +973,7 @@ refreshFeedBtn?.addEventListener("click", async () => {
   //  Enter Loading State
   refreshFeedBtn.disabled = true;
   
-  // Inject your skeleton (Add 2-3 for a better look)
+  // Inject your skeleton (3 for a better look)
   feedEl.innerHTML = `
     <article class="blog-post blog-post--skeleton" aria-hidden="true">
       <div class="blog-post__topline">
@@ -1939,13 +1939,12 @@ loadBlogSection = initBlogSection({
  */
 function handleDepositSuccess(reference) {
   if (PAYMENT_METHOD === 'manual') {
-    // Close the modal first so it doesn't linger behind the new page
-    // (openModal / closeModal pattern — adjust to whatever your modal exposes)
+    // Close the modal and pass the refernce to the checkout page
     window.location.href = `/src/checkout/?ref=${encodeURIComponent(reference)}`
-    return
+    return;
   }
  
-  // MERCHANT MODE — wire payment gateway redirect here when ready
+  //! MERCHANT MODE — wire payment gateway redirect here when ready
   console.warn('[deposit] Merchant mode not yet implemented.')
   showToast('Merchant mode not yet implemented.', 'warning');
 }

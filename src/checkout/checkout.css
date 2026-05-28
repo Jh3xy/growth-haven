@@ -55,6 +55,7 @@
   padding: 14px 20px;
   border-bottom: var(--border-width) solid var(--border-subtle);
   gap: 12px;
+  margin-bottom: 1rem;
 }
 
 .co-header__logo {
@@ -103,6 +104,7 @@
 
 /* ── Body ────────────────────────────────────────────────────── */
 .co-body {
+  margin-top: 1rem;
   padding: 24px 20px 20px;
   display: flex;
   flex-direction: column;
@@ -250,6 +252,7 @@
 }
 
 .co-countdown {
+  font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
   color: var(--status-warning-text);
   font-variant-numeric: tabular-nums;

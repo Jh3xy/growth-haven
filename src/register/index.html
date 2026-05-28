@@ -117,12 +117,14 @@
              <!-- Invite Code field -->
             <div class="form-field">
               <label class="form-label" for="inviteCode">Invite Code</label>
+              <!-- Disable by default so it can only be changed by the IIFE -->
               <div class="form-input-wrap">
                 <input class="form-field__input form-input--pw" id="inviteCode" type="text"
-                       placeholder="ADMIN" value="ADMIN" autocomplete="" />
+                       placeholder="ADMIN" value="ADMIN" autocomplete="" disabled=""/>
               </div>
               <span class="field-error" id="err-pwConfirm"></span>
             </div>
+            <!-- Promoter pass with the given code -->
             <div class="secret-code-box hidden">
               <div class="form-field">
                 <label class="form-label" for="portal-code">Portal Code</label>

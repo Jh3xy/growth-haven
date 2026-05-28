@@ -246,11 +246,11 @@ function bindConfirmButton() {
  
       setTimeout(() => {
         const message = encodeURIComponent(
-          `Hello GrowthHaven, I have completed a deposit of ${submittedAmount} to ${BANK_DETAILS.bankName} — Account: ${BANK_DETAILS.accountNumber}. Reference: ${depositRef}. Please kindly verify my payment and credit my wallet. Thank you.`
+          `Hello GrowthHaven Support, I have completed a deposit of ${submittedAmount} to ${BANK_DETAILS.bankName} — Account: ${BANK_DETAILS.accountNumber}. Reference: ${depositRef}. Please kindly verify my payment and credit my wallet. Thank you.`
         )
 
         window.open(`https://t.me/${SUPPORT_TELEGRAM}?text=${message}`, '_blank')
-      }, 3000)
+      }, 500)
 
     } catch (err) {
       console.error("[checkout] notify-deposit failed:", err);
