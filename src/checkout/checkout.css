@@ -33,6 +33,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  margin-top: 3rem;
   /* On very small screens it fills the viewport width */
 }
 
@@ -55,7 +56,6 @@
   padding: 14px 20px;
   border-bottom: var(--border-width) solid var(--border-subtle);
   gap: 12px;
-  margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
