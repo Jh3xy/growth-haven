@@ -1,10 +1,33 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===================== SEO ===================== -->
   <title>GrowthHaven | The Creator Ecosystem</title>
+  <meta name="description" content="GrowthHaven is the first of it's kind. The Nigeria's creator ecosystem where your content, network, and time earn real rewards. Write, stream, refer, play Arcade games, complete Quests — and grow your wallet, or share with others." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://growthhaven.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://growthhaven.app/" />
+  <meta property="og:title" content="GrowthHaven | The Creator Ecosystem" />
+  <meta property="og:description" content="Nigeria's first creator ecosystem. Write posts, stream music, refer friends, play Arcade games, and complete Quests — every action earns real rewards. Grow your wallet, or share with others." />
+  <meta property="og:site_name" content="GrowthHaven" />
+  <meta property="og:image" content="https://growthhaven.app/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GrowthHaven | The Creator Ecosystem" />
+  <meta name="twitter:description" content="Write, stream, refer, play, and quest your way to real rewards. Join 400+ members on GrowthHaven — free, always." />
+  <meta name="twitter:image" content="https://growthhaven.app/og-image.png" />
+
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 160 160'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M68 20 21 47c-6 4-5 2-5 38l1 33 31 20c6 2 6 2 20-6l13-7 14 7c11 7 12 8 15 7l14-7c14-8 14-8 14-25 0-15-1-18-5-20h-3l-8-5-4-3h1l-4-2c-6-3-6-4-6-20 0-14 0-16-3-19h-1v1l-11-8 2 1-23-12zm-4 4-15 9-28 16 35-21zm16 27 1 15c0 15 0 18 4 19q1 3 12-4c11-7 12-7 12 9s0 16-7 21l-6 3-2 2-10 5c-3 0-3-2-3-17q0-6-2-7c-3-3-5-3-17 4s-13 8-14 7l-2-1c-2 0-2-2-2-21l1-18 2-1 3-2 21-13q6-3 9-1M70 99l-7 5-9 5-2 1zm34 14-14 8zM122 81l9 5z'/%3E%3C/g%3E%3C/svg%3E">
+
   <script src="https://unpkg.com/lucide@latest"></script>
   <script type="module" src="./src/assets/js/script.js"></script>
 </head>
@@ -26,10 +49,10 @@
       </a>
 
       <nav class="nav__links" aria-label="Main navigation">
-        <a href="#features" class="nav__link">Features</a>
-        <a href="#how-it-works" class="nav__link">How It Works</a>
-        <a href="#community" class="nav__link">Community</a>
-        <a href="#waitlist" class="nav__link">Waitlist</a>
+        <a href="#features"      class="nav__link">Features</a>
+        <a href="#how-it-works"  class="nav__link">How It Works</a>
+        <a href="#community"     class="nav__link">Community</a>
+        <a href="#join"          class="nav__link">Join</a>
       </nav>
 
       <div class="nav__actions">
@@ -40,7 +63,6 @@
         <button class="dash-theme-toggle flex items-center gap-2" type="button" data-theme-toggle>
           <i data-lucide="sun-moon" style="width:14px;height:14px"></i>
         </button>
-
         <button class="nav__hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false">
           <i data-lucide="menu"></i>
         </button>
@@ -51,12 +73,12 @@
     <!-- Mobile drawer -->
     <div class="nav__drawer" id="navDrawer" aria-hidden="true">
       <div class="nav__drawer-inner">
-        <a href="#features"     class="nav__drawer-link">Features</a>
-        <a href="#how-it-works" class="nav__drawer-link">How It Works</a>
-        <a href="#community"    class="nav__drawer-link">Community</a>
-        <a href="#waitlist"     class="nav__drawer-link">Waitlist</a>
-        <a href="/src/login/"     class="cta-btn-secondary cta-btn nav__drawer-cta-alt">Login</a>
-        <a href="/src/register/"     class="cta-btn nav__drawer-cta">Join The Haven — For Free</a>
+        <a href="#features"      class="nav__drawer-link">Features</a>
+        <a href="#how-it-works"  class="nav__drawer-link">How It Works</a>
+        <a href="#community"     class="nav__drawer-link">Community</a>
+        <a href="#join"          class="nav__drawer-link">Join</a>
+        <a href="/src/login/"    class="cta-btn-secondary cta-btn nav__drawer-cta-alt">Login</a>
+        <a href="/src/register/" class="cta-btn nav__drawer-cta">Join The Haven — For Free</a>
       </div>
     </div>
   </header>
@@ -67,31 +89,21 @@
   ===================== -->
   <section class="hero">
 
-    <!-- Decorative blobs -->
     <div class="deco-blob deco-blob--hero-left"  aria-hidden="true"></div>
     <div class="deco-blob deco-blob--hero-right" aria-hidden="true"></div>
 
     <div class="hero__inner">
 
-      <!-- Badge -->
-      <!-- <div class="badge-pill hero__badge flex items-center gap-2">
-        <span class="badge-pill__dot"></span>
-        <span class="badge-pill__label uppercase">Coming Q4 2025</span>
-      </div> -->
-
-      <!-- Headline -->
       <h1 class="hero__heading">
         Your Content,<br>
-         Community,<br>
+        Community,<br>
         <span class="hero__accent italic">Real Growth.</span>
       </h1>
 
-      <!-- Sub -->
       <p class="hero__body">
-        GrowthHaven is the first ecosystem where your value and engagement counts — from content creation to community-powered games & rewards. You choose the field; we build the soil.
+        GrowthHaven is the first ecosystem where your value and engagement counts — from content creation to community-powered games &amp; rewards. You choose the field; we build the soil.
       </p>
 
-      <!-- CTAs -->
       <div class="hero__ctas">
         <a href="/src/register/" class="cta-btn hero__cta-primary flex-center gap-2">
           Join The Haven — For Free
@@ -105,12 +117,11 @@
         </a>
       </div>
 
-      <!-- Social proof -->
       <div class="social-proof hero__social flex items-center gap-4">
         <div class="avatar-stack flex">
-          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-01.png" alt="Early member 1" />
-          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="Early member 2" />
-          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="Early member 3" />
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-01.png" alt="" />
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="" />
+          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="" />
         </div>
         <p class="social-proof__text italic">Joining 400+ early members.</p>
       </div>
@@ -126,25 +137,21 @@
     <div class="stats__inner">
       <div class="stats__item">
         <span class="stats__value">400+</span>
-        <span class="stats__label">Early Members</span>
+        <span class="stats__label">Members</span>
       </div>
       <div class="stats__divider" aria-hidden="true"></div>
       <div class="stats__item">
-        <span class="stats__value">5+</span>
-        <span class="stats__label">Growth Environments</span>
+        <span class="stats__value">6</span>
+        <span class="stats__label">Live Features</span>
       </div>
       <div class="stats__divider" aria-hidden="true"></div>
       <div class="stats__item">
         <span class="stats__value">₦0</span>
         <span class="stats__label">Platform Fees</span>
       </div>
-      <div class="stats__divider" aria-hidden="true"></div>
-      <!-- <div class="stats__item">
-        <span class="stats__value">CAC</span>
-        <span class="stats__label">Certified</span>
-      </div> -->
     </div>
   </section>
+
 
   <!-- =====================
        TESTIMONIALS
@@ -165,10 +172,10 @@
       <div class="testi-track" id="testiTrack">
 
         <div class="testi-card">
-          <div class="testi-card__stars">★★★★</div>
-          <p class="testi-card__quote">"Finally, a platform that doesn't try to tell me what to do with my time and then call it 'flexibility'. With GrowthHaven, they let you be creative without unlimited "restrictions". I actually control my Creator Hub and my referrals. It feels like real ownership."</p>
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"Finally, a platform that doesn't tell me what to do with my time and call it 'flexibility'. With GrowthHaven, I actually control my Creator Hub and my referrals. It feels like real ownership."</p>
           <div class="testi-card__author">
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="Early member 3" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="" />
             <div>
               <div class="testi-card__name">Adeola O.</div>
               <div class="testi-card__role">Early Member · Lagos</div>
@@ -178,9 +185,9 @@
 
         <div class="testi-card">
           <div class="testi-card__stars">★★★★★</div>
-          <p class="testi-card__quote">"The referral system is actually straightforward. I brought in four people and I could clearly see exactly how much I earned from each one. No confusing or vague 'bonuses' — just clear numbers. I like that."</p>
+          <p class="testi-card__quote">"The referral system is actually straightforward. I brought in four people and could see exactly how much I earned from each one. No confusing bonuses — just clear numbers. I like that."</p>
           <div class="testi-card__author">
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-05.png" alt="Early member 3" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-05.png" alt="" />
             <div>
               <div class="testi-card__name">Emeka K.</div>
               <div class="testi-card__role">Early Member · Abuja</div>
@@ -190,11 +197,11 @@
 
         <div class="testi-card">
           <div class="testi-card__stars">★★★★★</div>
-          <p class="testi-card__quote">"Most social platforms give back very little. GrowthHaven is different — it actually shows you what time you put in is actually doing and lets you decide where it goes. That level of transparency is honestly rare."</p>
+          <p class="testi-card__quote">"Most social platforms give back very little. GrowthHaven actually shows what your time is doing and lets you decide where it goes. That level of transparency is honestly rare."</p>
           <div class="testi-card__author">
-          <img class="avatar-stack__img object-cover" src="/assets/other/avatar-07.png" alt="Early member 3" />
-          <div>
-            <div class="testi-card__name">Fatima N.</div>
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-07.png" alt="" />
+            <div>
+              <div class="testi-card__name">Fatima N.</div>
               <div class="testi-card__role">Promoter Partner · Kano</div>
             </div>
           </div>
@@ -202,9 +209,9 @@
 
         <div class="testi-card">
           <div class="testi-card__stars">★★★★★</div>
-          <p class="testi-card__quote">"I was skeptical at first, but the beta dashboard won me over. Watching my Creator Hub grow in real time and seeing my referral count ticking up… it’s clean, smooth, and it just works."</p>
+          <p class="testi-card__quote">"I was skeptical at first, but the beta dashboard won me over. Watching my Creator Hub grow in real time and seeing my referral count ticking up — it's clean, smooth, and it just works."</p>
           <div class="testi-card__author">
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="Early member 3" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="" />
             <div>
               <div class="testi-card__name">Tunde O.</div>
               <div class="testi-card__role">Early Member · Port Harcourt</div>
@@ -214,9 +221,9 @@
 
         <div class="testi-card">
           <div class="testi-card__stars">★★★★</div>
-          <p class="testi-card__quote">"The community rewards model feels genuinely different. You’re not just another user ID to them. Your activity actually matters, and you can see the returns directly. That’s refreshing."</p>
+          <p class="testi-card__quote">"The community rewards model feels genuinely different. You're not just another user ID to them. Your activity actually matters, and you can see the returns directly. That's refreshing."</p>
           <div class="testi-card__author">
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-04.png" alt="Early member 3" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-04.png" alt="" />
             <div>
               <div class="testi-card__name">Chioma I.</div>
               <div class="testi-card__role">Early Member · Enugu</div>
@@ -226,9 +233,9 @@
 
         <div class="testi-card">
           <div class="testi-card__stars">★★★★★</div>
-          <p class="testi-card__quote">"Just signed up and got my referral code in seconds. The interface is sharp — not too flashy, not messy. It feels exactly how it should when you’re trusting something with your time."</p>
+          <p class="testi-card__quote">"Just signed up and got my referral code in seconds. The interface is sharp — not too flashy, not messy. It feels exactly how it should when you're trusting something with your time."</p>
           <div class="testi-card__author">
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-09.png" alt="Early member 3" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-09.png" alt="" />
             <div>
               <div class="testi-card__name">Mohammed B.</div>
               <div class="testi-card__role">Promoter Partner · Kaduna</div>
@@ -236,9 +243,81 @@
           </div>
         </div>
 
+        <!-- Duplicate set for seamless infinite loop -->
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"Finally, a platform that doesn't tell me what to do with my time and call it 'flexibility'. With GrowthHaven, I actually control my Creator Hub and my referrals. It feels like real ownership."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="" />
+            <div>
+              <div class="testi-card__name">Adeola O.</div>
+              <div class="testi-card__role">Early Member · Lagos</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"The referral system is actually straightforward. I brought in four people and could see exactly how much I earned from each one. No confusing bonuses — just clear numbers. I like that."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-05.png" alt="" />
+            <div>
+              <div class="testi-card__name">Emeka K.</div>
+              <div class="testi-card__role">Early Member · Abuja</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testi-card">
+          <div class="testi-card__stars">★★★★★</div>
+          <p class="testi-card__quote">"Most social platforms give back very little. GrowthHaven actually shows what your time is doing and lets you decide where it goes. That level of transparency is honestly rare."</p>
+          <div class="testi-card__author">
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-07.png" alt="" />
+            <div>
+              <div class="testi-card__name">Fatima N.</div>
+              <div class="testi-card__role">Promoter Partner · Kano</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
+
+
+  <!-- =====================
+       COMMUNITY PHOTO STRIP
+       Place your 6–8 community/creator photos below.
+       Duplicate the full set once for seamless CSS loop.
+       Recommended: 800×600px JPG, <200KB each.
+       Store in: /assets/community/
+  ===================== -->
+  <section class="community-strip" aria-hidden="true">
+    <div class="community-strip__track">
+
+      <!-- SET 1 — replace src paths with your images -->
+      <img src="/assets/community/photo-1.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-2.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-3.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-4.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-5.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-6.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-7.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-8.jpg" alt="" class="community-strip__img" />
+
+      <!-- SET 2 — exact duplicate for seamless loop (do not remove) -->
+      <img src="/assets/community/photo-5.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-2.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-1.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-3.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-4.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-6.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-7.jpg" alt="" class="community-strip__img" />
+      <img src="/assets/community/photo-8.jpg" alt="" class="community-strip__img" />
+
+    </div>
+  </section>
+
 
   <!-- =====================
        FEATURES
@@ -254,86 +333,308 @@
       </div>
 
       <h2 class="section-heading" id="features-heading">
-        Four ways your Rewards grows.
+        Six ways your rewards grow.
       </h2>
       <p class="section-sub">
-        Most platforms give you one option and call it a strategy. GrowthHaven gives you four distinct environments — pick one, pick all, or let the platform balance them for you.
+        Most platforms give you one option and call it a strategy. GrowthHaven gives you six distinct environments — pick one, pick all, or let the platform balance them for you.
       </p>
 
       <div class="features__grid">
 
-        <article class="feature-card feature-card--vault">
+        <!-- 1 — CREATOR HUB -->
+        <article class="feature-card">
           <div class="feature-card__icon">
-            <i data-lucide="share-2"></i>
+            <i data-lucide="link"></i>
           </div>
-          <div class="feature-card__tag">Connect</div>
+          <div class="feature-card__tag">Manage</div>
           <h3 class="feature-card__title">The Creator Hub</h3>
           <p class="feature-card__body">
-            A personal space to manage your content goals and track your community impact. Your growth, organized.
+            Your personal command center. Track your goals, maintain progress, monitor referral activity, manage your profile, and see every transaction — organized, real-time, always yours.
           </p>
           <div class="feature-card__status">
-            <span class="feature-status-pill feature-status-pill--live">MVP Ready</span>
+            <span class="feature-status-pill feature-status-pill--live">Live</span>
           </div>
         </article>
 
-        <article class="feature-card feature-card--vault">
+        <!-- 2 — WRITER'S CIRCLE -->
+        <article class="feature-card">
           <div class="feature-card__icon">
-            <i data-lucide="bookmark-check"></i>
+            <i data-lucide="pen-line"></i>
           </div>
-          <div class="feature-card__tag">Read</div>
-          <h3 class="feature-card__title">The Haven Library</h3>
-          <p class="feature-card__body">
-            Read, review, share corrections and earn. Share insightful book reviews and earn rewards based on the quality of your community contributions.
-          </p>
-          <div class="feature-card__status">
-            <span class="feature-status-pill feature-status-pill--live">MVP Ready</span>
-          </div>
-        </article>
-
-        <article class="feature-card feature-card--market">
-          <div class="feature-card__icon">
-            <i data-lucide="trending-up"></i>
-          </div>
-          <div class="feature-card__tag">Grow</div>
+          <div class="feature-card__tag">Write</div>
           <h3 class="feature-card__title">The Writer's Circle</h3>
           <p class="feature-card__body">
-            Share your thoughts and get rewarded. Earn ₦200 for every like on your posts, and ₦100 for supporting fellow writers.
+            Share your thoughts, post content, and get rewarded. Earn ₦200 for every like on your posts and ₦100 for supporting fellow writers. Your voice has value here.
           </p>
           <div class="feature-card__status">
-            <span class="feature-status-pill feature-status-pill--live">MVP Ready</span>
+            <span class="feature-status-pill feature-status-pill--live">Live</span>
           </div>
         </article>
 
-        <article class="feature-card feature-card--rewards">
+        <!-- 3 — STREAM & EARN -->
+        <article class="feature-card">
+          <div class="feature-card__icon">
+            <i data-lucide="headphones"></i>
+          </div>
+          <div class="feature-card__tag">Stream</div>
+          <h3 class="feature-card__title">Stream &amp; Earn</h3>
+          <p class="feature-card__body">
+            Stream music from YouTube, Vevo, MTV Base, and Audiomack — and earn rewards for every session. Your playlist is now your paycheck.
+          </p>
+          <div class="feature-card__status">
+            <span class="feature-status-pill feature-status-pill--live">Live</span>
+          </div>
+        </article>
+
+        <!-- 4 — COMMUNITY REWARDS -->
+        <article class="feature-card">
           <div class="feature-card__icon">
             <i data-lucide="users"></i>
           </div>
-          <div class="feature-card__tag">Earn</div>
+          <div class="feature-card__tag">Refer</div>
           <h3 class="feature-card__title">Community Rewards</h3>
           <p class="feature-card__body">
             Tiered referral bonuses that turn your network into an asset. Every person you bring into the Haven earns you a cut — and the more they grow, the more you do too.
           </p>
           <div class="feature-card__status">
-            <span class="feature-status-pill feature-status-pill--live">MVP Ready</span>
+            <span class="feature-status-pill feature-status-pill--live">Live</span>
           </div>
         </article>
 
-        <article class="feature-card feature-card--social">
+        <!-- 5 — THE ARCADE -->
+        <article class="feature-card">
           <div class="feature-card__icon">
-            <i data-lucide="zap"></i>
+            <i data-lucide="gamepad-2"></i>
           </div>
-          <div class="feature-card__tag">Connect</div>
-          <h3 class="feature-card__title">Social Tasks</h3>
+          <div class="feature-card__tag">Play</div>
+          <h3 class="feature-card__title">The Arcade</h3>
           <p class="feature-card__body">
-            Earn rewards from your everyday activity. Follow, share, engage — turn the time you'd spend scrolling into something that actually pays. Community-powered, community-funded.
+            Five community-funded arcade games — Coin Flip, Dice, Limbo, Plinko, and Mines. Fast rounds, sharp mechanics, and a leaderboard that keeps it competitive.
           </p>
           <div class="feature-card__status">
-            <span class="feature-status-pill feature-status-pill--soon">Coming Soon</span>
+            <span class="feature-status-pill feature-status-pill--live">Live</span>
+          </div>
+        </article>
+
+        <!-- 6 — QUESTS -->
+        <article class="feature-card">
+          <div class="feature-card__icon">
+            <i data-lucide="target"></i>
+          </div>
+          <div class="feature-card__tag">Engage</div>
+          <h3 class="feature-card__title">Quests</h3>
+          <p class="feature-card__body">
+            Daily and weekly challenges that reward your everyday activity. Complete quests, stack rewards, and keep your momentum — one task at a time.
+          </p>
+          <div class="feature-card__status">
+            <span class="feature-status-pill feature-status-pill--live">Live</span>
           </div>
         </article>
 
       </div>
     </div>
+  </section>
+
+
+  <!-- =====================
+      STREAM & EARN SPOTLIGHT
+  ===================== -->
+  <section class="stream-spotlight" aria-labelledby="stream-spotlight-heading">
+    <div class="stream-spotlight__inner">
+
+      <!-- Left: copy -->
+      <div class="stream-spotlight__copy">
+
+        <div class="section-label">
+          <span class="badge-pill flex items-center gap-2">
+            <span class="badge-pill__dot"></span>
+            <span class="badge-pill__label uppercase">Stream &amp; Earn</span>
+          </span>
+        </div>
+
+        <h2 class="stream-spotlight__heading" id="stream-spotlight-heading">
+          Your playlist just became a paycheck.
+        </h2>
+
+        <p class="stream-spotlight__body">
+          Stream music from platforms you already use and earn rewards every session — automatically. No extra steps. No extra apps. Just press play.
+        </p>
+
+        <a href="/src/register/" class="stream-spotlight__cta flex items-center gap-2">
+          Start earning from streams
+          <i data-lucide="arrow-right"></i>
+        </a>
+
+      </div>
+
+      <!-- Right: CSS mock "now playing" card — aria-hidden, purely decorative -->
+      <div class="stream-player-mock" aria-hidden="true">
+        <div class="mock-player">
+
+          <div class="mock-player__top">
+            <span class="mock-player__now-playing">Now Playing</span>
+            <span class="mock-player__earning">
+              <!-- <i data-lucide="trending-up"></i> -->
+              +₦500 earned
+            </span>
+          </div>
+
+          <div class="mock-player__track">
+            <div class="mock-player__art">
+              <i data-lucide="music-2"></i>
+            </div>
+            <div class="mock-player__meta">
+              <span class="mock-player__title">Essence</span>
+              <span class="mock-player__artist">Wizkid ft. Tems</span>
+            </div>
+            <button class="mock-player__play" tabindex="-1" aria-hidden="true">
+              <i data-lucide="pause"></i>
+            </button>
+          </div>
+
+          <div class="mock-player__progress-wrap">
+            <div class="mock-player__bar">
+              <div class="mock-player__fill"></div>
+            </div>
+            <div class="mock-player__times">
+              <span>1:42</span>
+              <span>3:57</span>
+            </div>
+          </div>
+
+          <div class="mock-player__source">
+            <!-- Inline YouTube icon — swap for actual brand SVG if desired -->
+            <svg xmlns="http://w3.org" viewBox="0 0 24 24" width="14px" height="14px">
+              <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
+              <path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <span>via YouTube</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Partner logo marquee — full width, below the 2-col grid -->
+    <div class="partner-strip">
+
+      <p class="partner-strip__eyebrow">Partners</p>
+
+      <div class="partner-strip__wrap">
+        <div class="partner-strip__track">
+
+          <!-- ================================================
+              PARTNER LOGOS
+              Currently using text-based styled pills.
+              When you have actual SVG logo files, replace
+              the <span class="partner-logo__name"> inside
+              each .partner-logo with an <img> or inline <svg>.
+              Recommended: monochrome SVG, height 20–24px.
+              Store in: /assets/partners/
+              ================================================ -->
+
+          <!-- SET 1 -->
+          <div class="partner-logo">
+            <svg xmlns="http://w3.org" viewBox="0 0 24 24" width="32px" height="32px">
+              <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"></path>
+              <path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path>
+            </svg>
+            <span class="partner-logo__name">YouTube</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/vevo-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">Vevo</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/mtvbase-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">MTV Base</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/audiomack-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">Audiomack</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <!-- SET 2 — exact duplicate for seamless CSS loop -->
+          <div class="partner-logo">
+            <svg xmlns="http://w3.org" viewBox="0 0 24 24" width="32px" height="32px">
+              <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"></path>
+              <path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path>
+            </svg>
+            <span class="partner-logo__name">YouTube</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/vevo-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">Vevo</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/mtvbase-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">MTV Base</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/audiomack-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">Audiomack</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <!-- SET 3 — third repetition so strip stays full on wide screens -->
+          <div class="partner-logo">
+            <svg xmlns="http://w3.org" viewBox="0 0 24 24" width="32px" height="32px">
+              <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"></path>
+              <path fill="#FFFFFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path>
+            </svg>
+            <span class="partner-logo__name">YouTube</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/vevo-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">Vevo</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/mtvbase-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">MTV Base</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+          <div class="partner-logo">
+            <img src="/assets/partners/audiomack-logo.png" alt="" class="logo-img">
+            <span class="partner-logo__name">Audiomack</span>
+          </div>
+
+          <span class="partner-strip__sep" aria-hidden="true">·</span>
+
+        </div>
+      </div>
+
+    </div>
+
   </section>
 
 
@@ -371,7 +672,7 @@
           <div class="how-step__num">02</div>
           <div class="how-step__icon"><i data-lucide="settings-2"></i></div>
           <h3 class="how-step__title">Choose your environment</h3>
-          <p class="how-step__body">Pick the growth environment that fits your goals — or spread across all four. The Creator's Hub, Library, Writer's Hub, Community Rewards, Social Tasks. Your call.</p>
+          <p class="how-step__body">Pick the growth environment that fits your goals — or go all in across all six. Write, stream, refer, play, quest. Every path earns. Your call.</p>
         </div>
 
         <div class="how__connector" aria-hidden="true">
@@ -382,7 +683,7 @@
           <div class="how-step__num">03</div>
           <div class="how-step__icon"><i data-lucide="sprout"></i></div>
           <h3 class="how-step__title">Watch it grow</h3>
-          <p class="how-step__body">The ecosystem runs. You grow, Your network and influence grows too. Track everything from your dashboard — transparent, real-time, always yours.</p>
+          <p class="how-step__body">The ecosystem runs. You grow, your network and influence grow too. Track everything from your dashboard — transparent, real-time, always yours.</p>
         </div>
 
       </div>
@@ -391,9 +692,11 @@
 
 
   <!-- =====================
-       WAITLIST
+       JOIN THE HAVEN
+       Platform is live — reframed from waitlist to direct CTA.
+       Form still captures phone/WhatsApp for community data.
   ===================== -->
-  <section class="waitlist-section" id="waitlist" aria-labelledby="waitlist-heading">
+  <section class="waitlist-section" id="join" aria-labelledby="join-heading">
     <div class="waitlist-section__inner">
 
       <!-- Left: copy -->
@@ -402,30 +705,30 @@
         <div class="section-label">
           <span class="badge-pill flex items-center gap-2">
             <span class="badge-pill__dot"></span>
-            <span class="badge-pill__label uppercase">Priority Access</span>
+            <span class="badge-pill__label uppercase">Join Free</span>
           </span>
         </div>
 
-        <h2 class="waitlist-section__heading" id="waitlist-heading">
-          Secure your spot.<br>Start for free.
+        <h2 class="waitlist-section__heading" id="join-heading">
+          Join free.<br>Start today.
         </h2>
 
         <p class="waitlist-section__body">
-          The Haven is opening to a limited first wave. Early members get priority onboarding, locked-in referral rates, and first access to the Vault on launch day.
+          GrowthHaven is live and open. Sign up in under a minute — every environment is ready from day one, and your referral code is generated automatically the moment you're in.
         </p>
 
         <ul class="waitlist-perks">
           <li class="waitlist-perk flex items-start gap-3">
             <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
-            <span>Priority dashboard access on launch</span>
+            <span>All six environments, available from day one</span>
           </li>
           <li class="waitlist-perk flex items-start gap-3">
             <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
-            <span>Locked-in early referral bonus tier</span>
+            <span>Referral code generated automatically on signup</span>
           </li>
           <li class="waitlist-perk flex items-start gap-3">
             <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
-            <span>No entry fee. No credit card.</span>
+            <span>No entry fee. No credit card. No gatekeeping.</span>
           </li>
           <li class="waitlist-perk flex items-start gap-3">
             <div class="waitlist-perk__icon"><i data-lucide="check"></i></div>
@@ -436,53 +739,53 @@
         <!-- Social proof -->
         <div class="social-proof flex items-center gap-4">
           <div class="avatar-stack flex">
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-01.png" alt="Early member 1" />
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="Early member 2" />
-            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="Early member 3" />
-          </div>
-          <p class="social-proof__text italic">Joining 400+ early members.</p>
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-01.png" alt="" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-02.png" alt="" />
+            <img class="avatar-stack__img object-cover" src="/assets/other/avatar-03.png" alt="" />
+          </div> 
+          <p class="social-proof__text italic">Joining 400+ members.</p>
         </div>
-
+        <a href="/src/register/" class="cta-btn-alt cta-btn-secondary cta-btn nav__drawer-cta-alt">Join Now</a>
       </div>
 
       <!-- Right: form card -->
-      <div class="waitlist-section__card-wrap">
+      <!-- <div class="waitlist-section__card-wrap">
         <div class="waitlist-card">
 
           <div class="waitlist-card__header">
             <h3 class="waitlist-card__title">Join the Haven</h3>
             <p class="waitlist-card__subtitle">
-              Be the first to access the Vault, earn tiered referral bonuses, and start growing your portfolio.
+              Get in, earn tiered referral bonuses, and start growing from your first login.
             </p>
           </div>
 
           <form class="waitlist-form flex-col gap-6" novalidate>
 
             <div class="form-field flex-col gap-2">
-              <label class="form-field__label uppercase required" for="text">Full Name</label>
-              <input class="form-field__input" id="text" type="text" placeholder="John Doe" autocomplete="text" required />
+              <label class="form-field__label uppercase required" for="wl-name">Full Name</label>
+              <input class="form-field__input" id="wl-name" type="text" placeholder="John Doe" autocomplete="name" required />
             </div>
 
             <div class="form-field flex-col gap-2">
-              <label class="form-field__label uppercase required" for="email">Email Address</label>
-              <input class="form-field__input" id="email" type="email" placeholder="name@institution.com" autocomplete="email" required />
+              <label class="form-field__label uppercase required" for="wl-email">Email Address</label>
+              <input class="form-field__input" id="wl-email" type="email" placeholder="you@example.com" autocomplete="email" required />
             </div>
 
             <div class="form-field flex-col gap-2">
-              <label class="form-field__label uppercase" for="phone">WhatsApp / Phone Number</label>
-              <input class="form-field__input" id="phone" type="tel" placeholder="+234 (00) 000-000" autocomplete="tel" />
+              <label class="form-field__label uppercase" for="wl-phone">WhatsApp / Phone Number</label>
+              <input class="form-field__input" id="wl-phone" type="tel" placeholder="+234 (00) 000-000" autocomplete="tel" />
             </div>
 
             <div class="cta">
               <button class="cta-btn flex-center gap-2" type="submit">
-                Secure My Spot
-                <i data-lucide="calendar-check-2"></i>
+                Join The Haven — For Free
+                <i data-lucide="arrow-right"></i>
               </button>
             </div>
 
           </form>
         </div>
-      </div>
+      </div> -->
 
     </div>
   </section>
@@ -493,7 +796,7 @@
   ===================== -->
   <section class="prefooter" aria-label="Final call to action">
     <div class="prefooter__inner">
-      <h2 class="prefooter__heading">Your Rewards & Points deserves a better source.</h2>
+      <h2 class="prefooter__heading">Your rewards deserve a better source.</h2>
       <p class="prefooter__sub">Join the Haven today — free, fast, and built for growth.</p>
       <div class="prefooter__ctas">
         <a href="/src/register/" class="cta-btn prefooter__btn flex-center gap-2">
@@ -522,14 +825,14 @@
       <div class="site-footer__brand flex items-center gap-4">
         <span class="site-footer__name">GrowthHaven</span>
         <span class="site-footer__copy">
-          &copy; 2025 GrowthHaven. All rights reserved.
+          &copy; 2026 GrowthHaven. All rights reserved.
         </span>
       </div>
 
       <nav class="site-footer__links flex gap-8" aria-label="Footer navigation">
         <a href="/src/privacy/" class="site-footer__link">Security</a>
         <a href="/src/privacy/" class="site-footer__link">Privacy</a>
-        <a href="/src/terms/" class="site-footer__link">Terms</a>
+        <a href="/src/terms/"   class="site-footer__link">Terms</a>
       </nav>
 
     </div>

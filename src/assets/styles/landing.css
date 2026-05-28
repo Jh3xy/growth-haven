@@ -822,10 +822,12 @@ svg.site-header__wordmark {
   z-index: 9999;
   opacity: 1;
   will-change: opacity;
-  backdrop-filter: blur(30px);
-  transform: translateZ(0); /* Force GPU acceleration for better mobile blur support */
-  -webkit-backdrop-filter: blur(30px);
-  -webkit-transform: translateZ(0);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .nav__inner {
@@ -1010,7 +1012,7 @@ svg.site-header__wordmark {
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 9rem 2rem 5rem;
+  padding: 2rem 2rem 5rem;
   background: var(--surface-background);
 }
 
@@ -1066,6 +1068,11 @@ a.cta-btn.hero__tg-link {
   height: unset;
   background-color: transparent;
   border: 1px solid var(--brand-primary);
+}
+
+.cta-btn-alt {
+  height: unset;
+  margin-top: 2rem;
 }
 
 /* Telegram link — text style, blends into design */
@@ -1950,7 +1957,7 @@ a.cta-btn.hero__tg-link {
   }
 
   .hero {
-    padding: 8rem 1.5rem 4rem;
+    padding: 3rem 1.5rem 4rem;
   }
 
   .hero__ctas {
@@ -2059,4 +2066,587 @@ a.cta-btn.hero__tg-link {
     animation: none !important;
   }
 }
+
+.community-strip {
+  padding: 0 0 4rem;
+  overflow: hidden;
+  background: var(--surface-background);
+
+  /* The fade-out mask on left + right edges */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+.community-strip__track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  animation: strip-scroll 44s linear infinite;
+}
+
+/* Pause when the user hovers anywhere on the strip */
+.community-strip__track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes strip-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.community-strip__img {
+  height: 240px;
+  width: auto;
+  object-fit: cover;
+  border-radius: 14px;
+  flex-shrink: 0;
+  display: block;
+  min-width: 280px; /* fallback if an image hasn't loaded yet */
+  background: var(--surface-card-muted); /* placeholder while loading */
+  /* filter: grayscale(0.8) brightness(0.9); */
+  transition: filter 0.4s ease;
+}
+
+.community-strip__img:hover {
+  filter: saturate(1) brightness(1);
+}
+
+/* Mobile: shorter image height to keep proportions */
+@media (max-width: 768px) {
+  .community-strip {
+    padding-bottom: 3rem;
+  }
+
+  .community-strip__img {
+    height: 180px;
+    min-width: 220px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 540px) {
+  .features__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-status-pill--live {
+  position: relative;
+  padding-left: 1.25rem; /* room for the dot */
+}
+
+.feature-status-pill--live::before {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.nav__drawer-link[href="#join"]:hover {
+  color: var(--brand-primary);
+}
+
+.waitlist-form .cta-btn[type="submit"] {
+  width: 100%;
+  justify-content: center;
+}
+
+.prefooter__heading {
+  font-size: clamp(1.875rem, 4.5vw, 3rem);
+}
+
+/* ============================================================
+   STREAM & EARN SPOTLIGHT
+   Append to landing-additions.css (after community strip styles)
+   ============================================================ */
+
+
+/* ============================================================
+   SECTION WRAPPER
+   Subtle green-wash radial gradient breaks the alternating
+   background rhythm without jarring contrast.
+   overflow: hidden clips the gradient blob at the edge.
+   ============================================================ */
+
+.stream-spotlight {
+  position: relative;
+  padding: 6rem 2rem 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 100% 40%,
+      hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.08) 0%,
+      transparent 70%
+    ),
+    var(--surface-card);
+}
+
+
+/* ============================================================
+   2-COL INNER GRID
+   Copy left, mock player right.
+   Collapses to single column below 860px.
+   ============================================================ */
+
+.stream-spotlight__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  padding-bottom: 4rem;
+}
+
+/* ---- Left: copy ---- */
+
+.stream-spotlight__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.stream-spotlight__heading {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.stream-spotlight__body {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 44ch;
+}
+
+.stream-spotlight__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: gap var(--transition-global), opacity var(--transition-global);
+  width: fit-content;
+}
+
+.stream-spotlight__cta [data-lucide] {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.5;
+  transition: transform var(--transition-global);
+}
+
+.stream-spotlight__cta:hover [data-lucide] {
+  transform: translateX(4px);
+}
+
+.stream-spotlight__cta:hover {
+  opacity: 0.8;
+}
+
+
+/* ============================================================
+   MOCK NOW-PLAYING CARD
+   Purely decorative — aria-hidden on parent.
+   Designed to look like the actual stream player in the app.
+   ============================================================ */
+
+.stream-player-mock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mock-player {
+  width: 100%;
+  max-width: 320px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.04),
+    0 20px 56px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle brand glow in the corner */
+.mock-player::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(
+    circle,
+    hsla(var(--h-primary), var(--s-primary), var(--l-primary), 0.12) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Top row: label + earnings counter */
+.mock-player__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mock-player__now-playing {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.mock-player__earning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--status-success-text);
+  background: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  padding: 0.2rem 0.625rem;
+  border-radius: 999px;
+  /* Subtle fade in/out to feel alive */
+  animation: earning-pulse 4s ease-in-out infinite;
+}
+
+.mock-player__earning [data-lucide] {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.5;
+}
+
+@keyframes earning-pulse {
+  0%, 100% { opacity: 1;   transform: translateY(0); }
+  45%       { opacity: 1;   transform: translateY(0); }
+  50%       { opacity: 0;   transform: translateY(-6px); }
+  55%       { opacity: 0;   transform: translateY(6px); }
+  60%       { opacity: 1;   transform: translateY(0); }
+}
+
+/* Track row: art + meta + play button */
+.mock-player__track {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.mock-player__art {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 10px;
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--brand-primary-ring);
+  flex-shrink: 0;
+}
+
+.mock-player__art [data-lucide] {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.mock-player__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.mock-player__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mock-player__artist {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mock-player__play {
+  width: 36px;
+  height: 36px;
+  outline: none;
+  border: 1px solid transparent;
+  min-height: unset;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  color: var(--text-on-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: default; /* decorative — not interactive */
+  pointer-events: none;
+}
+
+.mock-player__play [data-lucide] {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+}
+
+/* Progress bar */
+.mock-player__progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.mock-player__bar {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.mock-player__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand-primary);
+  /* Animate progress from ~35% to ~80% and back — long duration
+     so it doesn't feel like a loading bar */
+  animation: mock-progress 14s ease-in-out infinite alternate;
+}
+
+@keyframes mock-progress {
+  from { width: 32%; }
+  to   { width: 81%; }
+}
+
+.mock-player__times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Platform source indicator */
+.mock-player__source {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mock-player__source svg {
+  flex-shrink: 0;
+  color: #FF0000; /* YouTube red — only brand color used */
+  opacity: 0.85;
+}
+
+
+/* ============================================================
+   PARTNER LOGO MARQUEE STRIP
+   Slower than the photo strip (60s vs 44s) — logos need
+   to be readable, not just felt.
+   ============================================================ */
+
+.partner-strip {
+  padding: 2rem 0 3.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.partner-strip__eyebrow {
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 1.5rem;
+}
+
+.partner-strip__wrap {
+  overflow: hidden;
+  /* Same fade mask as community strip */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+.partner-strip__track {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: max-content;
+  animation: partner-scroll 60s linear infinite;
+}
+
+.partner-strip__track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes partner-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.33%); } /* 3 sets = -33.33% lands back at start */
+}
+
+/* Each logo pill */
+.partner-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.375rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-card);
+  flex-shrink: 0;
+  transition:
+    border-color var(--transition-global),
+    box-shadow var(--transition-global);
+}
+
+.partner-logo:hover {
+  border-color: var(--brand-primary-ring);
+  box-shadow: 0 0 0 3px var(--brand-primary-soft);
+}
+.logo-img{
+  width: 40px;
+  height: 40px;
+  display: block;
+  object-fit: cover;
+}
+
+/* Small color dot before each logo name */
+.partner-logo__indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--brand-primary);
+}
+
+/* YouTube — red dot */
+.partner-logo__indicator--yt {
+  background: #FF0000;
+}
+
+/* Audiomack — orange dot */
+.partner-logo__indicator--am {
+  background: #FF6600;
+}
+
+.partner-logo__name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* Separator dot between pills */
+.partner-strip__sep {
+  font-size: 1.25rem;
+  color: var(--border-strong);
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 860px) {
+  .stream-spotlight__inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  /* On mobile, center and cap the mock player width */
+  .stream-player-mock {
+    justify-content: flex-start;
+  }
+
+  .mock-player {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .stream-spotlight {
+    padding: 4rem 1.5rem 0;
+  }
+
+  .stream-spotlight__inner {
+    padding-bottom: 3rem;
+  }
+
+  .partner-strip {
+    padding: 1.75rem 0 3rem;
+  }
+}
+
 
