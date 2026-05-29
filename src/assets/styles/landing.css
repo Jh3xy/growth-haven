@@ -1814,6 +1814,16 @@ a.cta-btn.hero__tg-link {
   overflow: hidden;
   text-align: center;
 }
+.prefooter-img{
+  position: absolute;
+  inset: 0; 
+  background-image: url('/assets/community/photo-1.jpg');
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+  opacity: .5;
+  filter: brightness(0.7) blur(2px);
+}
 
 .prefooter__inner {
   position: relative;
