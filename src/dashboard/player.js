@@ -39,6 +39,8 @@ const state = {
 };
 
 let loadingCardEl = null
+let _consecutiveErrors = 0;
+const MAX_CONSECUTIVE_ERRORS = 3;
 
 
 // ─── INIT ─────────────────────────────────────────────────────────
@@ -53,6 +55,7 @@ export async function initMusicSection(user) {
   loadYouTubeAPI();
   await Promise.all([fetchCatalog(), fetchLikedSongs()]);
 
+  buildDynamicTabs(); 
   initFilterTabs();
   initSearch();
   initMiniPlayer();
@@ -147,18 +150,22 @@ async function fetchLikedSongs() {
 // ─── FILTER TABS ──────────────────────────────────────────────────
 
 function initFilterTabs() {
-  document.querySelectorAll('#musicFilterTabs .music-filter-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('#musicFilterTabs .music-filter-tab').forEach(t => {
-        t.classList.remove('is-active')
-        t.setAttribute('aria-selected', 'false')
-      })
-      tab.classList.add('is-active')
-      tab.setAttribute('aria-selected', 'true')
-      state.displayCount = PAGE_SIZE   // reset pagination on filter change
-      applyFilters()
-    })
-  })
+  const tabBar = document.getElementById("musicFilterTabs");
+  if (!tabBar) return;
+
+  tabBar.addEventListener("click", (e) => {
+    const tab = e.target.closest(".music-filter-tab");
+    if (!tab) return;
+
+    tabBar.querySelectorAll(".music-filter-tab").forEach((t) => {
+      t.classList.remove("is-active");
+      t.setAttribute("aria-selected", "false");
+    });
+    tab.classList.add("is-active");
+    tab.setAttribute("aria-selected", "true");
+    state.displayCount = PAGE_SIZE;
+    applyFilters();
+  });
 }
 
 
@@ -179,29 +186,76 @@ function initSearch() {
 
 
 // ─── FILTER LOGIC ─────────────────────────────────────────────────
-
 function applyFilters() {
-  const filter = document.querySelector('#musicFilterTabs .music-filter-tab.is-active')?.dataset.filter || 'all'
-  const query  = document.getElementById('musicSearch')?.value.toLowerCase().trim() || ''
+  const filter =
+    document.querySelector("#musicFilterTabs .music-filter-tab.is-active")
+      ?.dataset.filter || "all";
+  const query =
+    document.getElementById("musicSearch")?.value.toLowerCase().trim() || "";
 
-  let results = state.allSongs
+  let results = [...state.allSongs];
 
-  if (filter !== 'all') {
-    results = results.filter(s =>
-      s.artist?.toLowerCase().includes(filter) ||
-      s.title?.toLowerCase().includes(filter)
-    )
+  if (filter === "all") {
+    // Default catalog order — fetchCatalog already sorts by last_refreshed desc
+  } else if (filter === "new") {
+    // Sort by YouTube publish date, most recent first
+    results.sort(
+      (a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0),
+    );
+  } else if (filter === "popular") {
+    // Sort by view count, highest first
+    results.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
+  } else if (filter === "short") {
+    // Under 2 minutes — good for quick listens
+    results = results.filter((s) => s.duration > 0 && s.duration < 120);
+  } else {
+    // Dynamic category tab — exact match against s.category (case-insensitive)
+    results = results.filter((s) => s.category?.toLowerCase() === filter);
   }
 
   if (query) {
-    results = results.filter(s =>
-      s.title?.toLowerCase().includes(query) ||
-      s.artist?.toLowerCase().includes(query)
-    )
+    results = results.filter(
+      (s) =>
+        s.title?.toLowerCase().includes(query) ||
+        s.artist?.toLowerCase().includes(query),
+    );
   }
 
-  state.filteredSongs = results
-  renderSongs(state.filteredSongs)
+  state.filteredSongs = results;
+  renderSongs(state.filteredSongs);
+}
+
+/**
+ * Reads unique category values from state.allSongs, sorts them alphabetically,
+  and appends one tab per category to the end of #musicFilterTabs.
+  The data-filter-type="category" attribute is the removal selector so this
+  is safe to call multiple times without duplicating tabs.
+ */
+function buildDynamicTabs() {
+  const tabBar = document.getElementById('musicFilterTabs')
+  if (!tabBar) return
+ 
+  // Remove any stale category tabs from a previous call
+  tabBar.querySelectorAll('[data-filter-type="category"]').forEach(t => t.remove())
+ 
+  const categories = [
+    ...new Set(state.allSongs.map(s => s.category).filter(Boolean))
+  ].sort()
+ 
+  categories.forEach(category => {
+    const btn = document.createElement('button')
+    btn.className = 'music-filter-tab'
+    btn.setAttribute('role', 'tab')
+    btn.setAttribute('aria-selected', 'false')
+    btn.setAttribute('type', 'button')
+    btn.dataset.filter = category.toLowerCase()
+    btn.dataset.filterType = 'category'
+    btn.textContent = category
+      .split(" ")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+    tabBar.appendChild(btn)
+  })
 }
 
 
@@ -360,8 +414,9 @@ function onPlayerStateChange(event) {
       state.playing = true;
       syncPlayIcons();
       startSeekUpdater();
-      clearCardLoading(); // remove spinner once video actually starts
-      onTrackPlaying()
+      clearCardLoading();
+      _consecutiveErrors = 0; // reset on any successful play
+      onTrackPlaying();
       break;
     case YT.PlayerState.PAUSED:
       state.playing = false;
@@ -376,6 +431,16 @@ function onPlayerStateChange(event) {
 function onPlayerError(event) {
   console.warn('[music] Video error code:', event.data, '— skipping')
   clearCardLoading()
+  _consecutiveErrors++
+ 
+  if (_consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+    _consecutiveErrors = 0
+    state.playing = false; 
+    syncPlayIcons(); 
+    window.showToast?.('Some tracks aren\'t available. Try another.', 'warning')
+    return // stop auto-advancing — user picks deliberately from here
+  }
+ 
   playNext()
 }
 
