@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   //  Set up your default safeguards based on your current HTML
-  let title = "Like post on GrowthHaven";
+  let title = "Like Post on GrowthHaven";
   let description = "Earn from GrowthHaven today — reward for your activity.";
   let image = "https://growthhaven.app/assets/other/og-default.png";
 
@@ -38,8 +38,8 @@ export default async function handler(req, res) {
       if (post.content) {
         // Remove excess whitespace and truncate long text for the preview snippet
         const cleanContent = post.content.trim();
-        description = cleanContent.length > 100 
-          ? cleanContent.substring(0, 100) + "..." 
+        description = cleanContent.length > 200 
+          ? cleanContent.substring(0, 200) + "..." 
           : cleanContent;
       }
     }
