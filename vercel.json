@@ -1,0 +1,12 @@
+
+{
+  "rewrites": [
+    { "source": "/src/view-post/", "destination": "/api/view-post" },
+    { "source": "/src/view-post", "destination": "/api/view-post" }
+  ],
+  "functions": {
+    "api/view-post.js": {
+      "includeFiles": "dist/src/view-post/index.html"
+    }
+  }
+}
