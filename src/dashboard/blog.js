@@ -406,11 +406,15 @@ export function initBlogSection({ user, supabase, openDeposit }) {
         countEl.textContent = pluralizeLikes(currentCount);
       }
 
-      const message = error.message?.includes('already liked')
+      const message = error.message?.includes("already liked")
         ? "You've already liked this post."
-        : error.message?.includes('own post')
-          ? 'You cannot like your own post.'
-          : 'Could not like post. Try again.';
+        : error.message?.includes("own post")
+          ? "You cannot like your own post."
+          : error.message?.includes("rate_limit_cooldown")
+            ? "Slow down — wait a moment before your next like."
+            : error.message?.includes("rate_limit_daily")
+              ? "You've reached your daily like limit. Come back tomorrow."
+              : "Could not like post. Try again.";
       showBlogToast(message, 'warning');
       return;
     }

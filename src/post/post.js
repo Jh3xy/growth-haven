@@ -373,8 +373,12 @@ form.addEventListener("submit", async (event) => {
     }, 650);
   } catch (error) {
     console.error("[post] Failed to create post:", error);
-    setError("Could not publish your post. Please try again.");
-    showToast("Post failed. Try again.", "error");
+    const isRateLimit = error.message?.includes("rate_limit_cooldown");
+    const msg = isRateLimit
+      ? "You posted recently. Wait 2 minutes before posting again."
+      : "Could not publish your post. Please try again.";
+    setError(msg);
+    showToast(msg, isRateLimit ? "warning" : "error");
     setSubmitting(false);
   }
 });
