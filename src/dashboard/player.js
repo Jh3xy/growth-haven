@@ -569,17 +569,52 @@ function togglePlayPause() {
 }
 
 function playNext() {
-  if (!state.queue.length) return
-  const next = (state.currentIndex + 1) % state.queue.length
-  state.filteredSongs = state.queue
-  playTrack(next)
+  if (!state.queue.length) return;
+
+  const next = (state.currentIndex + 1) % state.queue.length;
+  const track = state.queue[next];
+  if (!track) return;
+
+  resetRewardSession();
+  state.currentIndex = next;
+  state.currentTrack = track;
+  // state.queue is already correct — don't touch it
+  // state.filteredSongs belongs to the active filter view — don't touch it
+
+  updateMiniPlayer(track);
+  showMiniPlayer();
+  if (state.expanded) updateExpandedPlayer(track);
+  logPlayHistory(track.video_id);
+
+  if (state.player) {
+    state.player.loadVideoById(track.video_id);
+    state.playing = true;
+    syncPlayIcons();
+  }
 }
 
 function playPrevious() {
-  if (!state.queue.length) return
-  const prev = state.currentIndex === 0 ? state.queue.length - 1 : state.currentIndex - 1
-  state.filteredSongs = state.queue
-  playTrack(prev)
+  if (!state.queue.length) return;
+
+  const prev =
+    state.currentIndex === 0 ? state.queue.length - 1 : state.currentIndex - 1;
+  const track = state.queue[prev];
+  if (!track) return;
+
+  resetRewardSession();
+  state.currentIndex = prev;
+  state.currentTrack = track;
+
+  updateMiniPlayer(track);
+  showMiniPlayer();
+  if (state.expanded) updateExpandedPlayer(track);
+  logPlayHistory(track.video_id);
+
+  if (state.player) {
+    state.player.loadVideoById(track.video_id);
+    state.playing = true;
+    syncPlayIcons();
+  }
 }
 
 /**
