@@ -1,8 +1,10 @@
 
 {
   "rewrites": [
-    { "source": "/src/view-post/", "destination": "/api/view-post" },
-    { "source": "/src/view-post", "destination": "/api/view-post" }
+    {
+      "source": "/p",
+      "destination": "/api/view-post"
+    }
   ],
   "functions": {
     "api/view-post.js": {

@@ -61,7 +61,8 @@ function initGuidelinesStrips() {
 initGuidelinesStrips();
 
 async function handleShare(post) {
-  const shareUrl = `${window.location.origin}/src/view-post/?id=${post.id}`;
+  // we use this file path so vercel can pick it up and intercept to render dynamic meta tags when links are shared
+  const shareUrl = `${window.location.origin}/p?id=${post.id}`;
  
   if (navigator.share) {
     try {
